@@ -1,0 +1,545 @@
+/**
+ * Vinagreta Custom Styles
+ * Estils personalitzats per integrar Aixada amb l'estètica de lavinagreta.cat
+ * Versió: 2.2
+ */
+
+/* ============================================
+   VARIABLES CSS
+   ============================================ */
+:root {
+    /* Colors principals de La Vinagreta */
+    --vinagreta-primary: #4a5f6f;        /* Gris blavós fosc (capçalera/hero) */
+    --vinagreta-primary-dark: #3a4f5f;   /* Versió més fosca */
+    --vinagreta-primary-light: #5a7f8f;  /* Versió més clara */
+    
+    --vinagreta-accent-green: #6b8e23;   /* Verd natural del logotip */
+    --vinagreta-accent-green-light: #8fbc3f;
+    
+    --vinagreta-text-dark: #333333;      /* Text principal */
+    --vinagreta-text-medium: #555555;    /* Text secundari */
+    --vinagreta-text-light: #777777;     /* Text terciari */
+    
+    --vinagreta-bg-light: #f5f5f5;       /* Fons clar */
+    --vinagreta-bg-white: #ffffff;       /* Fons blanc */
+    
+    --vinagreta-border: #e0e0e0;         /* Borders subtils */
+    --vinagreta-shadow: rgba(0, 0, 0, 0.1); /* Ombres suaus */
+    
+    /* Espaciats */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    
+    /* Border radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+}
+
+/* ============================================
+   ESTILS GENERALS
+   ============================================ */
+
+/* Millora de la tipografia general */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color: var(--vinagreta-text-dark);
+    line-height: 1.6;
+}
+
+/* Links amb color accent */
+a {
+    color: var(--vinagreta-primary);
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--vinagreta-accent-green);
+}
+
+/* ============================================
+   PANELL D'INFORMACIÓ D'USUARI (DASHBOARD)
+   ============================================ */
+
+#dashboardLayout {
+    display: flex;
+    gap: var(--spacing-lg);
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+}
+
+#userInfoPanel {
+    flex: 0 0 320px;
+    background: var(--vinagreta-bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 8px var(--vinagreta-shadow);
+    padding: var(--spacing-md);
+    height: fit-content;
+    position: sticky;
+    top: var(--spacing-md);
+}
+
+#userInfoPanel h3 {
+    color: var(--vinagreta-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 var(--spacing-md) 0;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--vinagreta-primary);
+}
+
+.user-card {
+    background: var(--vinagreta-bg-light);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.user-card p {
+    margin: var(--spacing-sm) 0;
+    font-size: 1rem;
+    color: var(--vinagreta-text-medium);
+}
+
+.user-card strong {
+    color: var(--vinagreta-primary);
+    font-weight: 600;
+}
+
+.user-balance {
+    font-size: 1.8rem !important;
+    font-weight: bold !important;
+    color: var(--vinagreta-accent-green) !important;
+    text-align: center;
+    padding: var(--spacing-md) 0;
+    margin: var(--spacing-md) 0;
+    background: var(--vinagreta-bg-white);
+    border-radius: var(--radius-md);
+}
+
+.user-balance.negative {
+    color: #c53030 !important;
+}
+
+#ordersPanel {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ============================================
+   MILLORES DEL LOGIN
+   ============================================ */
+
+/* Ocultar la capçalera del menú a la pàgina de login */
+body #headwrap {
+    display: none !important;
+}
+
+/* Capçalera personalitzada per al login */
+.login-header {
+    background: var(--vinagreta-bg-white);
+    border-bottom: 1px solid var(--vinagreta-border);
+    padding: var(--spacing-md) 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px var(--vinagreta-shadow);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.login-header .logo img {
+    height: 50px;
+    width: auto;
+}
+
+.login-header .nav-links {
+    margin-right: var(--spacing-lg);
+}
+
+.login-header .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.login-header .logo img {
+    height: 40px;
+    width: auto;
+}
+
+.login-header .logo h1 {
+    color: var(--vinagreta-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.login-header .nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.login-header .nav-links ul {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.login-header .nav-links li a {
+    color: var(--vinagreta-text-dark);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+.login-header .nav-links li a:hover {
+    color: var(--vinagreta-primary);
+}
+
+.login-header .nav-links li.active a {
+    color: var(--vinagreta-primary);
+}
+
+.login-header .nav-icons {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.login-header .nav-icons a {
+    color: var(--vinagreta-text-medium);
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.login-header .nav-icons a:hover {
+    color: var(--vinagreta-primary);
+}
+
+/* Ajustar el contingut principal per la capçalera fixa */
+#wrap {
+    margin-top: 70px;
+}
+
+/* Responsive per a pantalles petites */
+@media (max-width: 768px) {
+    .login-header {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm);
+    }
+    
+    .login-header .nav-links {
+        gap: var(--spacing-md);
+    }
+    
+    .login-header .nav-links li a {
+        font-size: 0.8rem;
+    }
+    
+    #wrap {
+        margin-top: 120px;
+    }
+}
+
+#logonWrap {
+    background: var(--vinagreta-bg-white) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: 0 4px 12px var(--vinagreta-shadow) !important;
+    padding: 0 !important;
+    border: 2px solid var(--vinagreta-primary) !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    float: none !important;
+    overflow: hidden !important;
+}
+
+#logonWrap h4 {
+    background: var(--vinagreta-primary) !important;
+    color: white !important;
+    padding: var(--spacing-md);
+    margin: 0 !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--vinagreta-primary);
+}
+
+#logonWrap .padding15x10 {
+    padding: var(--spacing-lg) !important;
+    border-top: 2px solid var(--vinagreta-primary) !important;
+}
+
+#login input[type="text"],
+#login input[type="password"] {
+    border: 2px solid var(--vinagreta-border);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+#login input[type="text"]:focus,
+#login input[type="password"]:focus {
+    border-color: var(--vinagreta-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 95, 111, 0.1);
+}
+
+#btn_logon {
+    background: var(--vinagreta-accent-green) !important;
+    color: white !important;
+    border: none !important;
+    padding: var(--spacing-sm) var(--spacing-lg) !important;
+    border-radius: var(--radius-sm) !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.1s ease;
+}
+
+#btn_logon:hover {
+    background: var(--vinagreta-accent-green-light) !important;
+    transform: translateY(-1px);
+}
+
+#btn_logon:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1024px) {
+    #dashboardLayout {
+        flex-direction: column;
+    }
+    
+    #userInfoPanel {
+        flex: 1;
+        position: static;
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --spacing-md: 1rem;
+        --spacing-lg: 1.5rem;
+    }
+    
+    #userInfoPanel {
+        padding: var(--spacing-sm);
+    }
+    
+    #dashboardLayout {
+        padding: var(--spacing-sm);
+    }
+}
+
+/* ============================================
+   MILLORES DE BOTONS GENERALS
+   ============================================ */
+
+button, .ui-button {
+    border-radius: var(--radius-sm) !important;
+    transition: all 0.3s ease;
+}
+
+button:hover, .ui-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--vinagreta-shadow);
+}
+
+/* ============================================
+   MILLORES DE TAULES
+   ============================================ */
+
+.tblListingDefault,
+.table_overviewShop {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: 0 2px 4px var(--vinagreta-shadow);
+}
+
+.tblListingDefault thead,
+.table_overviewShop thead {
+    background: var(--vinagreta-primary) !important;
+    color: white !important;
+}
+
+.tblListingDefault th,
+.table_overviewShop th {
+    padding: var(--spacing-sm) !important;
+    font-weight: 600 !important;
+}
+
+.tblListingDefault tr:hover,
+.table_overviewShop tr:hover {
+    background-color: var(--vinagreta-bg-light) !important;
+    transition: background-color 0.2s ease;
+}
+
+/* ============================================
+   TABS MILLORES
+   ============================================ */
+
+.ui-tabs .ui-tabs-nav {
+    background: var(--vinagreta-bg-white);
+    border-bottom: 3px solid var(--vinagreta-primary);
+}
+
+.ui-tabs .ui-tabs-nav li {
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-active {
+    background: var(--vinagreta-primary) !important;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-state-active a {
+    color: white !important;
+}
+
+.ui-tabs .ui-tabs-nav li a {
+    color: var(--vinagreta-text-dark);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-weight: 500;
+}
+
+/* ============================================
+   MILLORES DEL MENÚ DE NAVEGACIÓ
+   ============================================ */
+
+/* Estil general del menú */
+#headwrap {
+    background: var(--vinagreta-bg-white);
+    border-bottom: 3px solid var(--vinagreta-primary);
+    box-shadow: 0 2px 4px var(--vinagreta-shadow);
+}
+
+/* Menú principal */
+#menu {
+    background: var(--vinagreta-bg-white) !important;
+    border-bottom: 1px solid var(--vinagreta-border) !important;
+}
+
+/* Específic per sobreescriure jQuery UI */
+.ui-widget-content {
+    background: var(--vinagreta-bg-white) !important;
+    border: 1px solid var(--vinagreta-border) !important;
+}
+
+#menu ul {
+    background: var(--vinagreta-bg-white) !important;
+    border: none !important;
+}
+
+#menu li {
+    border-right: 1px solid var(--vinagreta-border) !important;
+}
+
+#menu li a {
+    color: var(--vinagreta-text-dark) !important;
+    background: var(--vinagreta-bg-white) !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+#menu li a:hover {
+    background: var(--vinagreta-bg-light) !important;
+    color: var(--vinagreta-primary) !important;
+}
+
+#menu li.ui-state-active a,
+#menu li.ui-state-hover a {
+    background: var(--vinagreta-primary) !important;
+    color: white !important;
+}
+
+/* Estat de login */
+#logonStatus {
+    background: var(--vinagreta-bg-light);
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--vinagreta-border);
+}
+
+#logonStatus p {
+    color: var(--vinagreta-text-medium);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Selectors de rol i idioma */
+#role_select,
+#lang_select {
+    border: 1px solid var(--vinagreta-border) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 2px 6px !important;
+    background: var(--vinagreta-bg-white) !important;
+    color: var(--vinagreta-text-dark) !important;
+    margin: 0 var(--spacing-xs) !important;
+}
+
+#role_select:focus,
+#lang_select:focus {
+    border-color: var(--vinagreta-primary) !important;
+    outline: none !important;
+}
+
+/* Enllaços del menú */
+#logonStatus a {
+    color: var(--vinagreta-primary) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    padding: 2px 6px !important;
+    border-radius: var(--radius-sm) !important;
+    transition: all 0.3s ease !important;
+}
+
+#logonStatus a:hover {
+    background: var(--vinagreta-primary) !important;
+    color: white !important;
+}
+
+/* Millores responsive per al menú */
+@media (max-width: 768px) {
+    #menu li a {
+        padding: var(--spacing-xs) var(--spacing-sm) !important;
+        font-size: 0.9rem !important;
+    }
+    
+    #logonStatus {
+        padding: var(--spacing-xs);
+    }
+    
+    #logonStatus p {
+        font-size: 0.8rem;
+    }
+}
+

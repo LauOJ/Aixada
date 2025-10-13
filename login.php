@@ -18,6 +18,7 @@ if (!isset($_SESSION)) {
 	
 	<link rel="stylesheet" type="text/css"   media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css"   media="screen" href="css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
+    <link rel="stylesheet" type="text/css"   media="screen" href="css/vinagreta-custom.css?v=2.2"/>
 	
    
 	<script type="text/javascript" src="js/jquery/jquery.js"></script>
@@ -130,6 +131,22 @@ if (!isset($_SESSION)) {
 </head>
 <body>
 
+<!-- Capçalera personalitzada per al login -->
+<header class="login-header">
+    <div class="logo">
+        <!-- Logo de La Vinagreta - imatge de la caixa de verdures -->
+        <img src="local_config/custom_img/caixadeverdures.png" alt="La Vinagreta" style="height: 50px; width: auto;">
+    </div>
+    
+    <nav class="nav-links">
+        <ul>
+            <li><a href="https://lavinagreta.cat">INICI</a></li>
+            <li><a href="https://lavinagreta.cat/activitats">ACTIVITATS</a></li>
+            <li><a href="https://lavinagreta.cat/contacte">CONTACTA'NS</a></li>
+            <li class="active"><a href="#">INTRANET</a></li>
+        </ul>
+    </nav>
+</header>
 
 <div id="wrap">
 
