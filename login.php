@@ -129,7 +129,7 @@ if (!isset($_SESSION)) {
 	</script>    
 	
 </head>
-<body>
+<body class="login-page">
 
 <!-- Capçalera personalitzada per al login -->
         <header class="login-header">

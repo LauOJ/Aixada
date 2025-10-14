@@ -126,9 +126,9 @@ try {
             <!-- Aixada -->
             <div class="dashboard-section aixada">
                 <h2>Aixada (gestor de comandes)</h2>
-                <p>Fes clic a la següent imatge per accedir a l'<a href="https://lavinagreta.org/aixada" class="dashboard-link">Aixada</a></p>
+                <p>Fes clic a la següent imatge per accedir a l'<a href="aixada_main.php" class="dashboard-link">Aixada</a></p>
                 <div class="dashboard-icon">
-                    <a href="https://lavinagreta.org/aixada">
+                    <a href="aixada_main.php">
                         <img src="local_config/custom_img/logo-aixada.png" alt="Aixada" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
                     </a>
                 </div>

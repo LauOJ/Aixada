@@ -134,10 +134,10 @@ a:hover {
    MILLORES DEL LOGIN
    ============================================ */
 
-/* Ocultar la capçalera del menú a la pàgina de login */
-body #headwrap {
-    display: none !important;
-}
+    /* Ocultar la capçalera del menú NOMÉS a la pàgina de login */
+    body.login-page #headwrap {
+        display: none !important;
+    }
 
 /* Capçalera personalitzada per al login */
 .login-header {
@@ -254,26 +254,70 @@ body #headwrap {
     border-top: 1px solid var(--vinagreta-border);
 }
 
-/* Responsive per a pantalles petites */
-@media (max-width: 768px) {
-    .login-header {
-        flex-direction: column;
-        gap: var(--spacing-sm);
-        padding: var(--spacing-sm);
-    }
-    
-    .login-header .nav-links {
-        gap: var(--spacing-md);
-    }
-    
-    .login-header .nav-links li a {
-        font-size: 0.8rem;
-    }
-    
-    #wrap {
-        margin-top: 120px;
-    }
-}
+        /* Responsive per a pantalles petites */
+        @media (max-width: 768px) {
+            .login-header {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+                padding: var(--spacing-sm);
+            }
+            
+            .login-header .nav-links {
+                gap: var(--spacing-md);
+            }
+            
+            .login-header .nav-links li a {
+                font-size: 0.8rem;
+            }
+            
+            #wrap {
+                margin-top: 120px;
+            }
+        }
+
+        /* ============================================
+           COLORS DEL MENÚ D'AIXADA (ESTIL VINAGRETA)
+           ============================================ */
+
+        /* Capçalera del menú amb colors de La Vinagreta */
+        #menuBgBar {
+            background: var(--vinagreta-primary) !important;
+            border: none !important;
+        }
+
+        /* Botons del menú amb colors de La Vinagreta */
+        .menuTop {
+            color: var(--vinagreta-primary) !important;
+        }
+
+        .menuTop:hover {
+            background: var(--vinagreta-accent-green) !important;
+            color: white !important;
+        }
+
+        /* Menús desplegables amb colors de La Vinagreta */
+        #navManageItems,
+        #navReportItems,
+        #navIncidentsItems,
+        #navMyAcountItems {
+            background: var(--vinagreta-bg-white) !important;
+            border: 1px solid var(--vinagreta-border) !important;
+        }
+
+        #navManageItems a,
+        #navReportItems a,
+        #navIncidentsItems a,
+        #navMyAcountItems a {
+            color: var(--vinagreta-text-dark) !important;
+        }
+
+        #navManageItems a:hover,
+        #navReportItems a:hover,
+        #navIncidentsItems a:hover,
+        #navMyAcountItems a:hover {
+            background: var(--vinagreta-bg-light) !important;
+            color: var(--vinagreta-primary) !important;
+        }
 
 #logonWrap {
     background: var(--vinagreta-bg-white) !important;

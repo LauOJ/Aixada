@@ -52,15 +52,17 @@
 
 <div class="ui-widget-header ui-corner-all" id="menuBgBar">
 <div  id="topMenu">
-<a tabindex="1" href="index.php" 	id="navHome" class="menuTop"><?php echo $Text['nav_home'];?></a>
+<a tabindex="1" href="aixada_main.php" 	id="navHome" class="menuTop"><?php echo $Text['nav_home'];?></a>
 <a tabindex="2" href="manage_orders.php?filter=pastMonth" 	id="navWizard" class="menuTop"><?php echo $Text['nav_wiz'];?></a>
 <?php if ($cfg_use_shop) {  // USE SHOP: start ?>
 <a tabindex="3" href="shop_and_orderstock.php?what=Shop" 	id="navShop" class="menuTop"><?php echo $Text['nav_shop'];?></a>
 <?php } // - - - - - - - - - - USE SHOP: end ?>
 <a tabindex="4" href="shop_and_order.php?what=Order" 		id="navOrder" class="menuTop"><?php echo $Text['nav_order'];?></a>
 <a tabindex="5" href="#" 			id="navManage" class="menuTop"><?php echo $Text['nav_mng'];?></a>
+<?php if (get_current_role() != 'Consumer') { ?>
 <a tabindex="6" href="#" id="navReport" class="menuTop"><?php echo $Text['nav_report'];?></a>
 <a tabindex="7" href="#" id="navIncidents" class="menuTop"><?php echo $Text['nav_incidents'];?></a>
+<?php } ?>
 <a tabindex="8" href="#" id="navMyAccount" class="menuTop"><?php echo $Text['nav_myaccount'];?></a>
 </div>
 </div>
@@ -69,7 +71,15 @@
 <div id="navManageItems" class="hidden">
 	<ul>
 		<?php if (get_current_role() == 'Consumer') { ?>
-		<li><a href="manage_orderable_products.php">Gestiona comandes</a></li>
+		<li><a href="manage_orderable_products.php">Programar comandes</a></li>
+		<li><a href="manage_providers.php">Proveïdors i productes</a></li>
+		<?php } elseif (get_current_role() == 'Accounts Commission') { ?>
+		<li><a href="manage_money.php"><?php echo $Text['nav_mng_money'];?></a>
+			<ul>
+				<li><a href="manage_data.php?table=aixada_account_desc"><?php echo $Text['nav_mng_accdec']; ?></a></li>
+				<li><a href="manage_data.php?table=aixada_payment_method"><?php echo $Text['nav_mng_paymeth']; ?></a></li>
+			</ul>
+		</li>
 		<?php } else { ?>
 		<li><a href="manage_ufmember.php"><?php echo $Text['uf_short'];?> & <?php echo $Text['nav_mng_member'];?></a>
 			<ul>
