@@ -18,7 +18,7 @@ if (!isset($_SESSION)) {
 	
 	<link rel="stylesheet" type="text/css"   media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css"   media="screen" href="css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
-    <link rel="stylesheet" type="text/css"   media="screen" href="css/vinagreta-custom.css?v=2.3"/>
+    <link rel="stylesheet" type="text/css"   media="screen" href="css/vinagreta-custom.css?v=4.2"/>
 	
    
 	<script type="text/javascript" src="js/jquery/jquery.js"></script>
@@ -187,7 +187,10 @@ if (!isset($_SESSION)) {
 		
 		<div id="logonWrap" class="aix-layout-splitW20">
 			<div class="ui-widget-content ui-corner-all">
-			<h4 class="ui-widget-header ui-corner-all"><?php echo $Text['login'];?></h4>
+			<h4 class="ui-widget-header ui-corner-all">
+				<?php echo $Text['login'];?>
+				<div class="login-subtitle">Fes servir les credencials de l'Aixada</div>
+			</h4>
 			<p id="logonMsg" class="user_tips  minPadding"></p>
 			<form id="login" method="post" class="padding15x10">
 				<table class="tblForms">
