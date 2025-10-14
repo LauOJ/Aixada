@@ -18,7 +18,7 @@ if (!isset($_SESSION)) {
 	
 	<link rel="stylesheet" type="text/css"   media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css"   media="screen" href="css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
-    <link rel="stylesheet" type="text/css"   media="screen" href="css/vinagreta-custom.css?v=2.2"/>
+    <link rel="stylesheet" type="text/css"   media="screen" href="css/vinagreta-custom.css?v=2.3"/>
 	
    
 	<script type="text/javascript" src="js/jquery/jquery.js"></script>
@@ -132,18 +132,27 @@ if (!isset($_SESSION)) {
 <body>
 
 <!-- Capçalera personalitzada per al login -->
-<header class="login-header">
-    <div class="logo">
-        <!-- Logo de La Vinagreta - imatge de la caixa de verdures -->
-        <img src="local_config/custom_img/caixadeverdures.png" alt="La Vinagreta" style="height: 50px; width: auto;">
-    </div>
+        <header class="login-header">
+            <div class="logo">
+                <!-- Logo de La Vinagreta - imatge de la caixa de verdures -->
+                <a href="https://lavinagreta.org">
+                    <img src="local_config/custom_img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
+                </a>
+            </div>
     
     <nav class="nav-links">
         <ul>
-            <li><a href="https://lavinagreta.cat">INICI</a></li>
-            <li><a href="https://lavinagreta.cat/activitats">ACTIVITATS</a></li>
-            <li><a href="https://lavinagreta.cat/contacte">CONTACTA'NS</a></li>
-            <li class="active"><a href="#">INTRANET</a></li>
+            <li><a href="https://lavinagreta.org">INICI</a></li>
+            <li class="has-submenu">
+                <a href="https://lavinagreta.org/activitats">ACTIVITATS</a>
+                <ul class="submenu">
+                    <li><a href="https://lavinagreta.org/carnaval">Carnaval</a></li>
+                    <li><a href="https://lavinagreta.org/dprofit">Dinar de Profit</a></li>
+                    <li><a href="https://docsforaction.actiu.info/">Docs for Action</a></li>
+                </ul>
+            </li>
+            <li><a href="https://lavinagreta.org/contacta">CONTACTA</a></li>
+            <li class="active"><a href="https://lavinagreta.org/aixada">INTRANET</a></li>
         </ul>
     </nav>
 </header>

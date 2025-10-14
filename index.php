@@ -1,5 +1,11 @@
 <?php include "php/inc/header.inc.php" ?>
 <?php
+// Redirigir al dashboard personalitzat si l'usuari està logat
+if (is_created_session()) {
+    header('Location: dashboard.php');
+    exit;
+}
+
 // Obtenir el nom de la sòcia per a la salutació
 $memberName = '';
 try {
@@ -20,6 +26,7 @@ try {
   	<link rel="stylesheet" type="text/css"   media="screen" href="js/aixadacart/aixadacart.css?v=<?=aixada_js_version();?>" />
   	<link rel="stylesheet" type="text/css"   media="screen" href="js/fgmenu/fg.menu.css"   />
     <link rel="stylesheet" type="text/css"   media="screen" href="css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
+    <link rel="stylesheet" type="text/css"   media="screen" href="css/vinagreta-custom.css?v=1.1"/>
      
 	<style>
 		.ui-state-disabled a {pointer-events: none;}

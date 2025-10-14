@@ -1,7 +1,7 @@
 /**
  * Vinagreta Custom Styles
  * Estils personalitzats per integrar Aixada amb l'estètica de lavinagreta.cat
- * Versió: 2.5
+ * Versió: 3.8
  */
 
 /* ============================================
@@ -173,6 +173,15 @@ body #headwrap {
 .login-header .logo img {
     height: 40px;
     width: auto;
+}
+
+.login-header .logo a {
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.login-header .logo a:hover {
+    opacity: 0.8;
 }
 
 .login-header .logo h1 {
@@ -600,15 +609,27 @@ button:hover, .ui-button:hover {
    DASHBOARD PERSONALITZAT
    ============================================ */
 
-.dashboard-welcome {
-    background: var(--vinagreta-bg-white);
-    border: 2px solid var(--vinagreta-primary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin: var(--spacing-lg) auto;
-    max-width: 1200px;
-    box-shadow: 0 4px 12px var(--vinagreta-shadow);
-}
+        .dashboard-welcome {
+            background: linear-gradient(135deg, var(--vinagreta-bg-white) 0%, #fafbfc 100%);
+            border: 2px solid var(--vinagreta-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-xl) auto var(--spacing-sm) auto;
+            max-width: 1200px;
+            box-shadow: 0 4px 20px rgba(74, 95, 111, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-welcome::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--vinagreta-primary), var(--vinagreta-accent-green));
+        }
 
 .dashboard-welcome h1 {
     color: var(--vinagreta-primary);
@@ -647,37 +668,63 @@ button:hover, .ui-button:hover {
     margin: 0;
 }
 
-.dashboard-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-xl);
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-lg);
-}
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: var(--spacing-lg);
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
 
 .dashboard-left,
+.dashboard-center,
 .dashboard-right {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
 }
 
-.dashboard-section {
-    background: var(--vinagreta-bg-white);
-    border: 1px solid var(--vinagreta-border);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-lg);
-    box-shadow: 0 2px 8px var(--vinagreta-shadow);
-}
+        .dashboard-section {
+            background: var(--vinagreta-bg-white);
+            border: 1px solid var(--vinagreta-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: 0 2px 12px rgba(74, 95, 111, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
 
-.dashboard-section h2 {
-    color: var(--vinagreta-primary);
-    font-size: 1.3rem;
-    margin: 0 0 var(--spacing-md) 0;
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 2px solid var(--vinagreta-primary);
-}
+        .dashboard-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(74, 95, 111, 0.12);
+        }
+
+        .dashboard-section h2 {
+            color: var(--vinagreta-primary);
+            font-size: 1.3rem;
+            margin: 0 0 var(--spacing-md) 0;
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--vinagreta-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .dashboard-section h2::before {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Emojis específics per cada secció */
+        .dashboard-section.aixada h2::before { content: '🛒'; }
+        .dashboard-section.dades h2::before { content: '📋'; }
+        .dashboard-section.distribucio h2::before { content: '✉️'; }
+        .dashboard-section.repartiment h2::before { content: '🥬'; }
+        .dashboard-section.responsables h2::before { content: '👤'; }
+        .dashboard-section.actes h2::before { content: '📄'; }
+        .dashboard-section.contactes h2::before { content: '👥'; }
+        .dashboard-section.estoc h2::before { content: '📊'; }
+        .dashboard-section.reserva h2::before { content: '🏠'; }
 
 .dashboard-link {
     color: var(--vinagreta-primary);
@@ -695,8 +742,8 @@ button:hover, .ui-button:hover {
 }
 
 .icon-placeholder {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     background: var(--vinagreta-primary);
     border-radius: 50%;
     display: flex;
@@ -732,6 +779,7 @@ button:hover, .ui-button:hover {
 
 .dashboard-button:hover {
     background: var(--vinagreta-accent-green);
+    color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px var(--vinagreta-shadow);
 }
@@ -749,12 +797,31 @@ button:hover, .ui-button:hover {
     margin: var(--spacing-xs) 0;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .dashboard-content {
-        grid-template-columns: 1fr;
-        padding: 0 var(--spacing-md);
-    }
+.toggle-link {
+    color: var(--vinagreta-primary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: normal;
+    text-decoration: underline;
+}
+
+.toggle-link:hover {
+    color: var(--vinagreta-accent-green);
+}
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-content {
+                grid-template-columns: 1fr 1fr;
+                gap: var(--spacing-md);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+                padding: 0 var(--spacing-md);
+            }
     
     .user-info-grid {
         grid-template-columns: 1fr;
