@@ -47,7 +47,8 @@ try {
 		$.ajaxSetup({ cache: false });
 
 			//loading animation
-			$('.loadSpinner').attr('src', "img/ajax-loader-<?=$default_theme;?>.gif").hide(); 
+			$('.loadSpinner').attr('src', "img/ajax-loader-<?=$default_theme;?>.gif").hide();
+			
 				
 			
 			//sql result set limit for order
@@ -139,12 +140,12 @@ try {
 
 			//load the current orders by provider. introduces a date row when date changes
 			$('#tbl_Orders tbody').xml2html('init',{
-				url : 'php/ctrl/Orders.php',
-				params : 'oper=getOrdersListingForUf&uf_id=-1&filter=pastMonths2Future',
-				loadOnInit : true, 
-				beforeLoad : function(){
-					$('.loadSpinner').show();
-				},
+					url : 'php/ctrl/Orders.php',
+					params : 'oper=getOrdersListingForUf&uf_id=-1&filter=pastMonths2Future',
+					loadOnInit : true, 
+					beforeLoad : function(){
+						$('.loadSpinner').show();
+					},
 				rowComplete : function(rowIndex, row){
 					var orderId = $(row).attr('orderId');
 					var timeLeft = $(row).children().eq(2).text();
@@ -416,12 +417,12 @@ try {
 			
 			//load purchase listing
 			$('#tbl_Shop tbody').xml2html('init',{
-					url : 'php/ctrl/Shop.php',
-					params : 'oper=getShopListing&uf_id=-1&filter=all&limit='+getShopLimit(0),
-					loadOnInit : false, 
-					beforeLoad : function(){
-						$('.loadSpinner').show();
-					},
+						url : 'php/ctrl/Shop.php',
+						params : 'oper=getShopListing&uf_id=-1&filter=all&limit='+getShopLimit(0),
+						loadOnInit : false, 
+						beforeLoad : function(){
+							$('.loadSpinner').show();
+						},
 					rowComplete : function(rowIndex, row){
 						var validated = $(row).children().eq(2).text();
 
@@ -446,12 +447,12 @@ try {
 
 			//load purchase detail (products and quantities)
 			$('#tbl_purchaseDetail tbody').xml2html('init',{
-				url : 'php/ctrl/Shop.php',
-				params : 'oper=getShopCart', 
-				loadOnInit : false, 
-				beforeLoad : function(){
-					$('.loadSpinner').show();
-				},
+					url : 'php/ctrl/Shop.php',
+					params : 'oper=getShopCart', 
+					loadOnInit : false, 
+					beforeLoad : function(){
+						$('.loadSpinner').show();
+					},
 				rowComplete : function (rowIndex, row){
 					var price = new Number($(row).children().eq(5).text());
 					var qu = new Number($(row).children().eq(3).text());

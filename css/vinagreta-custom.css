@@ -273,6 +273,65 @@ a:hover {
             #wrap {
                 margin-top: 120px;
             }
+            
+            /* Arreglar el login en mòbil */
+            #logonWrap {
+                max-width: 90vw !important;
+                width: 90vw !important;
+                margin: 20px auto !important;
+            }
+            
+            #logonWrap .ui-widget-content {
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+            
+            .tblForms {
+                width: 100% !important;
+            }
+            
+            .tblForms td {
+                padding: 5px !important;
+            }
+            
+            .inputTxtSmall {
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* Estils més específics per al login */
+            body #logonWrap {
+                max-width: 90vw !important;
+                width: 90vw !important;
+                margin: 20px auto !important;
+                position: relative !important;
+                left: auto !important;
+                right: auto !important;
+            }
+            
+            body #logonWrap .ui-widget-content {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            
+            body #logonWrap .tblForms {
+                width: 100% !important;
+                table-layout: fixed !important;
+            }
+            
+            body #logonWrap .tblForms td {
+                padding: 8px 4px !important;
+                width: auto !important;
+            }
+            
+            body #logonWrap .tblForms td:first-child {
+                width: 30% !important;
+            }
+            
+            body #logonWrap .tblForms td:last-child {
+                width: 70% !important;
+            }
         }
 
         /* ============================================
@@ -285,14 +344,17 @@ a:hover {
             border: none !important;
         }
 
-        /* Botons del menú amb colors de La Vinagreta */
+        /* Botons del menú amb colors originals de jQuery UI (tema redmond) */
         .menuTop {
             color: var(--vinagreta-primary) !important;
+            transition: all 0.2s ease !important;
         }
 
         .menuTop:hover {
-            background: var(--vinagreta-accent-green) !important;
-            color: white !important;
+            background: #d0e5f5 !important;
+            color: #1d5987 !important;
+            border: 1px solid #79b7e7 !important;
+            transform: translateY(-2px) !important;
         }
 
         /* Menús desplegables amb colors de La Vinagreta */
@@ -491,6 +553,62 @@ button:hover, .ui-button:hover {
 .table_overviewShop th {
     padding: var(--spacing-sm) !important;
     font-weight: 600 !important;
+    color: white !important;
+    background: var(--vinagreta-primary) !important;
+    border: none !important;
+}
+
+/* Estils específics per a les capçaleres de taula */
+table.tblListingDefault thead tr,
+table.table_overviewShop thead tr {
+    background: var(--vinagreta-primary) !important;
+}
+
+table.tblListingDefault thead th,
+table.table_overviewShop thead th {
+    background: var(--vinagreta-primary) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 12px 8px !important;
+    border: none !important;
+    text-align: left !important;
+}
+
+/* Estils per a les files d'acció sota les capçaleres */
+table.tblListingDefault tbody tr:first-child td,
+table.table_overviewShop tbody tr:first-child td {
+    background: #f8f9fa !important;
+    border-top: 1px solid var(--vinagreta-border) !important;
+    padding: 8px !important;
+}
+
+/* Estils generals per a totes les capçaleres de taula */
+table thead th {
+    background: var(--vinagreta-primary) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 12px 8px !important;
+    border: none !important;
+    text-align: left !important;
+}
+
+/* Estils per a les capçaleres amb classes específiques */
+.ui-widget-header,
+.ui-widget-header th {
+    background: var(--vinagreta-primary) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border: none !important;
+}
+
+/* Estils per a les files de capçalera que poden estar dins de tbody */
+tbody tr:first-child th,
+tbody tr:first-child td[colspan] {
+    background: var(--vinagreta-primary) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 12px 8px !important;
+    border: none !important;
 }
 
 .tblListingDefault tr:hover,
@@ -749,14 +867,14 @@ button:hover, .ui-button:hover {
     margin: 0;
 }
 
-        .dashboard-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: var(--spacing-lg);
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: var(--spacing-xl) var(--spacing-lg);
-        }
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--spacing-lg);
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-lg);
+}
 
 .dashboard-left,
 .dashboard-center,
@@ -890,19 +1008,19 @@ button:hover, .ui-button:hover {
     color: var(--vinagreta-accent-green);
 }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .dashboard-content {
-                grid-template-columns: 1fr 1fr;
-                gap: var(--spacing-md);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-content {
-                grid-template-columns: 1fr;
-                padding: 0 var(--spacing-md);
-            }
+/* Responsive */
+@media (max-width: 1024px) {
+    .dashboard-content {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-md);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-content {
+        grid-template-columns: 1fr;
+        padding: 0 var(--spacing-md);
+    }
     
     .user-info-grid {
         grid-template-columns: 1fr;

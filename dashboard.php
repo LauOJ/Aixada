@@ -53,22 +53,27 @@ try {
     
     <link rel="stylesheet" type="text/css" media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=3.8"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.6"/>
     
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript" src="js/jqueryui/jqueryui.js"></script>
     <?php echo aixada_js_src(false); ?>
     
-    <script type="text/javascript">
-    function toggleSection(sectionId) {
-        var section = document.getElementById(sectionId);
-        if (section.style.display === 'none') {
-            section.style.display = 'block';
-        } else {
-            section.style.display = 'none';
-        }
-    }
-    </script>
+            <script type="text/javascript">
+            console.log('=== DASHBOARD DEBUG ===');
+            console.log('Dashboard page loaded');
+            console.log('User logged in successfully');
+            
+            function toggleSection(sectionId) {
+                console.log('Toggling section:', sectionId);
+                var section = document.getElementById(sectionId);
+                if (section.style.display === 'none') {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            }
+            </script>
 </head>
 <body>
 
@@ -76,7 +81,7 @@ try {
         <header class="login-header">
             <div class="logo">
                 <a href="https://lavinagreta.org">
-                    <img src="local_config/custom_img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
+                    <img src="https://lavinagreta.pangea.org/aixada/local_config/custom_img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
                 </a>
             </div>
     
@@ -128,9 +133,9 @@ try {
                 <h2>Aixada (gestor de comandes)</h2>
                 <p>Fes clic a la següent imatge per accedir a l'<a href="aixada_main.php" class="dashboard-link">Aixada</a></p>
                 <div class="dashboard-icon">
-                    <a href="aixada_main.php">
-                        <img src="local_config/custom_img/logo-aixada.png" alt="Aixada" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
-                    </a>
+                            <a href="aixada_main.php">
+                                <img src="https://lavinagreta.pangea.org/aixada/local_config/custom_img/logo-aixada.png" alt="Aixada" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+                            </a>
                 </div>
             </div>
 

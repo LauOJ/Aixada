@@ -1,3 +1,4 @@
+<?php echo aixada_custom_css(); ?>
 <div id="logonStatus">
 	<p class="ui-widget">
 <?php
@@ -36,6 +37,9 @@
             echo '</select> ';
         }
         echo " | ";
+
+        // torna al tauler
+        echo "<a href='dashboard.php'>Torna al tauler</a> | ";
 
         // logout
         echo "<a href='javascript:void(null)' id='logoutRef'>" .
