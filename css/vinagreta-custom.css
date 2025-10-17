@@ -1008,30 +1008,60 @@ tbody tr:first-child td[colspan] {
     color: var(--vinagreta-accent-green);
 }
 
-/* Responsive */
+/* Responsive - Mantenir 3 columnes sempre, reduir font segons pantalla */
 @media (max-width: 1024px) {
     .dashboard-content {
-        grid-template-columns: 1fr 1fr;
+        font-size: 0.9em;
         gap: var(--spacing-md);
+    }
+    
+    .dashboard-section h2 {
+        font-size: 1.1em;
+    }
+    
+    .dashboard-button {
+        font-size: 0.9em;
+        padding: 8px 12px;
     }
 }
 
 @media (max-width: 768px) {
     .dashboard-content {
-        grid-template-columns: 1fr;
+        font-size: 0.8em;
         padding: 0 var(--spacing-md);
+    }
+    
+    .dashboard-section h2 {
+        font-size: 1em;
+    }
+    
+    .dashboard-button {
+        font-size: 0.8em;
+        padding: 6px 10px;
     }
     
     .user-info-grid {
         grid-template-columns: 1fr;
     }
+}
+
+@media (max-width: 480px) {
+    .dashboard-content {
+        font-size: 0.7em;
+        gap: var(--spacing-sm);
+    }
     
-    .button-group {
-        flex-direction: column;
+    .dashboard-section h2 {
+        font-size: 0.9em;
     }
     
     .dashboard-button {
-        flex: none;
+        font-size: 0.7em;
+        padding: 5px 8px;
+    }
+    
+    .dashboard-welcome h1 {
+        font-size: 1.5em;
     }
 }
 

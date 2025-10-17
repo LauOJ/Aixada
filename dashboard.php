@@ -53,7 +53,7 @@ try {
     
     <link rel="stylesheet" type="text/css" media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.6"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.7"/>
     
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript" src="js/jqueryui/jqueryui.js"></script>
