@@ -177,10 +177,18 @@ function get_current_role()
 function change_session_role($new_role) {
     validate_session();
     if (!in_array($new_role, $_SESSION['userdata']['roles'])) {
-        throw new AuthException("Not logged in role");
+        throw new AuthException("Not logged in role. Available roles: " . implode(', ', $_SESSION['userdata']['roles']) . ". Requested: " . $new_role);
     }
     $_SESSION['userdata']['current_role'] = $new_role;
-    save_session();
+    $_SESSION['userdata']['t_saved'] = time();
+    // Force session write
+    session_write_close();
+    // Reopen session immediately to ensure changes are persisted
+    session_start();
+    // Reload session data to verify the change was saved
+    if (isset($_SESSION['userdata']['current_role']) && $_SESSION['userdata']['current_role'] !== $new_role) {
+        throw new Exception("Failed to save role change. Expected: " . $new_role . ", Got: " . $_SESSION['userdata']['current_role']);
+    }
 }
 
 /**

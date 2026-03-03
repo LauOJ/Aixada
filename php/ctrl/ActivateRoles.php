@@ -47,38 +47,69 @@ try{
       exit;
       
   case 'activateRoles':
-      $sql =  'delete from aixada_user_role where user_id=' . $user_id . '; ';
-      $sql .= 'insert into aixada_user_role values ';
-      $first = true;
-      foreach (explode(',', $_REQUEST['role_ids']) as $role) {
-          if ($first) {
-              $first = false;
-          } else {
-              $sql .= ', ';
-          }
-          $sql .= '(' . $user_id . ",'" . $role . "')";
-      }
-      $sql .= ';';
       $db = DBWrap::get_instance();
-      $db->MultiExecute($sql);
+      $user_id = intval($user_id); // Sanitize user_id
+      
+      // Start transaction to ensure atomicity
+      $db->start_transaction();
+      
+      try {
+          // Delete existing roles for this user
+          $db->Execute("DELETE FROM aixada_user_role WHERE user_id = :1", $user_id);
+          
+          // Insert new roles
+          if (!empty($_REQUEST['role_ids'])) {
+              $role_ids = explode(',', $_REQUEST['role_ids']);
+              foreach ($role_ids as $role) {
+                  $role = trim($role);
+                  if (!empty($role)) {
+                      $db->Execute("INSERT INTO aixada_user_role (user_id, role) VALUES (:1, :2q)", $user_id, $role);
+                  }
+              }
+          }
+          
+          // Commit transaction
+          $db->commit();
+      } catch (Exception $e) {
+          // Rollback on error
+          $db->rollback();
+          throw $e;
+      }
       exit;
 
   case 'activateUsers':
-      $role = $_REQUEST['role'];
-      $sql =  "delete from aixada_user_role where role='$role'; ";
-      $sql .= 'insert into aixada_user_role values ';
-      $first = true;
-      foreach (explode(',', $_REQUEST['user_ids']) as $user_id) {
-          if ($first) {
-              $first = false;
-          } else {
-              $sql .= ', ';
-          }
-          $sql .= '(' . $user_id . ",'" . $role . "')";
-      }
-      $sql .= ';';
       $db = DBWrap::get_instance();
-      $db->MultiExecute($sql);      
+      $role = trim($_REQUEST['role']);
+      
+      if (empty($role)) {
+          throw new Exception("Role cannot be empty");
+      }
+      
+      // Start transaction to ensure atomicity
+      $db->start_transaction();
+      
+      try {
+          // Delete existing users with this role
+          $db->Execute("DELETE FROM aixada_user_role WHERE role = :1q", $role);
+          
+          // Insert new users with this role
+          if (!empty($_REQUEST['user_ids'])) {
+              $user_ids = explode(',', $_REQUEST['user_ids']);
+              foreach ($user_ids as $user_id) {
+                  $user_id = intval(trim($user_id));
+                  if ($user_id > 0) {
+                      $db->Execute("INSERT INTO aixada_user_role (user_id, role) VALUES (:1, :2q)", $user_id, $role);
+                  }
+              }
+          }
+          
+          // Commit transaction
+          $db->commit();
+      } catch (Exception $e) {
+          // Rollback on error
+          $db->rollback();
+          throw $e;
+      }
       exit;
 
   default:

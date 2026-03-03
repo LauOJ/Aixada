@@ -1,10 +1,6 @@
 <?php include "php/inc/header.inc.php" ?>
 <?php
-// Redirigir al dashboard personalitzat si l'usuari està logat
-if (is_created_session()) {
-    header('Location: dashboard.php');
-    exit;
-}
+// NO redirigir al dashboard - aquesta és la versió per accedir des del dashboard
 
 // Obtenir el nom de la sòcia per a la salutació
 $memberName = '';
@@ -51,7 +47,8 @@ try {
 		$.ajaxSetup({ cache: false });
 
 			//loading animation
-			$('.loadSpinner').attr('src', "img/ajax-loader-<?=$default_theme;?>.gif").hide(); 
+			$('.loadSpinner').attr('src', "img/ajax-loader-<?=$default_theme;?>.gif").hide();
+			
 				
 			
 			//sql result set limit for order
@@ -143,12 +140,12 @@ try {
 
 			//load the current orders by provider. introduces a date row when date changes
 			$('#tbl_Orders tbody').xml2html('init',{
-				url : 'php/ctrl/Orders.php',
-				params : 'oper=getOrdersListingForUf&uf_id=-1&filter=pastMonths2Future',
-				loadOnInit : true, 
-				beforeLoad : function(){
-					$('.loadSpinner').show();
-				},
+					url : 'php/ctrl/Orders.php',
+					params : 'oper=getOrdersListingForUf&uf_id=-1&filter=pastMonths2Future',
+					loadOnInit : true, 
+					beforeLoad : function(){
+						$('.loadSpinner').show();
+					},
 				rowComplete : function(rowIndex, row){
 					var orderId = $(row).attr('orderId');
 					var timeLeft = $(row).children().eq(2).text();
@@ -175,11 +172,12 @@ try {
 
 				},
 				complete : function(rowCount){
-					if (rowCount == 0){
-						$.showMsg({
-							msg:"<?php echo $Text['msg_err_noorder']; ?>",
-							type: 'warning'});	
-					}
+					// Warning desactivat: no es mostra quan no hi ha comandes
+					// if (rowCount == 0){
+					//	$.showMsg({
+					//		msg:"<?php echo $Text['msg_err_noorder']; ?>",
+					//		type: 'warning'});	
+					// }
 					$('.loadSpinner').hide();
 					
 				}
@@ -419,12 +417,12 @@ try {
 			
 			//load purchase listing
 			$('#tbl_Shop tbody').xml2html('init',{
-					url : 'php/ctrl/Shop.php',
-					params : 'oper=getShopListing&uf_id=-1&filter=all&limit='+getShopLimit(0),
-					loadOnInit : false, 
-					beforeLoad : function(){
-						$('.loadSpinner').show();
-					},
+						url : 'php/ctrl/Shop.php',
+						params : 'oper=getShopListing&uf_id=-1&filter=all&limit='+getShopLimit(0),
+						loadOnInit : false, 
+						beforeLoad : function(){
+							$('.loadSpinner').show();
+						},
 					rowComplete : function(rowIndex, row){
 						var validated = $(row).children().eq(2).text();
 
@@ -449,12 +447,12 @@ try {
 
 			//load purchase detail (products and quantities)
 			$('#tbl_purchaseDetail tbody').xml2html('init',{
-				url : 'php/ctrl/Shop.php',
-				params : 'oper=getShopCart', 
-				loadOnInit : false, 
-				beforeLoad : function(){
-					$('.loadSpinner').show();
-				},
+					url : 'php/ctrl/Shop.php',
+					params : 'oper=getShopCart', 
+					loadOnInit : false, 
+					beforeLoad : function(){
+						$('.loadSpinner').show();
+					},
 				rowComplete : function (rowIndex, row){
 					var price = new Number($(row).children().eq(5).text());
 					var qu = new Number($(row).children().eq(3).text());
@@ -576,7 +574,6 @@ try {
 	
 		<div id="homeWrap">
 			<div id="rightSummaryCol" class="aix-style-layout-splitW80" style="margin:3em auto 1em auto; text-align:center; max-width:1200px;">
-				<h2 style="font-weight: normal; margin:.2em 0 .6em 0; color:#365da0; text-align:left;">Hola, <?=htmlspecialchars($memberName ?: get_session_login())?>!</h2>
 
 				<ul>
 					<li><a href="#tabs-1"><h2><?=$Text['my_orders'];?></h2></a></li>

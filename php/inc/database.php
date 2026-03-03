@@ -52,6 +52,7 @@ class DBWrap {
     $user = $cv->db_user;
     $password = $cv->db_password;
     $host_ = explode(":", $host);
+
     if (count($host_) > 1) {
         $this->mysqli = new mysqli($host_[0], $user, $password, $db_name, $host_[1]);
     } else {

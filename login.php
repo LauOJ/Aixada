@@ -18,6 +18,7 @@ if (!isset($_SESSION)) {
 	
 	<link rel="stylesheet" type="text/css"   media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css"   media="screen" href="css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
+    <link rel="stylesheet" type="text/css"   media="screen" href="css/vinagreta-custom.css?v=4.4"/>
 	
    
 	<script type="text/javascript" src="js/jquery/jquery.js"></script>
@@ -32,7 +33,35 @@ if (!isset($_SESSION)) {
         } else {
             echo "p#logonHeader {background-image: none;}";
         }
-    ?></style>
+    ?>
+    /* Estils per mòbil */
+    @media (max-width: 768px) {
+        #logonWrap {
+            max-width: 90vw !important;
+            width: 90vw !important;
+            margin: 20px auto !important;
+            position: relative !important;
+        }
+        #logonWrap .ui-widget-content {
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        .tblForms {
+            width: 100% !important;
+            table-layout: fixed !important;
+        }
+        .tblForms td:first-child {
+            width: 30% !important;
+        }
+        .tblForms td:last-child {
+            width: 70% !important;
+        }
+        .inputTxtSmall {
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+    }
+    </style>
 	   	
 	
 	   	
@@ -44,17 +73,29 @@ if (!isset($_SESSION)) {
 			 */
 			$('#btn_logon').button();
 			$('#login').submit(function(){
+				console.log('=== LOGIN DEBUG START ===');
+				console.log('Form submitted');
+				
 				var dataSerial = $(this).serialize();
-				//alert(dataSerial);
+				console.log('Form data serialized:', dataSerial);
+				console.log('AJAX URL: php/ctrl/Login.php');
+				
 				$.ajax({
 					type: "POST",
-                    url: "php/ctrl/Login.php?oper=login",
+                    url: "php/ctrl/Login.php",
 					data:dataSerial,		
-					success: function() {
-					    top.location.href = 'index.php';
+					success: function(response) {
+						console.log('AJAX SUCCESS - Response:', response);
+						console.log('Redirecting to dashboard.php');
+					    top.location.href = 'dashboard.php';
 					    
 					},
 					error : function(XMLHttpRequest, textStatus, errorThrown){
+						console.log('=== AJAX ERROR ===');
+						console.log('Status:', textStatus);
+						console.log('Error:', errorThrown);
+						console.log('Response Text:', XMLHttpRequest.responseText);
+						console.log('Response Status:', XMLHttpRequest.status);
 						$.updateTips('#logonMsg','error',XMLHttpRequest.responseText);
                                           
 					}
@@ -97,13 +138,13 @@ if (!isset($_SESSION)) {
 	
 				
 			/**
-			 *	incidents
+			 *	incidents - DESACTIVAT per evitar 401 Unauthorized al login
 			 */
-			$('#newsWrap').xml2html('init',{
-					url: 'php/ctrl/Incidents.php',
-					params : 'oper=getIncidentsListing&filter=pastWeek&type=3',
-					loadOnInit: true
-			});
+			// $('#newsWrap').xml2html('init',{
+			//		url: 'php/ctrl/Incidents.php',
+			//		params : 'oper=getIncidentsListing&filter=pastWeek&type=3',
+			//		loadOnInit: true
+			// });
 
 
 			
@@ -128,11 +169,35 @@ if (!isset($_SESSION)) {
 	</script>    
 	
 </head>
-<body>
+<body class="login-page">
 
+<!-- Capçalera personalitzada per al login -->
+<header class="login-header">
+    <div class="logo">
+        <!-- Logo de La Vinagreta - imatge de la caixa de verdures -->
+                <a href="https://lavinagreta.org">
+                    <img src="https://lavinagreta.org/aixada/local_config/custom_img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
+                </a>
+    </div>
+    
+    <nav class="nav-links">
+        <ul>
+            <li><a href="https://lavinagreta.org">INICI</a></li>
+            <li class="has-submenu">
+                <a href="https://lavinagreta.org/activitats">ACTIVITATS</a>
+                <ul class="submenu">
+                    <li><a href="https://lavinagreta.org/carnaval">Carnaval</a></li>
+                    <li><a href="https://lavinagreta.org/dprofit">Dinar de Profit</a></li>
+                    <li><a href="https://docsforaction.actiu.info/">Docs for Action</a></li>
+                </ul>
+            </li>
+            <li><a href="https://lavinagreta.org/contacta">CONTACTA</a></li>
+            <li class="active"><a href="https://lavinagreta.org/aixada">INTRANET</a></li>
+        </ul>
+    </nav>
+</header>
 
 <div id="wrap">
-
 	<div id="headwrap">
 		<p id="logonHeader"><span><?php 
             if (get_config('login_header_show_name', false)) {
@@ -150,28 +215,28 @@ if (!isset($_SESSION)) {
 		
 		<div class="floatLeft aix-layout-splitW50 aix-layout-widget-center-col">
 			<div id="newsWrap">
-				<div class="portalPost">
-					<h2 class="subject">{subject}</h2>
-					<p class="info"><?php echo $Text['posted_by']; ?> {user_name} (<?php echo $Text['uf_short'] ;?>{uf_id}),  {ts} </p>
-					<p class="msg">{details}</p>
-				</div>
+				<!-- Incidents desactivats per evitar 401 Unauthorized -->
 			</div>
 		</div>
 	
 		
-		<div id="logonWrap" class="aix-layout-splitW20">
+		<div id="logonWrap" class="aix-layout-splitW20" style="max-width: 90vw; width: 90vw; margin: 20px auto; position: relative;">
 			<div class="ui-widget-content ui-corner-all">
-			<h4 class="ui-widget-header ui-corner-all"><?php echo $Text['login'];?></h4>
+			<h4 class="ui-widget-header ui-corner-all">
+				<?php echo $Text['login'];?>
+				<div class="login-subtitle">Fes servir les credencials de l'Aixada</div>
+			</h4>
 			<p id="logonMsg" class="user_tips  minPadding"></p>
 			<form id="login" method="post" class="padding15x10">
-				<table class="tblForms">
+				<input type="hidden" name="oper" value="login">
+				<table class="tblForms" style="width: 100%; table-layout: fixed;">
 					<tr>
 						<td><label class="formLabel" for="login"><?=$Text['logon'];?>:</label></td>
-						<td><input type="text" class="inputTxtSmall ui-widget-content ui-corner-all " name="login" id="login"/></td>
+						<td><input type="text" class="inputTxtSmall ui-widget-content ui-corner-all " name="login" id="login" style="width: 100%; box-sizing: border-box;"/></td>
 					</tr>
 					<tr>
 						<td><label class="formLabel" for="password"><?=$Text['pwd'];?>:</label></td>
-						<td><input type="password" class="inputTxtSmall ui-widget-content ui-corner-all" name="password" id="password"/></td>
+						<td><input type="password" class="inputTxtSmall ui-widget-content ui-corner-all" name="password" id="password" style="width: 100%; box-sizing: border-box;"/></td>
 					</tr>
 					<tr>
 						<td colspan="2"><div>&nbsp;</div></td>
@@ -195,7 +260,6 @@ if (!isset($_SESSION)) {
 	</div><!-- end stagewrap -->
 	
 
-
 </div>
 <div id="dialog-message" title="">
 	<p class="minPadding ui-corner-all"></p>
@@ -207,7 +271,3 @@ if (!isset($_SESSION)) {
 
 </body>
 </html>
-
-
-
-

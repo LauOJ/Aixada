@@ -44,3 +44,8 @@ function aixada_js_src($useMenus = true, $rootJs = '') {
 
     return $src . "\n";
 }
+
+// Funció per incluir CSS personalitzat a totes les pàgines
+function aixada_custom_css() {
+    return '<link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.4"/>' . "\n";
+}
