@@ -6,7 +6,7 @@ networks:
     driver: bridge
 services:
   mariadb:
-    image: 'bitnami/mariadb:10.6'
+    image: 'mariadb:10.6'
     networks:
       - aixada
     ports:
@@ -22,18 +22,20 @@ services:
       - MARIADB_CHARACTER_SET=utf8
       - MARIADB_COLLATE=utf8_general_ci
   phpmyadmin:
-    image: 'bitnami/phpmyadmin:5'
+    image: 'phpmyadmin:5'
     depends_on:
       - mariadb
     networks:
       - aixada
     ports:
-      - '8080:80'
+      - '8084:80'
     links:
       - 'mariadb:database'
     environment:
-      - DATABASE_HOST=mariadb
-      - DATABASE_ALLOW_NO_PASSWORD=false
+      - PMA_HOST=mariadb
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+      - UPLOAD_LIMIT=64M
   php:
     build: .
     depends_on:
@@ -41,8 +43,7 @@ services:
     networks:
       - aixada
     ports:
-      - '80:80'
-      - '443:443'
+      - '8083:80'
     links:
       - 'mariadb:database'
     volumes:
