@@ -176,7 +176,7 @@ if (!isset($_SESSION)) {
     <div class="logo">
         <!-- Logo de La Vinagreta - imatge de la caixa de verdures -->
                 <a href="https://lavinagreta.org">
-                    <img src="https://lavinagreta.org/aixada/local_config/custom_img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
+                    <img src="<?= get_config('base_path', ''); ?>/local_config/custom_img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
                 </a>
     </div>
     
@@ -192,7 +192,7 @@ if (!isset($_SESSION)) {
                 </ul>
             </li>
             <li><a href="https://lavinagreta.org/contacta">CONTACTA</a></li>
-            <li class="active"><a href="https://lavinagreta.org/aixada">INTRANET</a></li>
+            <li class="active"><a href="<?= get_config('base_path', '') ?: '/'; ?>">INTRANET</a></li>
         </ul>
     </nav>
 </header>
