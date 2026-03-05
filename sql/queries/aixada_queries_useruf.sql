@@ -676,10 +676,10 @@ end|
 
 drop function if exists get_products_of_member|
 create function get_products_of_member(the_member_id int)
-returns varchar(255)
+returns text
 reads sql data
 begin
-  declare products varchar(255);
+  declare products text;
   select group_concat(distinct p.name  separator ', ') 
   into products
   from aixada_member m
