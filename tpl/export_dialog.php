@@ -11,9 +11,9 @@
 <br/><br/>
 
 <h4><?php echo $Text['other_options']; ?></h4>
-<input type="checkbox" name="makePublic" id="makePublic" checked="checked" class="freeInput"/> <label for="makePublic"><?php echo $Text['export_publish']; ?></label>
+<input type="checkbox" name="makePublic" id="makePublic" checked="checked" class="freeInput"/> <label for="makePublic"><?php echo $Text['export_publish']; ?></label> <span style="color:#b22222; font-weight:bold;">Si el fitxer conté dades de persones, desmarca aquest checkbox.</span>
 <br/>
-<p id="exportURL">&nbsp;&nbsp;&nbsp;&nbsp;<span class="">http://yourdomain.com/local_config/export/<span id="showExportFileName"></span></span></p>
+<p id="exportURL">&nbsp;&nbsp;&nbsp;&nbsp;<span class="">https://lavinagreta.org/aixada/local_config/export/<span id="showExportFileName"></span></span></p>
 <br/>
 </form>
 </div>
