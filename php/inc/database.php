@@ -65,7 +65,7 @@ class DBWrap {
                                     . $mysqli->character_set_name());
     $this->mysqli->query("SET @@SQL_MODE = ' ';"); // At least one blank space is required!
                                                    // otherwise, it does not act in MariaDB 10.3.13
-    $this->mysqli->query("SET @@group_concat_max_len = 255;");
+    $this->mysqli->query("SET @@group_concat_max_len = 10000;");
   }
   /**
    * The DBWrap class is implemented as a Singleton. Call this
