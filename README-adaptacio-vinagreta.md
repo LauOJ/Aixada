@@ -211,6 +211,7 @@ function aixada_custom_css() {
 
 ### Fitxers Modificats:
 - `local_config/config.php` - Credencials de BD
+- `sql/queries/aixada_queries_useruf.sql` - Ajust de funció SQL per evitar truncament de `GROUP_CONCAT`
 
 ### Canvis Principals:
 ```php
@@ -235,6 +236,24 @@ public $menu_config = array(
         // NOU ROL afegit
     )
 );
+```
+
+### Patch manual BD (març 2026): error `GROUP_CONCAT` en entrar a una UF
+
+S'ha detectat un error en la pantalla de gestió de membres de UF quan la llista de productes associats a una UF és molt llarga.
+
+La funció SQL original `get_products_of_member` retornava `varchar(255)`, però `GROUP_CONCAT()` pot generar cadenes més llargues.  
+Això provocava l'error: `Data too long for column 'products'`.
+
+Solució aplicada:
+- Al repositori: modificació del fitxer `sql/queries/aixada_queries_useruf.sql`.
+- A la base de dades existent: recreació manual de la funció.
+
+Canvi aplicat:
+
+```sql
+RETURNS TEXT
+DECLARE products TEXT
 ```
 
 ---
@@ -305,6 +324,7 @@ echo "<a href='dashboard.php'>Torna al tauler</a> | ";
 
 2. **Verificar** que les funcionalitats funcionen
 3. **Actualitzar** aquest README si cal
+4. **Reaplicar patch SQL manual** de `get_products_of_member` si una actualització ha recreat les funcions de `sql/queries/`
 
 ### Fitxers Crítics (NO SOBRESCRIURE):
 - `dashboard.php` - NOU, no existeix a l'original
@@ -335,5 +355,5 @@ echo "<a href='dashboard.php'>Torna al tauler</a> | ";
 
 Per qualsevol dubte sobre aquestes personalitzacions, consultar aquest document o el codi comentat als fitxers modificats.
 
-**Última actualització**: 15 d'octubre de 2025
+**Última actualització**: 5 de març de 2026
 **Versió Aixada**: Original + personalitzacions La Vinagreta
