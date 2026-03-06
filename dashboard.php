@@ -54,7 +54,7 @@ try {
 
     <link rel="stylesheet" type="text/css" media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui-themes/<?= $default_theme; ?>/jqueryui.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.6" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.7" />
 
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript" src="js/jqueryui/jqueryui.js"></script>
@@ -109,6 +109,11 @@ try {
         <!-- Missatge personalitzat -->
         <div class="dashboard-welcome">
             <h1>Hola, <?php echo htmlspecialchars($member_name); ?>!</h1>
+            <div class="dashboard-alert-votacio">
+                <a href="https://lavinagreta.org/aixada/votacio-logo/" target="_blank" rel="noopener noreferrer">
+                    Vota la nova imatge de la cope!
+                </a>
+            </div>
             <div class="user-info-grid">
                 <div class="info-card">
                     <h3>Unitat Familiar</h3>
@@ -139,6 +144,12 @@ try {
                             <img src="https://lavinagreta.org/aixada/local_config/custom_img/logo-aixada.png" alt="Aixada" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
                         </a>
                     </div>
+                    <p style="margin-top: 12px; font-size: 0.9rem; color: #6b7280; text-align: center;">
+                        T'has trobat algun error o vols millorar l'Aixada?
+                    </p>
+                    <p style="margin-top: 4px; font-size: 0.9rem; text-align: center;">
+                        <a href="https://tally.so/r/LZdLA1" target="_blank" class="dashboard-link">Proposa una millora</a>.
+                    </p>
                 </div>
 
                 <!-- Dades de l'associació -->
@@ -209,18 +220,6 @@ try {
                     </div>
                     <div style="margin-top: 15px;">
                         <p><a href="https://lavinagreta.org/assemblees-anteriors" class="dashboard-link" target="_blank">Veure totes les assemblees</a></p>
-                    </div>
-                </div>
-
-                <!-- Propostes de millora -->
-                <div class="dashboard-section millores">
-                    <h2>Proposa millores per l'Aixada</h2>
-                    <p>Vols suggerir canvis o noves funcionalitats?</p>
-                    <br>
-                    <div class="button-group">
-                        <a href="https://tally.so/r/LZdLA1" target="_blank" class="dashboard-button">
-                            PROPOSAR UNA MILLORA
-                        </a>
                     </div>
                 </div>
 
