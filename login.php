@@ -61,6 +61,15 @@ if (!isset($_SESSION)) {
             box-sizing: border-box !important;
         }
     }
+    #logonMsg {
+        line-height: 1.4;
+    }
+    .login-error-actions {
+        margin-top: 10px;
+    }
+    .login-error-actions .ui-button {
+        font-size: 0.9em;
+    }
     </style>
 	   	
 	
@@ -68,10 +77,37 @@ if (!isset($_SESSION)) {
 	<script type="text/javascript">
 		$(function(){
 			$.ajaxSetup({ cache: false });
+			var incorrectLogonMsg = <?php echo json_encode($Text['msg_err_incorrectLogon']); ?>;
+			var resetPwdBtnLabel = <?php echo json_encode($Text['btn_reset_pwd']); ?>;
 			/**
 			 *	logon stuff
 			 */
 			$('#btn_logon').button();
+			function showLoginError(message){
+				$('#logonMsg')
+					.text(message)
+					.addClass('ui-state-error');
+			}
+
+			function recoverPassword(loginValue){
+				$.ajax({
+					type: "POST",
+					url: "php/ctrl/Login.php",
+					data: {
+						oper: "recoverPassword",
+						login: loginValue
+					},
+					success: function(msg){
+						$('#logonMsg')
+							.text(msg)
+							.removeClass('ui-state-error');
+					},
+					error: function(XMLHttpRequest){
+						showLoginError(XMLHttpRequest.responseText);
+					}
+				});
+			}
+
 			$('#login').submit(function(){
 				console.log('=== LOGIN DEBUG START ===');
 				console.log('Form submitted');
@@ -96,7 +132,35 @@ if (!isset($_SESSION)) {
 						console.log('Error:', errorThrown);
 						console.log('Response Text:', XMLHttpRequest.responseText);
 						console.log('Response Status:', XMLHttpRequest.status);
-						$.updateTips('#logonMsg','error',XMLHttpRequest.responseText);
+
+						var msg = XMLHttpRequest.responseText || '';
+						var enteredLogin = $.trim($('input[name=login]').val());
+
+						if (msg === incorrectLogonMsg && enteredLogin !== '') {
+							$('#logonMsg')
+								.removeClass('ui-state-error')
+								.html(
+									$('<div/>').text(msg).html() +
+									'<div class="login-error-actions">' +
+										'<button type="button" id="btnResetPwdLogin">' +
+											$('<div/>').text(resetPwdBtnLabel).html() +
+										'</button>' +
+									'</div>'
+								)
+								.addClass('ui-state-error');
+
+							$('#btnResetPwdLogin')
+								.button({
+									icons: {primary: "ui-icon-locked"}
+								})
+								.off('click')
+								.on('click', function(e){
+								e.preventDefault();
+								recoverPassword(enteredLogin);
+							});
+						} else {
+							showLoginError(msg);
+						}
                                           
 					}
 				}); //end ajax retrieve date

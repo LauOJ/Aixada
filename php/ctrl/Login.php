@@ -8,6 +8,7 @@ require_once(__ROOT__ . "local_config/config.php");
 require_once(__ROOT__ . "php/inc/database.php");
 require_once(__ROOT__ . "php/inc/authentication.inc.php");
 require_once(__ROOT__ . "php/utilities/general.php");
+require_once(__ROOT__ . "php/utilities/useruf.php");
 require_once(__ROOT__ . "php/lib/exceptions.php");
 
 ob_start(); // Probably only needed for FirePHP(no longer used)
@@ -71,6 +72,10 @@ try{
 	        die($e->getMessage());
 	      }	
 	      exit; 
+
+      case 'recoverPassword':
+          echo reset_password_by_login(get_param('login', ''));
+          exit;
 	      	
 	  default:
 	    throw new Exception("ctrl/Login: operation {$_REQUEST['oper']} not supported");
