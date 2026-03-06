@@ -139,6 +139,12 @@ try {
                             <img src="https://lavinagreta.org/aixada/local_config/custom_img/logo-aixada.png" alt="Aixada" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
                         </a>
                     </div>
+                    <p style="margin-top: 12px; font-size: 0.9rem; color: #6b7280; text-align: center;">
+                        T'has trobat algun error o vols millorar l'Aixada?
+                    </p>
+                    <p style="margin-top: 4px; font-size: 0.9rem; text-align: center;">
+                        <a href="https://tally.so/r/LZdLA1" target="_blank" class="dashboard-link">Proposa una millora</a>.
+                    </p>
                 </div>
 
                 <!-- Dades de l'associació -->
@@ -209,18 +215,6 @@ try {
                     </div>
                     <div style="margin-top: 15px;">
                         <p><a href="https://lavinagreta.org/assemblees-anteriors" class="dashboard-link" target="_blank">Veure totes les assemblees</a></p>
-                    </div>
-                </div>
-
-                <!-- Propostes de millora -->
-                <div class="dashboard-section millores">
-                    <h2>Proposa millores per l'Aixada</h2>
-                    <p>Vols suggerir canvis o noves funcionalitats?</p>
-                    <br>
-                    <div class="button-group">
-                        <a href="https://tally.so/r/LZdLA1" target="_blank" class="dashboard-button">
-                            PROPOSAR UNA MILLORA
-                        </a>
                     </div>
                 </div>
 
