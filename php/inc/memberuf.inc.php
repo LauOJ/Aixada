@@ -107,10 +107,6 @@
 							<td><p class="textAlignLeft">{providers}</p></td>
 							
 						</tr>
-						<tr>
-							<td><?php echo $Text['products_cared_for'];?>:</td>
-							<td><p class="textAlignLeft">{products}</p></td>
-						</tr>
 						<tr><td>&nbsp;</td></tr>
 					</table>
 		

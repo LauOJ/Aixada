@@ -162,8 +162,7 @@ begin
         	u.language,
 			u.gui_theme,
         	get_roles_of_member(mem.id) as roles,
-    		get_providers_of_member(mem.id) as providers,
-    		get_products_of_member(mem.id) as products
+    		get_providers_of_member(mem.id) as providers
     	from 
     		aixada_member mem, 
     		aixada_user u, 
@@ -670,7 +669,8 @@ begin
   from aixada_member m
   left join aixada_provider p
   on m.uf_id = p.responsible_uf_id
-  where m.id = the_member_id;
+  where m.id = the_member_id
+    and p.active = 1;
   return providers;
 end|
 
