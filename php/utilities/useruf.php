@@ -180,32 +180,73 @@ function reset_password($user_id)
 	//only admin 
 	 if (get_current_role() != 'Hacker Commission')
           throw new Exception($Text['msg_err_adminStuff']);
-	
-          
-    $sendAsEmail = configuration_vars::get_instance()->internet_connection;
-    
-    
-    $newPwd = createPassword();
 
-    
+    return reset_password_for_user($user_id, false);
+}
+
+/**
+ * Self-service password reset by login from public login page.
+ * Always uses email delivery and never exposes generated password in response.
+ * @param string $login
+ * @throws Exception
+ */
+function reset_password_by_login($login)
+{
+    global $Text;
+
+    $login = trim($login);
+    if ($login === '') {
+        throw new Exception($Text['msg_err_incorrectLogon']);
+    }
+
+    DBWrap::get_instance()->free_next_results();
+    $strSQL = 'SELECT id FROM aixada_user WHERE login = :1q';
+    $db = DBWrap::get_instance();
+    $rs = $db->Execute($strSQL, $login);
+
+    if ($rs->num_rows == 0) {
+        // Keep a neutral response and avoid revealing user existence.
+        return $Text['msg_pwd_emailed'];
+    }
+
+    $row = $rs->fetch_assoc();
+    return reset_password_for_user($row['id'], true);
+}
+
+/**
+ * Shared password reset logic.
+ * @param int $user_id
+ * @param bool $forceEmailOnly If true, password is never returned in plain text.
+ * @throws Exception
+ */
+function reset_password_for_user($user_id, $forceEmailOnly)
+{
+    global $Text;
+
+    $sendAsEmail = configuration_vars::get_instance()->internet_connection;
+    if ($forceEmailOnly && !$sendAsEmail) {
+        throw new Exception($Text['msg_err_emailed']);
+    }
+
+    $newPwd = createPassword();
     $auth = new Authentication();
-    $db = DBWrap::get_instance(); 
+    $db = DBWrap::get_instance();
+
     do_stored_query('update_password', $user_id, $auth->generate_password_hash($newPwd));
-    
-    
-    if ($sendAsEmail){
-    	DBWrap::get_instance()->free_next_results();     
-		$strSQL = 'SELECT email, login FROM aixada_user WHERE id = :1q';
-    	$rs = $db->Execute($strSQL, $user_id);
-    	if($rs->num_rows == 0){
-    		throw new Exception("This user has no valid email.");
-		}
-		
-		while ($row = $rs->fetch_assoc()) {
-      		$toEmail = $row['email'];
-            $login =  $row['login'];
-    	}
-    	
+
+    if ($sendAsEmail) {
+        DBWrap::get_instance()->free_next_results();
+        $strSQL = 'SELECT email, login FROM aixada_user WHERE id = :1q';
+        $rs = $db->Execute($strSQL, $user_id);
+        if ($rs->num_rows == 0) {
+            throw new Exception("This user has no valid email.");
+        }
+
+        while ($row = $rs->fetch_assoc()) {
+            $toEmail = $row['email'];
+            $login = $row['login'];
+        }
+
         $subject = $Text['msg_pwd_email_reset'];
         $message = '<p>'.$Text['msg_pwd_change'].
             '<span style="color:red">'. $newPwd ."</span></p>\n";
@@ -213,25 +254,25 @@ function reset_password($user_id)
                 array('user' => '<span style="color:blue">'.$login.'</span>')
             )."</p>\n";
         $message .= '<p><span style="color:#666">'.i18n(
-                'msg_pwd_email_change', 
+                'msg_pwd_email_change',
                 array('menu' => '"<span style="color:green">'
                         .$Text['nav_myaccount']
                         .'</span>"&gt;"<span style="color:green">'
                         .$Text['nav_myaccount_settings'].'</span>"')
             )."</span></p>\n";
-        if (send_mail($toEmail, $subject, $message)){
-            echo $Text['msg_pwd_emailed'];
-        } else {
-            echo $Text['msg_pwd_change'].$newPwd.'<br>'.
-                 '<span style="color:red">'.$Text['msg_err_emailed'].'</span>';
-		}
-    	
+        if (send_mail($toEmail, $subject, $message)) {
+            return $Text['msg_pwd_emailed'];
+        }
 
-    } else {
-    	
-    	echo $Text['msg_pwd_change'] . $newPwd; 
-    	
+        if ($forceEmailOnly) {
+            throw new Exception($Text['msg_err_emailed']);
+        }
+
+        return $Text['msg_pwd_change'].$newPwd.'<br>'.
+             '<span style="color:red">'.$Text['msg_err_emailed'].'</span>';
     }
+
+    return $Text['msg_pwd_change'] . $newPwd;
 }
 
 
