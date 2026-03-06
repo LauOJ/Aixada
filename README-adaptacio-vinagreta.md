@@ -45,7 +45,7 @@ Aquest document descriu totes les adaptacions fetes a l'Aixada original per La V
 
 ---
 
-## 🆕 Últims Canvis (Versió 4.3)
+## 🆕 Últims Canvis (Versió 4.4)
 
 ### **🎨 Estils del Menú Principal:**
 - **Hover actualitzat**: Colors de jQuery UI (tema redmond)
@@ -64,6 +64,13 @@ Aquest document descriu totes les adaptacions fetes a l'Aixada original per La V
 - **CSS personalitzat afegit** a totes les pàgines `manage_*.php`
 - **Capçaleres de taula** amb estils consistents
 - **Integració completa** amb el disseny de La Vinagreta
+
+### **👥 Fitxa d'usuari (UF):**
+- **Eliminada** la llista "Productes de què sóc responsable" de la descripció del membre.
+- **Mantinguda** la llista "Proveïdors de què sóc responsable".
+- **Filtre aplicat**: només es mostren proveïdors actius (`aixada_provider.active = 1`).
+- **Motiu funcional**: a La Vinagreta es treballa per responsable de proveïdor/comanda, no per responsable de producte.
+- **Impacte**: fitxa d'usuari més clara i sense llistes llargues que no aportaven valor.
 
 ---
 
@@ -211,7 +218,9 @@ function aixada_custom_css() {
 
 ### Fitxers Modificats:
 - `local_config/config.php` - Credencials de BD
-- `sql/queries/aixada_queries_useruf.sql` - Ajust de funció SQL per evitar truncament de `GROUP_CONCAT`
+- `sql/queries/aixada_queries_useruf.sql` - Ajust de consultes de fitxa d'usuari (només proveïdors actius)
+- `sql/setup/aixada_queries_all.sql` - Mateix ajust incorporat al paquet SQL agregat
+- `php/inc/memberuf.inc.php` - Eliminació de la línia de productes responsables a la fitxa
 
 ### Canvis Principals:
 ```php
@@ -255,6 +264,25 @@ Canvi aplicat:
 RETURNS TEXT
 DECLARE products TEXT
 ```
+
+### Ajust funcional de fitxa d'usuari (març 2026): només proveïdors actius
+
+Per adaptar l'Aixada al funcionament de La Vinagreta, la fitxa de membre/usuari ara mostra només:
+- rols actius
+- proveïdors responsables actius
+
+Canvis aplicats:
+- `sql/queries/aixada_queries_useruf.sql`
+  - `get_member_info`: elimina el camp calculat `products`
+  - `get_providers_of_member`: afegeix filtre `and p.active = 1`
+- `sql/setup/aixada_queries_all.sql`
+  - mateix canvi per mantenir consistència en noves instal·lacions/recreacions de procediments
+- `php/inc/memberuf.inc.php`
+  - elimina el bloc visual `{products}` ("Productes de què sóc responsable")
+
+Resultat:
+- s'eviten llistes llargues i confuses a la fitxa d'usuari
+- la informació visible queda alineada amb l'operativa real de la cooperativa
 
 ---
 
@@ -355,5 +383,5 @@ echo "<a href='dashboard.php'>Torna al tauler</a> | ";
 
 Per qualsevol dubte sobre aquestes personalitzacions, consultar aquest document o el codi comentat als fitxers modificats.
 
-**Última actualització**: 5 de març de 2026
+**Última actualització**: 6 de març de 2026
 **Versió Aixada**: Original + personalitzacions La Vinagreta
