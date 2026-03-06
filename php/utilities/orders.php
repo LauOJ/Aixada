@@ -522,6 +522,7 @@ function finalize_order($provider_id, $date_for_order, $new_date_for_order = '',
 function send_order($order_id) 
 {
     global $Text;
+    $msg = '';
     
     // Send order by email to provider
     if (get_config('internet_connection') && get_config('email_orders')) {
