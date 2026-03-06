@@ -284,6 +284,11 @@ Resultat:
 - s'eviten llistes llargues i confuses a la fitxa d'usuari
 - la informació visible queda alineada amb l'operativa real de la cooperativa
 
+Nota de compatibilitat i permisos BD:
+- La funció `get_products_of_member` ja no és utilitzada per l'aplicació.
+- La funció es manté a la base de dades per compatibilitat enrere, però queda efectivament deprecada.
+- En entorns on no hi ha permisos per modificar/recrear procedures i funcions SQL, aquest canvi continua sent vàlid perquè la funcionalitat es resol a nivell de consulta de `get_member_info` i de plantilla (`memberuf`).
+
 ---
 
 ## 🧭 Menú i Navegació
