@@ -54,7 +54,7 @@ try {
 
     <link rel="stylesheet" type="text/css" media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui-themes/<?= $default_theme; ?>/jqueryui.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.6" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.7" />
 
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript" src="js/jqueryui/jqueryui.js"></script>
@@ -109,6 +109,11 @@ try {
         <!-- Missatge personalitzat -->
         <div class="dashboard-welcome">
             <h1>Hola, <?php echo htmlspecialchars($member_name); ?>!</h1>
+            <div class="dashboard-alert-votacio">
+                <a href="https://lavinagreta.org/aixada/votacio-logo/" target="_blank" rel="noopener noreferrer">
+                    Vota la nova imatge de la cope!
+                </a>
+            </div>
             <div class="user-info-grid">
                 <div class="info-card">
                     <h3>Unitat Familiar</h3>
