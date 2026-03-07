@@ -829,13 +829,13 @@
 					err_msg += "<?=$Text['msg_err_usershort'];?>" + "<br/><br/>"; 
 				}
 
-				isValidItem = $.checkFormLength($(mi+' input[name=password]'),4,15);
+				isValidItem = $.checkFormLength($(mi+' input[name=password]'),4,20);
 				if (!isValidItem){
 					isValid = false; 
 					err_msg += "<?=$Text['msg_err_passshort'];?>" + "<br/><br/>"; 
 				}
 				
-				isValidItem = $.checkPassword($(mi+' input[name=password]'), $('input[name=password_ctrl]'));
+				isValidItem = $.checkPassword($(mi+' input[name=password]'), $(mi+' input[name=password_ctrl]'));
 				if (!isValidItem){
 					isValid = false; 
 					err_msg += "<?=$Text['msg_err_pwdctrl']; ?>"+ "<br/><br/>";
@@ -1256,7 +1256,7 @@
 						
 						<tr>
 							<td><label for="password_ctrl"><?=$Text['retype_pwd'];?>:</label></td>
-							<td><input type="password" class="ui-widget-content ui-corner-all " name="password_ctrl"></td>
+							<td style="padding-top: 0.85em;"><input type="password" class="ui-widget-content ui-corner-all " name="password_ctrl"></td>
 						</tr>
 						
 						<tr><td>&nbsp;</td></tr>
