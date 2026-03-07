@@ -829,13 +829,13 @@
 					err_msg += "<?=$Text['msg_err_usershort'];?>" + "<br/><br/>"; 
 				}
 
-				isValidItem = $.checkFormLength($(mi+' input[name=password]'),4,15);
+				isValidItem = $.checkFormLength($(mi+' input[name=password]'),4,20);
 				if (!isValidItem){
 					isValid = false; 
 					err_msg += "<?=$Text['msg_err_passshort'];?>" + "<br/><br/>"; 
 				}
 				
-				isValidItem = $.checkPassword($(mi+' input[name=password]'), $('input[name=password_ctrl]'));
+				isValidItem = $.checkPassword($(mi+' input[name=password]'), $(mi+' input[name=password_ctrl]'));
 				if (!isValidItem){
 					isValid = false; 
 					err_msg += "<?=$Text['msg_err_pwdctrl']; ?>"+ "<br/><br/>";
