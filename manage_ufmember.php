@@ -1256,7 +1256,7 @@
 						
 						<tr>
 							<td><label for="password_ctrl"><?=$Text['retype_pwd'];?>:</label></td>
-							<td><input type="password" class="ui-widget-content ui-corner-all " name="password_ctrl"></td>
+							<td style="padding-top: 0.85em;"><input type="password" class="ui-widget-content ui-corner-all " name="password_ctrl"></td>
 						</tr>
 						
 						<tr><td>&nbsp;</td></tr>
