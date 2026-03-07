@@ -54,7 +54,7 @@ try {
 
     <link rel="stylesheet" type="text/css" media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui-themes/<?= $default_theme; ?>/jqueryui.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.7" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.8" />
 
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript" src="js/jqueryui/jqueryui.js"></script>
@@ -148,7 +148,7 @@ try {
                         T'has trobat algun error o vols millorar l'Aixada?
                     </p>
                     <p style="margin-top: 4px; font-size: 0.9rem; text-align: center;">
-                        <a href="https://tally.so/r/LZdLA1" target="_blank" class="dashboard-link">Proposa una millora</a>.
+                        <a href="https://tally.so/r/LZdLA1" target="_blank" class="dashboard-link">Proposa una millora</a>
                     </p>
                 </div>
 
@@ -227,6 +227,14 @@ try {
 
             <!-- Columna dreta -->
             <div class="dashboard-right">
+
+                <!-- Calendari de la Vinagreta -->
+                <div class="dashboard-section calendari">
+                    <h2>Calendari Vinagreta</h2>
+                    <div class="button-group">
+                        <a href="https://nextcloud.pangea.org/apps/calendar/p/WL8zZHsSF4547DG2" target="_blank" rel="noopener noreferrer" class="dashboard-button">OBRE EL CALENDARI</a>
+                    </div>
+                </div>
 
                 <!-- Llistats de famílies -->
                 <div class="dashboard-section contactes">

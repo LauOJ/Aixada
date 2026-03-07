@@ -947,6 +947,7 @@ tbody tr:first-child td[colspan] {
         .dashboard-section.contactes h2::before { content: '👥'; }
         .dashboard-section.estoc h2::before { content: '📊'; }
         .dashboard-section.reserva h2::before { content: '🏠'; }
+        .dashboard-section.calendari h2::before { content: '📅'; }
 
 .dashboard-link {
     color: var(--vinagreta-primary);
