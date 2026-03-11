@@ -215,7 +215,8 @@ try {
                             <a href="https://lavinagreta.org/acta-gener-2025" class="dashboard-link" target="_blank">GENER</a> –
                             <a href="https://lavinagreta.org/acta-marc-2025" class="dashboard-link" target="_blank">MARÇ</a> –
                             <a href="https://lavinagreta.org/acta-maig-2025" class="dashboard-link" target="_blank">MAIG</a> –
-                            <a href="https://lavinagreta.org/acta-octubre-2025" class="dashboard-link" target="_blank">OCTUBRE</a>
+                            <a href="https://lavinagreta.org/acta-octubre-2025" class="dashboard-link" target="_blank">OCTUBRE</a> –
+                            <a href="https://lavinagreta.org/acta-desembre-2025/" class="dashboard-link" target="_blank">DESEMBRE</a>
                         </p>
                     </div>
                     <div style="margin-top: 15px;">
