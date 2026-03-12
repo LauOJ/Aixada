@@ -536,7 +536,7 @@
 				width:480,
 				height:600,
 				buttons: {  
-					"<?=$Text['btn_ok'];?>" : function(){
+					"<?=$Text['btn_disValitate_ok'];?>" : function(){
 						var $this = $(this);
 						$.ajax({
 							type: "POST",
@@ -566,7 +566,7 @@
 						});
 						},
 				
-					"<?=$Text['btn_continue_reviewing'];?>"	: function(){
+					"<?=$Text['btn_cancel'];?>"	: function(){
 						$( this ).dialog( "close" );
 						} 
 				}
@@ -624,7 +624,7 @@
                                 }
                             });
                         },
-                        "<?=$Text['btn_bakToRevise'];?>": function(){
+                        "<?=$Text['btn_cancel'];?>": function(){
                             $(this).dialog("close");
                         }
                     },
