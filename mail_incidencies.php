@@ -89,18 +89,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message .= '<p><strong>Altres comentaris:</strong><br>' . nl2br(h($form_values['other_comments'])) . '</p>';
         $message .= '<p><strong>Enviat per:</strong> ' . h(get_session_value('login')) . '</p>';
 
+        $mail_list_address = 'proves.lavinagreta@lists.riseup.net';
+
         // Set "From" display name as "L'Aixada - usuari",
         // while keeping the configured sender email address for delivery.
+        $cfg = configuration_vars::get_instance();
+        $previous_admin_email = $cfg->admin_email;
+        $previous_safe_reply_to = $cfg->email_safe_replyTo;
         $base_from_email = get_plain_email_address(get_config('admin_email'));
         $from_display_name = "L'Aixada - " . trim(get_session_value('login'));
         if ($base_from_email !== '') {
             $escaped_display_name = str_replace(array('\\', '"'), array('\\\\', '\\"'), $from_display_name);
-            configuration_vars::get_instance()->admin_email = '"' . $escaped_display_name . '" <' . $base_from_email . '>';
+            $cfg->admin_email = '"' . $escaped_display_name . '" <' . $base_from_email . '>';
         }
+        // For this page only, allow reply-to to point to the list.
+        $cfg->email_safe_replyTo = false;
 
-        $mail_sent = send_mail('proves.lavinagreta@lists.riseup.net', $subject, $message, array(
-            'prepend_coop_name' => false
+        $mail_sent = send_mail($mail_list_address, $subject, $message, array(
+            'prepend_coop_name' => false,
+            'reply_to' => $mail_list_address
         ));
+
+        // Restore global email config values after sending.
+        $cfg->admin_email = $previous_admin_email;
+        $cfg->email_safe_replyTo = $previous_safe_reply_to;
         if (!$mail_sent) {
             $mail_error = $Text['msg_err_emailed'];
         }
