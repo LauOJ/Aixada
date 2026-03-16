@@ -80,12 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $subject_date = ($formatted_delivery_date !== '') ? $formatted_delivery_date : $form_values['delivery_date'];
         $subject = 'Repartiment ' . $subject_date;
 
-<<<<<<< Updated upstream
-        $message = '<div style="font-size:16px; margin-bottom:10px;">Hola!<br>Aquest és el resum del repartiment d\'avui.</div>';
-=======
         $message = '<p>Hola!</p>';
         $message .= '<p>Aquest es el resum del repartiment d\'avui.</p>';
->>>>>>> Stashed changes
         $message .= '<p><strong>Data del repartiment:</strong> ' . h($subject_date) . '</p>';
         $message .= '<p><strong>UF responsable:</strong> ' . h($form_values['uf_responsible']) . '</p>';
         $message .= '<p><strong>Incidencies:</strong><br>' . nl2br(h($form_values['incidents'])) . '</p>';
