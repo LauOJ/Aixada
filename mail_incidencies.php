@@ -21,6 +21,19 @@ function h($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+function get_plain_email_address($raw_email) {
+    $raw_email = trim((string)$raw_email);
+    if ($raw_email === '') {
+        return '';
+    }
+
+    if (preg_match('/<([^>]+)>/', $raw_email, $matches)) {
+        return trim($matches[1]);
+    }
+
+    return $raw_email;
+}
+
 function normalize_delivery_date($raw_date) {
     $raw_date = trim($raw_date);
     if ($raw_date === '') {
@@ -65,9 +78,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail_error = 'Cal omplir com a minim la data del repartiment i la UF responsable.';
     } else {
         $subject_date = ($formatted_delivery_date !== '') ? $formatted_delivery_date : $form_values['delivery_date'];
-        $subject = '[Repartiment] Mail d\'incidencies - ' . $subject_date . ' - UF ' . $form_values['uf_responsible'];
+        $subject = 'Repartiment ' . $subject_date;
 
+<<<<<<< Updated upstream
         $message = '<div style="font-size:16px; margin-bottom:10px;">Hola!<br>Aquest és el resum del repartiment d\'avui.</div>';
+=======
+        $message = '<p>Hola!</p>';
+        $message .= '<p>Aquest es el resum del repartiment d\'avui.</p>';
+>>>>>>> Stashed changes
         $message .= '<p><strong>Data del repartiment:</strong> ' . h($subject_date) . '</p>';
         $message .= '<p><strong>UF responsable:</strong> ' . h($form_values['uf_responsible']) . '</p>';
         $message .= '<p><strong>Incidencies:</strong><br>' . nl2br(h($form_values['incidents'])) . '</p>';
@@ -75,7 +93,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message .= '<p><strong>Altres comentaris:</strong><br>' . nl2br(h($form_values['other_comments'])) . '</p>';
         $message .= '<p><strong>Enviat per:</strong> ' . h(get_session_value('login')) . '</p>';
 
-        $mail_sent = send_mail('lauoj@protonmail.com', $subject, $message);
+        // Set "From" display name as "L'Aixada - usuari",
+        // while keeping the configured sender email address for delivery.
+        $base_from_email = get_plain_email_address(get_config('admin_email'));
+        $from_display_name = "L'Aixada - " . trim(get_session_value('login'));
+        if ($base_from_email !== '') {
+            $escaped_display_name = str_replace(array('\\', '"'), array('\\\\', '\\"'), $from_display_name);
+            configuration_vars::get_instance()->admin_email = '"' . $escaped_display_name . '" <' . $base_from_email . '>';
+        }
+
+        $mail_sent = send_mail('proves.lavinagreta@lists.riseup.net', $subject, $message, array(
+            'prepend_coop_name' => false
+        ));
         if (!$mail_sent) {
             $mail_error = $Text['msg_err_emailed'];
         }
