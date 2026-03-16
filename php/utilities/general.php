@@ -456,7 +456,7 @@ function to_js_str($text) {
  * @param str $to, 
  * @param str $subject
  * @param str $bodyHTML only the body of the html message.
- * @param array $options valid keys are: 'reply_to', 'cc', 'bcc'
+ * @param array $options valid keys are: 'reply_to', 'cc', 'bcc', 'prepend_coop_name'
  * @return boolean as response of php mail.
  */
 function send_mail($to, $subject, $bodyHTML, $options=array())
@@ -471,7 +471,10 @@ function send_mail($to, $subject, $bodyHTML, $options=array())
                     $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']).
                 substr($_SERVER['SCRIPT_NAME'],0,$pos_root);
     // get HTML message
-    $subject = get_config('coop_name') . ': ' . $subject;
+    $prepend_coop_name = !isset($options['prepend_coop_name']) || !!$options['prepend_coop_name'];
+    if ($prepend_coop_name) {
+        $subject = get_config('coop_name') . ': ' . $subject;
+    }
     $messageHTML = 
         '<html><head><title>'.$subject."</title></head>\r\n".
         '<body style="font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;">'.
