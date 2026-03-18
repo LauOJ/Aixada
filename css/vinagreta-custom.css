@@ -856,6 +856,13 @@ tbody tr:first-child td[colspan] {
     font-size: 0.95rem;
 }
 
+.dashboard-alert-votacio span {
+    display: block;
+    margin-bottom: 6px;
+    color: #4e6f1d;
+    font-size: 0.95rem;
+}
+
 .dashboard-alert-votacio a:hover {
     text-decoration: underline;
 }
