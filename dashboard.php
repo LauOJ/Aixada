@@ -109,11 +109,6 @@ try {
         <!-- Missatge personalitzat -->
         <div class="dashboard-welcome">
             <h1>Hola, <?php echo htmlspecialchars($member_name); ?>!</h1>
-            <div class="dashboard-alert-votacio">
-                <a href="https://lavinagreta.org/aixada/votacio-logo/" target="_blank" rel="noopener noreferrer">
-                    Vota la nova imatge de la cope!
-                </a>
-            </div>
             <div class="user-info-grid">
                 <div class="info-card">
                     <h3>Unitat Familiar</h3>
