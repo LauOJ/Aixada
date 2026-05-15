@@ -140,6 +140,12 @@ try {
                         </a>
                     </div>
                     <p style="margin-top: 12px; font-size: 0.9rem; color: #6b7280; text-align: center;">
+                        Tens dubtes sobre com funciona l'Aixada?
+                    </p>
+                    <p style="margin-top: 4px; font-size: 0.9rem; text-align: center;">
+                    <a href="https://lavinagreta.org/tutorials-programari-laixada/" class="dashboard-link" target="_blank" rel="noopener noreferrer">Mira els tutorials</a>
+                    </p>
+                    <p style="margin-top: 12px; font-size: 0.9rem; color: #6b7280; text-align: center;">
                         T'has trobat algun error o vols millorar l'Aixada?
                     </p>
                     <p style="margin-top: 4px; font-size: 0.9rem; text-align: center;">
