@@ -57,7 +57,7 @@
 <div class="ui-widget-header ui-corner-all" id="menuBgBar">
 <div  id="topMenu">
 <a tabindex="1" href="aixada_main.php" 	id="navHome" class="menuTop"><?php echo $Text['nav_home'];?></a>
-<a tabindex="2" href="manage_orders.php?filter=pastMonth" 	id="navWizard" class="menuTop"><?php echo $Text['nav_wiz'];?></a>
+<a tabindex="2" href="#" 	id="navWizard" class="menuTop"><?php echo $Text['nav_wiz'];?></a>
 <?php if ($cfg_use_shop) {  // USE SHOP: start ?>
 <a tabindex="3" href="shop_and_orderstock.php?what=Shop" 	id="navShop" class="menuTop"><?php echo $Text['nav_shop'];?></a>
 <?php } // - - - - - - - - - - USE SHOP: end ?>
@@ -69,6 +69,13 @@
 <?php } ?>
 <a tabindex="8" href="#" id="navMyAccount" class="menuTop"><?php echo $Text['nav_myaccount'];?></a>
 </div>
+</div>
+
+<div id="navWizardItems" class="hidden">
+	<ul>
+		<li><a href="manage_orders.php?filter=pastMonth"><?php echo $Text['nav_wiz_orders']; ?></a></li>
+		<li><a href="mail_incidencies.php"><?php echo $Text['nav_wiz_incidents_mail']; ?></a></li>
+	</ul>
 </div>
 
 

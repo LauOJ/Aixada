@@ -1,11 +1,11 @@
 <?php include "php/inc/header.inc.php" ?>
 <?php
-// Temporary override to allow email sending on localhost and staging.
+// Temporary override to allow email sending on localhost and production.
 $host_name = $_SERVER['HTTP_HOST'] ?? '';
 if (
     strpos($host_name, 'localhost') !== false ||
     strpos($host_name, '127.0.0.1') !== false ||
-    strpos($host_name, 'proves.lavinagreta.org') !== false
+    strpos($host_name, 'lavinagreta.org') !== false
 ) {
     configuration_vars::get_instance()->internet_connection = true;
 }
@@ -23,6 +23,19 @@ $form_values = array(
 
 function h($value) {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}
+
+function get_plain_email_address($raw_email) {
+    $raw_email = trim((string)$raw_email);
+    if ($raw_email === '') {
+        return '';
+    }
+
+    if (preg_match('/<([^>]+)>/', $raw_email, $matches)) {
+        return trim($matches[1]);
+    }
+
+    return $raw_email;
 }
 
 function normalize_delivery_date($raw_date) {
@@ -69,10 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail_error = 'Cal omplir com a minim la data del repartiment i la UF responsable.';
     } else {
         $subject_date = ($formatted_delivery_date !== '') ? $formatted_delivery_date : $form_values['delivery_date'];
-        $subject = '[Repartiment] Mail d\'incidencies - ' . $subject_date . ' - UF ' . $form_values['uf_responsible'];
+        $subject = 'Repartiment ' . $subject_date;
 
         $message = '<p>Hola!</p>';
-        $message = '<p>Aquest és el resultat del repartiment d\'avui.</p>';
+        $message .= '<p>Aquest es el resum del repartiment d\'avui.</p>';
         $message .= '<p><strong>Data del repartiment:</strong> ' . h($subject_date) . '</p>';
         $message .= '<p><strong>UF responsable:</strong> ' . h($form_values['uf_responsible']) . '</p>';
         $message .= '<p><strong>Incidencies:</strong><br>' . nl2br(h($form_values['incidents'])) . '</p>';
@@ -80,7 +93,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message .= '<p><strong>Altres comentaris:</strong><br>' . nl2br(h($form_values['other_comments'])) . '</p>';
         $message .= '<p><strong>Enviat per:</strong> ' . h(get_session_value('login')) . '</p>';
 
-        $mail_sent = send_mail('lauoj@protonmail.com', $subject, $message);
+        $mail_list_address = 'lavinagreta@lists.riseup.net';
+
+        // Set "From" display name as "L'Aixada - usuari",
+        // while keeping the configured sender email address for delivery.
+        $cfg = configuration_vars::get_instance();
+        $previous_admin_email = $cfg->admin_email;
+        $previous_safe_reply_to = $cfg->email_safe_replyTo;
+        $base_from_email = get_plain_email_address(get_config('admin_email'));
+        $from_display_name = "L'Aixada - " . trim(get_session_value('login'));
+        if ($base_from_email !== '') {
+            $escaped_display_name = str_replace(array('\\', '"'), array('\\\\', '\\"'), $from_display_name);
+            $cfg->admin_email = '"' . $escaped_display_name . '" <' . $base_from_email . '>';
+        }
+        // For this page only, allow reply-to to point to the list.
+        $cfg->email_safe_replyTo = false;
+
+        $mail_sent = send_mail($mail_list_address, $subject, $message, array(
+            'prepend_coop_name' => false,
+            'reply_to' => $mail_list_address
+        ));
+
+        // Restore global email config values after sending.
+        $cfg->admin_email = $previous_admin_email;
+        $cfg->email_safe_replyTo = $previous_safe_reply_to;
         if (!$mail_sent) {
             $mail_error = $Text['msg_err_emailed'];
         }
@@ -214,6 +250,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #2f4d79;
             font-weight: bold;
         }
+        .mail-form-warning {
+            margin: 0 0 10px 0;
+            padding: 8px 10px;
+            background: #fff8e6;
+            border: 1px solid #e6c84a;
+            border-left: 4px solid #c9a227;
+            border-radius: 0 6px 6px 0;
+            color: #5c4a12;
+            font-size: 0.9em;
+            font-weight: bold;
+            line-height: 1.35;
+        }
         .mail-submit-wrap {
             margin-top: 18px;
             text-align: right;
@@ -256,9 +304,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="mail-form-group">
                 <label class="mail-form-title" for="claims">Reclamacions</label>
+                <p class="mail-form-warning" role="note">Atenció: responsables de comanda! Feu arribar aquesta informació al proveïdor/a.</p>
                 <p class="mail-help">
-                    Productes que <strong>surten a l'albarà</strong> i no han arribat o han arribat en mal estat.
-                    <span class="mail-help-note">Aquesta secció va dirigida sobretot a les UF responsables de comanda.</span>
+                    Productes que <strong>surten a l'albarà</strong> i no han arribat o han arribat en mal estat. 
                 </p>
                 <textarea class="mail-field" id="claims" name="claims" rows="5"><?php echo h($form_values['claims']); ?></textarea>
             </div>
