@@ -1,11 +1,11 @@
 <?php include "php/inc/header.inc.php" ?>
 <?php
-// Temporary override to allow email sending on localhost and staging.
+// Temporary override to allow email sending on localhost and production.
 $host_name = $_SERVER['HTTP_HOST'] ?? '';
 if (
     strpos($host_name, 'localhost') !== false ||
     strpos($host_name, '127.0.0.1') !== false ||
-    strpos($host_name, 'proves.lavinagreta.org') !== false
+    strpos($host_name, 'lavinagreta.org') !== false
 ) {
     configuration_vars::get_instance()->internet_connection = true;
 }
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message .= '<p><strong>Altres comentaris:</strong><br>' . nl2br(h($form_values['other_comments'])) . '</p>';
         $message .= '<p><strong>Enviat per:</strong> ' . h(get_session_value('login')) . '</p>';
 
-        $mail_list_address = 'proves.lavinagreta@lists.riseup.net';
+        $mail_list_address = 'lavinagreta@lists.riseup.net';
 
         // Set "From" display name as "L'Aixada - usuari",
         // while keeping the configured sender email address for delivery.
@@ -250,6 +250,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #2f4d79;
             font-weight: bold;
         }
+        .mail-form-warning {
+            margin: 0 0 10px 0;
+            padding: 8px 10px;
+            background: #fff8e6;
+            border: 1px solid #e6c84a;
+            border-left: 4px solid #c9a227;
+            border-radius: 0 6px 6px 0;
+            color: #5c4a12;
+            font-size: 0.9em;
+            font-weight: bold;
+            line-height: 1.35;
+        }
         .mail-submit-wrap {
             margin-top: 18px;
             text-align: right;
@@ -292,9 +304,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="mail-form-group">
                 <label class="mail-form-title" for="claims">Reclamacions</label>
+                <p class="mail-form-warning" role="note">Atenció: responsables de comanda! Feu arribar aquesta informació al proveïdor/a.</p>
                 <p class="mail-help">
-                    Productes que <strong>surten a l'albarà</strong> i no han arribat o han arribat en mal estat.
-                    <span class="mail-help-note">Aquesta secció va dirigida sobretot a les UF responsables de comanda.</span>
+                    Productes que <strong>surten a l'albarà</strong> i no han arribat o han arribat en mal estat. 
                 </p>
                 <textarea class="mail-field" id="claims" name="claims" rows="5"><?php echo h($form_values['claims']); ?></textarea>
             </div>
