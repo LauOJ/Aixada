@@ -234,7 +234,7 @@ try {
                 <div class="dashboard-section calendari">
                     <h2>Calendari Vinagreta</h2>
                     <div class="button-group">
-                        <a href="https://nextcloud.pangea.org/apps/calendar/p/ZXcaAYDygbdq9Y3F" target="_blank" rel="noopener noreferrer" class="dashboard-button">OBRE EL CALENDARI</a>
+                        <a href="https://nextcloud.pangea.org/apps/calendar/p/feppNnS42MaBzapB" target="_blank" rel="noopener noreferrer" class="dashboard-button">OBRE EL CALENDARI</a>
                     </div>
                 </div>
 
