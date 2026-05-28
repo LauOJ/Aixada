@@ -89,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message .= '<p><strong>Data del repartiment:</strong> ' . h($subject_date) . '</p>';
         $message .= '<p><strong>UF responsable:</strong> ' . h($form_values['uf_responsible']) . '</p>';
         $message .= '<p><strong>Incidencies:</strong><br>' . nl2br(h($form_values['incidents'])) . '</p>';
+        $message .= '<p style="margin: 10px 0; padding: 8px 10px; background: #fff8e6; border: 1px solid #e6c84a; border-left: 4px solid #c9a227; border-radius: 4px;"><strong>Atenció:</strong> Responsables de comanda! Feu arribar aquesta informació al proveïdor/a.</p>';
         $message .= '<p><strong>Reclamacions:</strong><br>' . nl2br(h($form_values['claims'])) . '</p>';
         $message .= '<p><strong>Altres comentaris:</strong><br>' . nl2br(h($form_values['other_comments'])) . '</p>';
         $message .= '<p><strong>Enviat per:</strong> ' . h(get_session_value('login')) . '</p>';
