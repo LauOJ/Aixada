@@ -94,11 +94,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message .= '<p><strong>Altres comentaris:</strong><br>' . nl2br(h($form_values['other_comments'])) . '</p>';
         $message .= '<p><strong>Enviat per:</strong> ' . h(get_session_value('login')) . '</p>';
 
-        $mail_list_address = 'lavinagreta@lists.riseup.net';
-
         // Set "From" display name as "L'Aixada - usuari",
         // while keeping the configured sender email address for delivery.
         $cfg = configuration_vars::get_instance();
+        $mail_list_address = $cfg->incidents_mail_list;
         $previous_admin_email = $cfg->admin_email;
         $previous_safe_reply_to = $cfg->email_safe_replyTo;
         $base_from_email = get_plain_email_address(get_config('admin_email'));
