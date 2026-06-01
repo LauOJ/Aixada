@@ -380,6 +380,12 @@ class configuration_vars {
   public $incidents_email_list = "";
 
   /**
+   * Mailing list address for the incidents mail form (mail_incidencies.php).
+   * Override in staging config to avoid sending to the real list.
+   */
+  public $incidents_mail_list = 'lavinagreta@lists.riseup.net';
+
+  /**
   * CALENDARI
   */
 

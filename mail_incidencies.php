@@ -89,15 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message .= '<p><strong>Data del repartiment:</strong> ' . h($subject_date) . '</p>';
         $message .= '<p><strong>UF responsable:</strong> ' . h($form_values['uf_responsible']) . '</p>';
         $message .= '<p><strong>Incidencies:</strong><br>' . nl2br(h($form_values['incidents'])) . '</p>';
+        $message .= '<p style="margin: 10px 0; padding: 8px 10px; background: #fff8e6; border: 1px solid #e6c84a; border-left: 4px solid #c9a227; border-radius: 4px;"><strong>Atenció:</strong> Responsables de comanda! Feu arribar aquesta informació al proveïdor/a.</p>';
         $message .= '<p><strong>Reclamacions:</strong><br>' . nl2br(h($form_values['claims'])) . '</p>';
         $message .= '<p><strong>Altres comentaris:</strong><br>' . nl2br(h($form_values['other_comments'])) . '</p>';
         $message .= '<p><strong>Enviat per:</strong> ' . h(get_session_value('login')) . '</p>';
 
-        $mail_list_address = 'lavinagreta@lists.riseup.net';
-
         // Set "From" display name as "L'Aixada - usuari",
         // while keeping the configured sender email address for delivery.
         $cfg = configuration_vars::get_instance();
+        $mail_list_address = $cfg->incidents_mail_list;
         $previous_admin_email = $cfg->admin_email;
         $previous_safe_reply_to = $cfg->email_safe_replyTo;
         $base_from_email = get_plain_email_address(get_config('admin_email'));

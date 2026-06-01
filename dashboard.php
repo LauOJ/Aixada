@@ -176,6 +176,8 @@ try {
                         <p><strong>Documentació:</strong></p>
                         <p><a href="http://lavinagreta.org/wp-content/uploads/2025/10/ESTATUTS_2.0-La-Vinagreta.pdf" class="dashboard-link" target="_blank">Estatuts de la Vinagreta</a></p>
                         <p><a href="https://lavinagreta.org/tutorial-renovar-junta/" class="dashboard-link" target="_blank">Tutorial per renovar la Junta</a></p>
+                        <p><a href="https://lavinagreta.org/tutorial-altes-i-baixes/" class="dashboard-link" target="_blank">Tutorial d'altes i baixes</a></p>
+
                     </div>
                 </div>
 
@@ -210,6 +212,14 @@ try {
                 <!-- Actes de les assemblees -->
                 <div class="dashboard-section actes">
                     <h2>Actes de les assemblees</h2>
+                    <div>
+                        <p><strong>Assemblees 2026:</strong></p>
+                        <p>
+                            <a href="https://lavinagreta.org/acta-marc-2026" class="dashboard-link" target="_blank">MARÇ</a> –
+                            <a href="https://lavinagreta.org/acta-maig-2026" class="dashboard-link" target="_blank">MAIG</a> 
+                        </p>
+                    </div>
+                    <br>
                     <div>
                         <p><strong>Assemblees 2025:</strong></p>
                         <p>
