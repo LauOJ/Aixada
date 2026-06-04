@@ -40,7 +40,7 @@ h1 {
 .card {
     display: flex;
     gap: 20px;
-    align-items: center;
+    align-items: flex-start;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
@@ -54,6 +54,10 @@ h1 {
 
 .card-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: stretch;
 }
 
 .card-info h2 {
@@ -70,7 +74,6 @@ h1 {
     border-radius: 5px;
     font-size: 0.9em;
     font-weight: bold;
-    max-width: 200px;
 }
 
 .boto-pdf:hover {
