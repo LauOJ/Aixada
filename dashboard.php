@@ -107,7 +107,8 @@ try {
     <div id="wrap" style="margin-top: 70px;">
 
         <!-- Missatge personalitzat -->
-        <div class="dashboard-welcome">
+        <div class="dashboard-welcome" style="position: relative;">
+            <a href="votacio-logo/" target="_blank" style="position: absolute; top: 12px; right: 12px; background: #2e7d32; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">VOTA LA NOVA IMATGE</a>
             <h1>Hola, <?php echo htmlspecialchars($member_name); ?>!</h1>
             <div class="user-info-grid">
                 <div class="info-card">
