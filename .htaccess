@@ -1,0 +1,8 @@
+RewriteEngine On
+RewriteRule ^\.git(/|$) - [F,L]
+RewriteRule ^local_config(/|$) - [F,L]
+
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
