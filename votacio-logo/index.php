@@ -47,7 +47,7 @@ h1 {
 }
 
 .card img {
-    width: 220px;
+    width: 260px;
     flex-shrink: 0;
     border-radius: 6px;
 }
@@ -63,13 +63,14 @@ h1 {
 .boto-pdf {
     display: block;
     margin-top: 10px;
-    padding: 10px 16px;
+    padding: 8px 12px;
     background: #444;
     color: white;
     text-decoration: none;
     border-radius: 5px;
-    font-size: 0.95em;
+    font-size: 0.9em;
     font-weight: bold;
+    max-width: 200px;
 }
 
 .boto-pdf:hover {
@@ -102,7 +103,7 @@ h1 {
 
 <h1>Votació nova imatge de La Vinagreta</h1>
 
-<p style="text-align: center;">Aquestes són les tres propostes finalistes per a la nova imatge de La Vinagreta. Opina sobre les tres i vota la que més t'agrada.</p>
+<p style="text-align: center;">Aquestes són les tres propostes finalistes per a la nova imatge de La Vinagreta. Entra al formulari i ordena-les de la que més t'agradi a la que menys.</p>
 
 <p class="deadline">Tens fins <strong>abans de la propera assemblea</strong> per votar.</p>
 
@@ -113,8 +114,8 @@ h1 {
         <div class="card-info">
             <h2>AloKaos</h2>
             <div class="links-proposta">
-                <a class="boto-pdf" href="https://www.canva.com/design/DAHKM5zO6H4/Cj-fUyuuukK47Feg9TzaIw/edit" target="_blank">&#128196; Veure proposta 1</a>
-                <a class="boto-pdf" href="https://www.canva.com/design/DAHGQhorE2Q/CguRiEYVseNWV-jVNCIjxA/edit" target="_blank">&#128196; Veure proposta 2</a>
+                <a class="boto-pdf" href="https://www.canva.com/design/DAHKM5zO6H4/Cj-fUyuuukK47Feg9TzaIw/edit" target="_blank">&#128196; Proposta final</a>
+                <a class="boto-pdf" href="https://www.canva.com/design/DAHGQhorE2Q/CguRiEYVseNWV-jVNCIjxA/edit" target="_blank">&#128196; Manual de marca</a>
             </div>
         </div>
     </div>
