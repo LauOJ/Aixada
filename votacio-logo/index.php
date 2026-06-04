@@ -38,27 +38,38 @@ h1 {
 }
 
 .card {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
 }
 
 .card img {
-    width: 100%;
+    width: 220px;
+    flex-shrink: 0;
     border-radius: 6px;
 }
 
+.card-info {
+    flex: 1;
+}
+
+.card-info h2 {
+    margin-top: 0;
+}
+
 .boto-pdf {
-    display: inline-block;
+    display: block;
     margin-top: 10px;
-    margin-right: 8px;
     padding: 10px 16px;
     background: #444;
     color: white;
     text-decoration: none;
-    text-align: center;
     border-radius: 5px;
-    font-size: 0.9em;
+    font-size: 0.95em;
+    font-weight: bold;
 }
 
 .boto-pdf:hover {
@@ -66,7 +77,7 @@ h1 {
 }
 
 .links-proposta {
-    margin-top: 12px;
+    margin-top: 16px;
 }
 
 .boto-votar {
@@ -98,28 +109,34 @@ h1 {
 <div class="grid">
 
     <div class="card">
-        <h2>AloKaos</h2>
         <img src="Alokaos.png" alt="Proposta AloKaos">
-        <div class="links-proposta">
-            <a class="boto-pdf" href="https://www.canva.com/design/DAHKM5zO6H4/Cj-fUyuuukK47Feg9TzaIw/edit" target="_blank">Veure proposta 1</a>
-            <a class="boto-pdf" href="https://www.canva.com/design/DAHGQhorE2Q/CguRiEYVseNWV-jVNCIjxA/edit" target="_blank">Veure proposta 2</a>
+        <div class="card-info">
+            <h2>AloKaos</h2>
+            <div class="links-proposta">
+                <a class="boto-pdf" href="https://www.canva.com/design/DAHKM5zO6H4/Cj-fUyuuukK47Feg9TzaIw/edit" target="_blank">&#128196; Veure proposta 1</a>
+                <a class="boto-pdf" href="https://www.canva.com/design/DAHGQhorE2Q/CguRiEYVseNWV-jVNCIjxA/edit" target="_blank">&#128196; Veure proposta 2</a>
+            </div>
         </div>
     </div>
 
     <div class="card">
-        <h2>Katze</h2>
         <img src="Katze.png" alt="Proposta Katze">
-        <div class="links-proposta">
-            <a class="boto-pdf" href="proposta-final-katze.pdf" target="_blank">Proposta final</a>
-            <a class="boto-pdf" href="manual-de-marca-katze.pdf" target="_blank">Manual de marca</a>
+        <div class="card-info">
+            <h2>Katze</h2>
+            <div class="links-proposta">
+                <a class="boto-pdf" href="proposta-final-katze.pdf" target="_blank">&#128196; Proposta final</a>
+                <a class="boto-pdf" href="manual-de-marca-katze.pdf" target="_blank">&#128196; Manual de marca</a>
+            </div>
         </div>
     </div>
 
     <div class="card">
-        <h2>Nec Studio</h2>
         <img src="nec-studio.png" alt="Proposta Nec Studio">
-        <div class="links-proposta">
-            <a class="boto-pdf" href="manual-de-marca-nec-studio.pdf" target="_blank">Manual de marca</a>
+        <div class="card-info">
+            <h2>Nec Studio</h2>
+            <div class="links-proposta">
+                <a class="boto-pdf" href="manual-de-marca-nec-studio.pdf" target="_blank">&#128196; Manual de marca</a>
+            </div>
         </div>
     </div>
 

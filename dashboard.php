@@ -108,7 +108,7 @@ try {
 
         <!-- Missatge personalitzat -->
         <div class="dashboard-welcome" style="position: relative;">
-            <a href="votacio-logo/" target="_blank" style="position: absolute; top: 12px; right: 12px; background: #2e7d32; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">VOTA LA NOVA IMATGE</a>
+            <a href="votacio-logo/" target="_blank" style="position: absolute; top: 12px; right: 12px; background: #f0faf0; color: #1b5e20; border: 2px solid #2e7d32; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">VOTA LA NOVA IMATGE</a>
             <h1>Hola, <?php echo htmlspecialchars($member_name); ?>!</h1>
             <div class="user-info-grid">
                 <div class="info-card">
