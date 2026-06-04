@@ -40,7 +40,7 @@ h1 {
 .card {
     display: flex;
     gap: 20px;
-    align-items: flex-start;
+    align-items: center;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
