@@ -304,7 +304,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="mail-form-group">
                 <label class="mail-form-title" for="claims">Reclamacions</label>
-                <p class="mail-form-warning" role="note">Atenció: responsables de comanda! Feu arribar aquesta informació al proveïdor/a.</p>
                 <p class="mail-help">
                     Productes que <strong>surten a l'albarà</strong> i no han arribat o han arribat en mal estat. 
                 </p>

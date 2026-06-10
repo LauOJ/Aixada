@@ -231,8 +231,7 @@ function reset_password_for_user($user_id, $forceEmailOnly)
     $newPwd = createPassword();
     $auth = new Authentication();
     $db = DBWrap::get_instance();
-
-    do_stored_query('update_password', $user_id, $auth->generate_password_hash($newPwd));
+    $hashedPwd = $auth->generate_password_hash($newPwd);
 
     if ($sendAsEmail) {
         DBWrap::get_instance()->free_next_results();
@@ -261,17 +260,21 @@ function reset_password_for_user($user_id, $forceEmailOnly)
                         .$Text['nav_myaccount_settings'].'</span>"')
             )."</span></p>\n";
         if (send_mail($toEmail, $subject, $message)) {
+            do_stored_query('update_password', $user_id, $hashedPwd);
             return $Text['msg_pwd_emailed'];
         }
 
         if ($forceEmailOnly) {
+            // No canviem la contrasenya si no hem pogut enviar l'email
             throw new Exception($Text['msg_err_emailed']);
         }
 
+        do_stored_query('update_password', $user_id, $hashedPwd);
         return $Text['msg_pwd_change'].$newPwd.'<br>'.
              '<span style="color:red">'.$Text['msg_err_emailed'].'</span>';
     }
 
+    do_stored_query('update_password', $user_id, $hashedPwd);
     return $Text['msg_pwd_change'] . $newPwd;
 }
 

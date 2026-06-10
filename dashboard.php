@@ -83,7 +83,7 @@ try {
     <header class="login-header">
         <div class="logo">
             <a href="https://lavinagreta.org">
-                <img src="https://lavinagreta.org/aixada/local_config/custom_img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
+                <img src="img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
             </a>
         </div>
 
@@ -137,7 +137,7 @@ try {
                     <p>Fes clic a la següent imatge per accedir a l'<a href="aixada_main.php" class="dashboard-link">Aixada</a></p>
                     <div class="dashboard-icon">
                         <a href="aixada_main.php">
-                            <img src="https://lavinagreta.org/aixada/local_config/custom_img/logo-aixada.png" alt="Aixada" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+                            <img src="img/logo-aixada.png" alt="Aixada" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
                         </a>
                     </div>
                     <p style="margin-top: 12px; font-size: 0.9rem; color: #6b7280; text-align: center;">
