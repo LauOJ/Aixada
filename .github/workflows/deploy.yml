@@ -21,21 +21,15 @@ jobs:
           SFTP_PASSWORD: ${{ secrets.PRD_SFTP_PASSWORD }}
         run: |
           sudo apt-get install -y lftp
-          lftp -c "
+          cat > /tmp/deploy.lftp << EOF
           set sftp:auto-confirm yes
           set net:timeout 30
           set net:max-retries 3
-          open -u vinagreta-aixada,\$SFTP_PASSWORD sftp://web-12.pangea.org
-          mirror --reverse --delete --verbose \
-            --exclude-glob .git/ \
-            --exclude-glob .github/ \
-            --exclude-glob local_config/config.php \
-            --exclude-glob local_config/debug_mail/ \
-            --exclude-glob local_config/export/ \
-            --exclude-glob local_config/custom_img/ \
-            . /lavinagreta-aixada/
+          open -u vinagreta-aixada,${SFTP_PASSWORD} sftp://web-12.pangea.org
+          mirror --reverse --delete --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob local_config/config.php --exclude-glob local_config/debug_mail/ --exclude-glob local_config/export/ --exclude-glob local_config/custom_img/ . /lavinagreta-aixada/
           bye
-          "
+          EOF
+          lftp -f /tmp/deploy.lftp
 
   deploy-proves:
     if: github.ref == 'refs/heads/develop'
@@ -51,18 +45,12 @@ jobs:
           SFTP_PASSWORD: ${{ secrets.PROVES_SFTP_PASSWORD }}
         run: |
           sudo apt-get install -y lftp
-          lftp -c "
+          cat > /tmp/deploy.lftp << EOF
           set sftp:auto-confirm yes
           set net:timeout 30
           set net:max-retries 3
-          open -u lavinag_aixprov,\$SFTP_PASSWORD sftp://web-12.pangea.org
-          mirror --reverse --delete --verbose \
-            --exclude-glob .git/ \
-            --exclude-glob .github/ \
-            --exclude-glob local_config/config.php \
-            --exclude-glob local_config/debug_mail/ \
-            --exclude-glob local_config/export/ \
-            --exclude-glob local_config/custom_img/ \
-            . /aixada_proves/
+          open -u lavinag_aixprov,${SFTP_PASSWORD} sftp://web-12.pangea.org
+          mirror --reverse --delete --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob local_config/config.php --exclude-glob local_config/debug_mail/ --exclude-glob local_config/export/ --exclude-glob local_config/custom_img/ . /aixada_proves/
           bye
-          "
+          EOF
+          lftp -f /tmp/deploy.lftp
