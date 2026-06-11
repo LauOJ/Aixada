@@ -1168,10 +1168,6 @@
 							<td>&nbsp;</td>
 							<td><?php echo $Text['active']?></td>
 							<td><input type="checkbox" name="uf_info_active" /></td>
-							<td colspan="5">&nbsp;</td>
-						</tr>
-						<tr>
-							<td colspan="10">&nbsp;</td>
 						</tr>
 						<tr>
 							<td class="minwidth-180"><?php echo $Text['mentor_uf'] ;?>: </td>
