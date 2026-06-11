@@ -11,6 +11,9 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
+      - name: Configure git symlinks
+        run: git config --global core.symlinks false
+
       - uses: actions/checkout@v4
 
       - name: Deploy to PRD via SFTP
@@ -38,6 +41,9 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
+      - name: Configure git symlinks
+        run: git config --global core.symlinks false
+
       - uses: actions/checkout@v4
 
       - name: Deploy to Proves via SFTP
