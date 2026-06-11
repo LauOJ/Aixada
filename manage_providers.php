@@ -1597,9 +1597,6 @@
 					</ul>
 
 					<div id="tab-actius" class="ui-widget-content ui-corner-all">
-						<h4 class="ui-widget-header">&nbsp;
-							<span style="float:right; margin-top:-2px; margin-right:4px;"><img class="loadSpinnerActive" src="img/ajax-loader.gif"/></span>
-						</h4>
 						<table id="tbl_providers" class="tblListingDefault" >
 							<thead>
 								<tr>
@@ -1630,9 +1627,6 @@
 					</div>
 
 					<div id="tab-inactius" class="ui-widget-content ui-corner-all">
-						<h4 class="ui-widget-header">&nbsp;
-							<span style="float:right; margin-top:-2px; margin-right:4px;"><img class="loadSpinnerInactive" src="img/ajax-loader.gif"/></span>
-						</h4>
 						<table id="tbl_providers_inactive" class="tblListingDefault" >
 							<thead>
 								<tr>

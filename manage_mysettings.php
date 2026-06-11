@@ -345,9 +345,6 @@
 		
 			<div id="edit_my_settings" class="ui-widget editMemberElements">
 					<div class="ui-widget-content ui-corner-all member-info" id="detail_member_{id}">
-					<h3 class="ui-widget-header ui-corner-all">&nbsp;
-						<span style="float:right; margin-top:-2px; margin-right:4px;"><img class="loadSpinner" src="img/ajax-loader.gif"/></span>
-					</h3>
 						<p>&nbsp;</p>
 						<form id="frm_save_member_{id}">
 							<input type="hidden" name="member_id" value="{id}"/>

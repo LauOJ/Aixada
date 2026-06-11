@@ -622,12 +622,14 @@ tbody tr:first-child td[colspan] {
    del tipus de lletra i inflen el row 1-2px. Neutralitzem els causants del canvi d'altura
    i posem els colors visuals explícitament perquè el hover es noti igualment. */
 /* Hover explícit sobre links d'acció dins files de taula */
-table.tblListingDefault tbody tr td a:hover {
+table.tblListingDefault tbody tr td a:hover,
+table.tblListingBorder tbody tr td a:hover {
     color: #0a2a52 !important;
     text-decoration: underline !important;
 }
 
-table.tblListingDefault tbody tr.ui-state-hover {
+table.tblListingDefault tbody tr.ui-state-hover,
+table.tblListingBorder tbody tr.ui-state-hover {
     border: none !important;
     outline: none !important;
     font-weight: normal !important;
@@ -635,7 +637,8 @@ table.tblListingDefault tbody tr.ui-state-hover {
     background: #d0e5f5 !important;
     background-image: none !important;
 }
-table.tblListingDefault tbody tr.ui-state-highlight {
+table.tblListingDefault tbody tr.ui-state-highlight,
+table.tblListingBorder tbody tr.ui-state-highlight {
     border: none !important;
     outline: none !important;
     font-weight: normal !important;
