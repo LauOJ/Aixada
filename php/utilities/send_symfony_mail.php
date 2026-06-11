@@ -7,9 +7,10 @@ use Symfony\Component\Mime\Address;
 
 function send_symfony_mail($from, $reply_to, $to, $subject, $messageHTML, $options) {
 
-    // 'email_SMTP_encryption': It is only used to determine if it has value or not
-    //      See: https://www.ionos.es/digitalguide/servidores/seguridad/ssl-y-tls/
-    $dsn = (get_config('email_SMTP_encryption') ? 'smtps://' : 'smtp://') . 
+    // smtps:// = SSL implícit (port 465). smtp:// = plain o STARTTLS (port 587).
+    // 'tls' significa STARTTLS → smtp://. Només 'ssl' usa smtps://.
+    $scheme = (get_config('email_SMTP_encryption') === 'ssl') ? 'smtps://' : 'smtp://';
+    $dsn = $scheme .
             get_config('email_SMTP_user', $from) . ':' .
             get_config('email_SMTP_pswd') . '@' .
             get_config('email_SMTP_host') . ':' .
@@ -78,7 +79,7 @@ function send_symfony_mail($from, $reply_to, $to, $subject, $messageHTML, $optio
     try {
         $mailer->send($message);
         return true;
-    } catch(Exception $e) {
+    } catch(\Throwable $e) {
         return false;
     }
 }

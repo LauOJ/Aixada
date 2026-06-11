@@ -83,7 +83,7 @@ try {
     <header class="login-header">
         <div class="logo">
             <a href="https://lavinagreta.org">
-                <img src="https://lavinagreta.org/aixada/local_config/custom_img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
+                <img src="img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
             </a>
         </div>
 
@@ -107,7 +107,8 @@ try {
     <div id="wrap" style="margin-top: 70px;">
 
         <!-- Missatge personalitzat -->
-        <div class="dashboard-welcome">
+        <div class="dashboard-welcome" style="position: relative;">
+            <a href="votacio-logo/" target="_blank" style="position: absolute; top: 12px; right: 12px; background: #f0faf0; color: #1b5e20; border: 2px solid #2e7d32; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem; transition: background 0.2s, color 0.2s;" onmouseover="this.style.background='#2e7d32';this.style.color='white';" onmouseout="this.style.background='#f0faf0';this.style.color='#1b5e20';">VOTA LA NOVA IMATGE!</a>
             <h1>Hola, <?php echo htmlspecialchars($member_name); ?>!</h1>
             <div class="user-info-grid">
                 <div class="info-card">
@@ -136,7 +137,7 @@ try {
                     <p>Fes clic a la següent imatge per accedir a l'<a href="aixada_main.php" class="dashboard-link">Aixada</a></p>
                     <div class="dashboard-icon">
                         <a href="aixada_main.php">
-                            <img src="https://lavinagreta.org/aixada/local_config/custom_img/logo-aixada.png" alt="Aixada" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+                            <img src="img/logo-aixada.png" alt="Aixada" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
                         </a>
                     </div>
                     <p style="margin-top: 12px; font-size: 0.9rem; color: #6b7280; text-align: center;">
