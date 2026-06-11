@@ -17,21 +17,24 @@ jobs:
         run: git config --global core.symlinks false
 
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Deploy to Proves via SFTP
+      - name: Install lftp
+        run: sudo apt-get install -y lftp
+
+      - name: Deploy to Proves
         env:
           SFTP_PASSWORD: ${{ secrets.PROVES_SFTP_PASSWORD }}
         run: |
-          sudo apt-get install -y lftp
-          cat > /tmp/deploy.lftp << EOF
-          set sftp:auto-confirm yes
-          set net:timeout 30
-          set net:max-retries 3
-          open -u lavinag_aixprov,${SFTP_PASSWORD} sftp://web-12.pangea.org
-          mirror --reverse --delete --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob local_config/config.php --exclude-glob local_config/debug_mail/ --exclude-glob local_config/export/ --exclude-glob local_config/custom_img/ . /aixada_proves/
-          bye
-          EOF
-          lftp -f /tmp/deploy.lftp
+          chmod +x .github/scripts/sftp-deploy.sh
+          .github/scripts/sftp-deploy.sh \
+            "${{ github.event.pull_request.base.sha }}" \
+            "${{ github.event.pull_request.head.sha }}" \
+            "/aixada_proves" \
+            "lavinag_aixprov" \
+            "web-12.pangea.org" \
+            "$SFTP_PASSWORD"
 
   deploy-prd:
     if: github.event_name == 'push'
@@ -41,18 +44,21 @@ jobs:
         run: git config --global core.symlinks false
 
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Deploy to PRD via SFTP
+      - name: Install lftp
+        run: sudo apt-get install -y lftp
+
+      - name: Deploy to PRD
         env:
           SFTP_PASSWORD: ${{ secrets.PRD_SFTP_PASSWORD }}
         run: |
-          sudo apt-get install -y lftp
-          cat > /tmp/deploy.lftp << EOF
-          set sftp:auto-confirm yes
-          set net:timeout 30
-          set net:max-retries 3
-          open -u vinagreta-aixada,${SFTP_PASSWORD} sftp://web-12.pangea.org
-          mirror --reverse --delete --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob local_config/config.php --exclude-glob local_config/debug_mail/ --exclude-glob local_config/export/ --exclude-glob local_config/custom_img/ . /lavinagreta-aixada/
-          bye
-          EOF
-          lftp -f /tmp/deploy.lftp
+          chmod +x .github/scripts/sftp-deploy.sh
+          .github/scripts/sftp-deploy.sh \
+            "${{ github.event.before }}" \
+            "${{ github.sha }}" \
+            "/lavinagreta-aixada" \
+            "vinagreta-aixada" \
+            "web-12.pangea.org" \
+            "$SFTP_PASSWORD"
