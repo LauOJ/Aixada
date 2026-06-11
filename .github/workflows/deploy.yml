@@ -4,35 +4,13 @@ on:
   push:
     branches:
       - main
-      - develop
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  deploy-prd:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure git symlinks
-        run: git config --global core.symlinks false
-
-      - uses: actions/checkout@v4
-
-      - name: Deploy to PRD via SFTP
-        env:
-          SFTP_PASSWORD: ${{ secrets.PRD_SFTP_PASSWORD }}
-        run: |
-          sudo apt-get install -y lftp
-          cat > /tmp/deploy.lftp << EOF
-          set sftp:auto-confirm yes
-          set net:timeout 30
-          set net:max-retries 3
-          open -u vinagreta-aixada,${SFTP_PASSWORD} sftp://web-12.pangea.org
-          mirror --reverse --delete --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob local_config/config.php --exclude-glob local_config/debug_mail/ --exclude-glob local_config/export/ --exclude-glob local_config/custom_img/ . /lavinagreta-aixada/
-          bye
-          EOF
-          lftp -f /tmp/deploy.lftp
-
   deploy-proves:
-    if: github.ref == 'refs/heads/develop'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Configure git symlinks
@@ -51,6 +29,30 @@ jobs:
           set net:max-retries 3
           open -u lavinag_aixprov,${SFTP_PASSWORD} sftp://web-12.pangea.org
           mirror --reverse --delete --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob local_config/config.php --exclude-glob local_config/debug_mail/ --exclude-glob local_config/export/ --exclude-glob local_config/custom_img/ . /aixada_proves/
+          bye
+          EOF
+          lftp -f /tmp/deploy.lftp
+
+  deploy-prd:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure git symlinks
+        run: git config --global core.symlinks false
+
+      - uses: actions/checkout@v4
+
+      - name: Deploy to PRD via SFTP
+        env:
+          SFTP_PASSWORD: ${{ secrets.PRD_SFTP_PASSWORD }}
+        run: |
+          sudo apt-get install -y lftp
+          cat > /tmp/deploy.lftp << EOF
+          set sftp:auto-confirm yes
+          set net:timeout 30
+          set net:max-retries 3
+          open -u vinagreta-aixada,${SFTP_PASSWORD} sftp://web-12.pangea.org
+          mirror --reverse --delete --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob local_config/config.php --exclude-glob local_config/debug_mail/ --exclude-glob local_config/export/ --exclude-glob local_config/custom_img/ . /lavinagreta-aixada/
           bye
           EOF
           lftp -f /tmp/deploy.lftp
