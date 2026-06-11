@@ -617,6 +617,27 @@ tbody tr:first-child td[colspan] {
     transition: background-color 0.2s ease;
 }
 
+/* Evitar que ui-state-hover infli les files de taula.
+   El tema redmond aplica font-weight:bold + border:1px que canvien les mètriques verticals
+   del tipus de lletra i inflen el row 1-2px. Neutralitzem els causants del canvi d'altura
+   i posem els colors visuals explícitament perquè el hover es noti igualment. */
+table.tblListingDefault tbody tr.ui-state-hover {
+    border: none !important;
+    outline: none !important;
+    font-weight: normal !important;
+    color: #1d5987 !important;
+    background: #d0e5f5 !important;
+    background-image: none !important;
+}
+table.tblListingDefault tbody tr.ui-state-highlight {
+    border: none !important;
+    outline: none !important;
+    font-weight: normal !important;
+    color: #1d5987 !important;
+    background: #b8d8f0 !important;
+    background-image: none !important;
+}
+
 /* ============================================
    TABS MILLORES
    ============================================ */
