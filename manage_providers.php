@@ -1565,25 +1565,26 @@
 						<table id="tbl_providers" class="tblListingDefault" >
 							<thead>
 								<tr>
-									<th>&nbsp;&nbsp;<input type="checkbox" id="toggleProviderBulkActions" name="toggleProviderBulk"/></th>
-									<th class="clickable"><p class="floatLeft"><?php echo $Text['id'];?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
-									<th class="clickable"><p class="floatLeft"><?php echo $Text['provider_name']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>						
+									<th style="text-align:left"><input type="checkbox" id="toggleProviderBulkActions" name="toggleProviderBulk"/></th>
+									<th class="clickable textAlignRight" style="white-space:nowrap; min-width:42px"><p class="floatLeft"><?php echo $Text['id'];?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th class="clickable"><p class="floatLeft"><?php echo $Text['provider_name']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
 									<th class="clickable"><p class="floatLeft"><?php echo $Text['phone_pl']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
 									<th class="clickable"><p class="floatLeft"><?php echo $Text['email']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
 									<th class="textAlignLeft clickable"><?php echo $Text['active']; ?>&nbsp; </th>
-									<th class="clickable" colspan="2"><p class="floatLeft"><?php echo $Text['responsible_uf'];?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th class="clickable" style="white-space:nowrap"><p class="floatLeft">UF resp.</p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th></th>
 									
 								</tr>
 							</thead>
 							<tbody>
 								<tr class="clickable" providerId="{id}" responsibleUfId="{responsible_uf_id}" >
-									<td><input type="checkbox" name="providerBulkAction"/></td>
+									<td style="text-align:left"><input type="checkbox" name="providerBulkAction"/></td>
 									<td><p class="textAlignRight">{id}</p></td>
 									<td title="<?php echo $Text['click_to_list']; ?>">{name}</td>
 									<td>{phone1} / {phone2}</p></td>
 									<td>{email}</td>
 									<td><p class="providerActiveStatus iconContainer">{active}</p></td>
-									<td><?php echo $Text['uf_short'];?>{responsible_uf_id} {responsible_uf_name}</td>
+									<td style="text-align:center" title="<?php echo $Text['uf_short'];?>{responsible_uf_id} - {responsible_uf_name}">{responsible_uf_id}</td>
 									<td><a href="javascript:void(null)" class="btn_edit_provider"><?php echo $Text['edit']; ?></a> | <a href="javascript:void(null)" class="btn_del_provider"><?php echo $Text['btn_del']; ?></a></td>
 								</tr>						
 							</tbody>
