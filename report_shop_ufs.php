@@ -364,7 +364,6 @@
 				
         <div id="shop_list" class="ui-widget overviewElements">    
         	<div class="ui-widget-content ui-corner-all">
-	        	<h3 class="ui-widget-header ui-corner-all">&nbsp;<span style="float:right; margin-top:-4px;"><img class="loadSpinner" src="img/ajax-loader.gif"/></span></h3>    
 				<table id="tbl_Shop" class="tblListingDefault">
 					<thead>
 						<tr>

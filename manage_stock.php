@@ -300,7 +300,6 @@
  
 				<div class="ui-widget aix-layout-center80 overviewElements">
 					<div class="ui-widget-content ui-corner-all">
-						<h3 class="ui-widget-header">&nbsp;</h3>
 						<table id="product_list_provider" class="tblListingBorder" >
 							<thead>
 								<tr>

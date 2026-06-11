@@ -1091,6 +1091,8 @@ $Text['msg_activate_prod_ok'] = "El producto se ha activado con éxito.";
 $Text['msg_deactivate_prod_ok'] = "El producto se ha desactivado con éxito.";
 $Text['msg_activate_prov_ok'] = "El proveedor se ha activado con éxito.";
 $Text['msg_deactivate_prov_ok'] = "El proveedor se ha desactivado con éxito.";
+$Text['msg_confirm_deactivate_provider'] = "¿Seguro que quieres desactivar este proveedor?";
+$Text['msg_confirm_activate_provider'] = "¿Seguro que quieres activar este proveedor?";
 $Text['no_stock'] = "Sin stock!!";
 $Text['stock_mov_type'] = "Tipo de movimiento";
 

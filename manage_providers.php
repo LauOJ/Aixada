@@ -74,65 +74,85 @@
 		 *
 		 ***********************************************************/
 
-		//list providers
+		//tabs de proveïdors (actius / inactius)
+		$('#provider_tabs').tabs();
+
+		function initActiveStatus($table) {
+			$('p.providerActiveStatus', $table).each(function(){
+				if ($(this).text() == "1"){
+					$(this).html('<span class="ui-icon ui-icon-check"></span>').addClass('aix-style-ok-green ui-corner-all');
+				} else {
+					$(this).html('<span class="ui-icon ui-icon-cancel"></span>').addClass("noRed ui-corner-all");
+				}
+			});
+		}
+
+		var tableSorterOpts = {
+			textExtraction: function(node){
+				if ($(node).find('.aix-style-ok-green').length == 1) {
+					return 1;
+				} else if ($(node).find('.noRed').length == 1){
+					return 0;
+				} else {
+					return $(node).text();
+				}
+			}
+		};
+
+		//list active providers
 		$('#tbl_providers tbody').xml2html("init", {
+			url: 'php/ctrl/Providers.php',
+			params : 'oper=getProviders&all=0',
+			loadOnInit:true,
+			beforeLoad: function(){
+				$('.loadSpinnerActive').show();
+			},
+			rowComplete : function (rowIndex, row){},
+			complete : function(rowCount){
+				$('.loadSpinnerActive').hide();
+				initActiveStatus('#tbl_providers');
+				$("#tbl_providers").trigger("update");
+			}
+		});
+
+		$("#tbl_providers").tablesorter(tableSorterOpts);
+
+		//list inactive providers
+		$('#tbl_providers_inactive tbody').xml2html("init", {
 			url: 'php/ctrl/Providers.php',
 			params : 'oper=getProviders&all=1',
 			loadOnInit:true,
 			beforeLoad: function(){
-				$('.loadSpinner').show();
+				$('.loadSpinnerInactive').show();
 			},
-			rowComplete : function (rowIndex, row){
-
-			},
+			rowComplete : function (rowIndex, row){},
 			complete : function(rowCount){
-				$('.loadSpinner').hide();
-				//$('tr:even', this).addClass('rowHighlight');
-				$('p.providerActiveStatus').each(function(){
-					if ($(this).text() == "1"){
-						$(this).html('<span class="ui-icon ui-icon-check"></span>').addClass('aix-style-ok-green ui-corner-all')
-					} else {
-						$(this).html('<span class="ui-icon ui-icon-cancel"></span>').addClass("noRed ui-corner-all");
-					}
-				});
-				$("#tbl_providers").trigger("update"); 
+				$('.loadSpinnerInactive').hide();
+				initActiveStatus('#tbl_providers_inactive');
+				// keep only inactive rows
+				$('#tbl_providers_inactive tbody tr').filter(function(){
+					return $(this).find('.aix-style-ok-green').length > 0;
+				}).remove();
+				$("#tbl_providers_inactive").trigger("update");
 			}
 		});
 
-		$("#tbl_providers").tablesorter({
-			textExtraction: function(node){
-				  //should be made faster??	
-		          if ($(node).find('.aix-style-ok-green').length == 1) {
-		            return 1;
-		          } else if ($(node).find('.noRed').length == 1){
-					return 0; 
-			      } else {
-		            return $(node).text();
-		          }
-			}
-		}); 
-		
-		/*$("#tbl_providers").bind('sortEnd', function(){
-			$('tr',this).removeClass('rowHighlight')
-			$('tr:even',this).addClass('rowHighlight');
-		});*/
+		$("#tbl_providers_inactive").tablesorter(tableSorterOpts);
 
-		
-
-		//interactivity of provider listing table
-		$('#tbl_providers tbody tr')
+		//interactivity of provider listing tables (active + inactive)
+		$('#tbl_providers tbody tr, #tbl_providers_inactive tbody tr')
 			.live('mouseenter', function(){
 				$(this).addClass('ui-state-hover');
 			})
 			.live('mouseleave',function(){
-					$(this).removeClass('ui-state-hover');
+				$(this).removeClass('ui-state-hover');
 			})
 			//click on table row
 			.live("click", function(e){
-				$('#tbl_providers tbody tr').removeClass('ui-state-highlight');
+				$('#tbl_providers tbody tr, #tbl_providers_inactive tbody tr').removeClass('ui-state-highlight');
 				gSelProvider = $(this);
 				gSelProvider.addClass('ui-state-highlight');
-				gProductListReload = true; 
+				gProductListReload = true;
 				switchTo('overviewProducts');
 			});
 
@@ -184,7 +204,7 @@
 		//edit provider
 		$('.btn_edit_provider')
 			.live('click', function(e){
-				$('#tbl_providers tbody tr').removeClass('ui-state-highlight');
+				$('#tbl_providers tbody tr, #tbl_providers_inactive tbody tr').removeClass('ui-state-highlight');
 				gSelProvider = $(this).parents('tr');
 				gSelProvider.addClass('ui-state-highlight');
 				
@@ -421,8 +441,6 @@
 		 * 	Deactivate provider 
 		 */
 		function setActiveFlagProvider(providerId, status){
-			
-			$('.loadSpinner').show();
 			var oper = (status==1)? "activateProvider":"deactivateProvider";
 			var successMsg = (status==1)? "<?php echo $Text['msg_activate_prov_ok']; ?>":"<?php echo $Text['msg_deactivate_prov_ok'] ?>";
 
@@ -430,24 +448,39 @@
 			   	url: "php/ctrl/Providers.php?oper="+oper+"&provider_id="+providerId,
 			   	type: 'POST',
 			   	success: function(msg){
-					$('input[name=active_dummy_provider]').attr('checked', status);
-					$.showMsg({
-						msg: successMsg,
-						type: 'success',
-						autoclose:1500});
+					$.showMsg({msg: successMsg, type: 'success', autoclose:1500});
 			   	},
 			   	error : function(XMLHttpRequest, textStatus, errorThrown){
-						$.showMsg({
-								msg: XMLHttpRequest.responseText,
-								type: 'error'});
-
+					$.showMsg({msg: XMLHttpRequest.responseText, type: 'error'});
 				},
 				complete : function(){
-					$('.loadSpinner').hide();
-					$('#tbl_providers tbody').xml2html("reload"); 
-				}				   	
+					$('#tbl_providers tbody').xml2html("reload");
+					$('#tbl_providers_inactive tbody').xml2html("reload");
+				}
 			}); //end ajax
 		}
+
+		$('.btn_toggle_provider').live('click', function(e){
+			e.stopPropagation();
+			var $btn = $(this);
+			var providerId = $btn.parents('tr').attr('providerId');
+			var newStatus = parseInt($btn.data('newStatus'));
+			var confirmMsg = (newStatus === 0)
+				? "<?php echo $Text['msg_confirm_deactivate_provider']; ?>"
+				: "<?php echo $Text['msg_confirm_activate_provider']; ?>";
+			$.showMsg({
+				msg: confirmMsg,
+				buttons: {
+					"<?=$Text['btn_ok'];?>": function(){
+						$(this).dialog('close');
+						setActiveFlagProvider(providerId, newStatus);
+					},
+					"<?=$Text['btn_cancel'];?>": function(){
+						$(this).dialog('close');
+					}
+				}
+			});
+		});
 
 		
 
@@ -1553,45 +1586,71 @@
  
  
  
-				 <!-- 
+				 <!--
 							PROVIDER LISTING
-							
+
 				 -->
-				<div class="ui-widget pgProviderOverview">
-					<div class="ui-widget-content ui-corner-all">
-					<h4 class="ui-widget-header">&nbsp;
-						<span style="float:right; margin-top:-2px; margin-right:4px;"><img class="loadSpinner" src="img/ajax-loader.gif"/></span>
-					</h4>
+				<div id="provider_tabs" class="ui-widget pgProviderOverview">
+					<ul>
+						<li><a href="#tab-actius"><h2>Actius</h2></a></li>
+						<li><a href="#tab-inactius"><h2>Inactius</h2></a></li>
+					</ul>
+
+					<div id="tab-actius" class="ui-widget-content ui-corner-all">
 						<table id="tbl_providers" class="tblListingDefault" >
 							<thead>
 								<tr>
-									<th>&nbsp;&nbsp;<input type="checkbox" id="toggleProviderBulkActions" name="toggleProviderBulk"/></th>
-									<th class="clickable"><p class="floatLeft"><?php echo $Text['id'];?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
-									<th class="clickable"><p class="floatLeft"><?php echo $Text['provider_name']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>						
+									<th style="text-align:left"><input type="checkbox" id="toggleProviderBulkActions" name="toggleProviderBulk"/></th>
+									<th class="clickable textAlignRight" style="white-space:nowrap; min-width:42px"><p class="floatLeft"><?php echo $Text['id'];?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th class="clickable"><p class="floatLeft"><?php echo $Text['provider_name']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
 									<th class="clickable"><p class="floatLeft"><?php echo $Text['phone_pl']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
 									<th class="clickable"><p class="floatLeft"><?php echo $Text['email']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
-									<th class="textAlignLeft clickable"><?php echo $Text['active']; ?>&nbsp; </th>
-									<th class="clickable" colspan="2"><p class="floatLeft"><?php echo $Text['responsible_uf'];?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
-									
+									<th class="clickable" style="white-space:nowrap"><p class="floatLeft">UF resp.</p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th></th>
+									<th></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr class="clickable" providerId="{id}" responsibleUfId="{responsible_uf_id}" >
-									<td><input type="checkbox" name="providerBulkAction"/></td>
+									<td style="text-align:left"><input type="checkbox" name="providerBulkAction"/></td>
 									<td><p class="textAlignRight">{id}</p></td>
 									<td title="<?php echo $Text['click_to_list']; ?>">{name}</td>
-									<td>{phone1} / {phone2}</p></td>
+									<td>{phone1} / {phone2}</td>
 									<td>{email}</td>
-									<td><p class="providerActiveStatus iconContainer">{active}</p></td>
-									<td><?php echo $Text['uf_short'];?>{responsible_uf_id} {responsible_uf_name}</td>
+									<td style="text-align:center" title="<?php echo $Text['uf_short'];?>{responsible_uf_id} - {responsible_uf_name}">{responsible_uf_id}</td>
+									<td><a href="javascript:void(null)" class="btn_toggle_provider" data-new-status="0">Desactivar</a></td>
 									<td><a href="javascript:void(null)" class="btn_edit_provider"><?php echo $Text['edit']; ?></a> | <a href="javascript:void(null)" class="btn_del_provider"><?php echo $Text['btn_del']; ?></a></td>
-								</tr>						
-							</tbody>
-							<tfoot>
-								<tr>
-
 								</tr>
-							</tfoot>
+							</tbody>
+							<tfoot><tr></tr></tfoot>
+						</table>
+					</div>
+
+					<div id="tab-inactius" class="ui-widget-content ui-corner-all">
+						<table id="tbl_providers_inactive" class="tblListingDefault" >
+							<thead>
+								<tr>
+									<th class="clickable textAlignRight" style="white-space:nowrap; min-width:42px"><p class="floatLeft"><?php echo $Text['id'];?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th class="clickable"><p class="floatLeft"><?php echo $Text['provider_name']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th class="clickable"><p class="floatLeft"><?php echo $Text['phone_pl']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th class="clickable"><p class="floatLeft"><?php echo $Text['email']; ?></p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th class="clickable" style="white-space:nowrap"><p class="floatLeft">UF resp.</p><span class="ui-icon ui-icon-triangle-2-n-s"></span></th>
+									<th></th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="clickable" providerId="{id}" responsibleUfId="{responsible_uf_id}" >
+									<td><p class="textAlignRight">{id}</p></td>
+									<td title="<?php echo $Text['click_to_list']; ?>">{name}</td>
+									<td>{phone1} / {phone2}</td>
+									<td>{email}</td>
+									<td style="text-align:center" title="<?php echo $Text['uf_short'];?>{responsible_uf_id} - {responsible_uf_name}">{responsible_uf_id}</td>
+									<td><p class="providerActiveStatus iconContainer" style="display:none">{active}</p><a href="javascript:void(null)" class="btn_toggle_provider" data-new-status="1">Activar</a></td>
+									<td><a href="javascript:void(null)" class="btn_edit_provider"><?php echo $Text['edit']; ?></a> | <a href="javascript:void(null)" class="btn_del_provider"><?php echo $Text['btn_del']; ?></a></td>
+								</tr>
+							</tbody>
+							<tfoot><tr></tr></tfoot>
 						</table>
 					</div>
 				</div>		

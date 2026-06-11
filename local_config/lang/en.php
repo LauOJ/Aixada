@@ -1059,8 +1059,10 @@ $Text['msg_err_deactivate_product'] = "There are open orders for this product. D
 
 $Text['msg_activate_prod_ok'] = "The product has been activated successfully."; 
 $Text['msg_deactivate_prod_ok'] = "The product has been deactivated successfully."; 
-$Text['msg_activate_prov_ok'] = "The provider has been activated successfully."; 
-$Text['msg_deactivate_prov_ok'] = "The provider has been deactivated successfully."; 
+$Text['msg_activate_prov_ok'] = "The provider has been activated successfully.";
+$Text['msg_deactivate_prov_ok'] = "The provider has been deactivated successfully.";
+$Text['msg_confirm_deactivate_provider'] = "Are you sure you want to deactivate this provider?";
+$Text['msg_confirm_activate_provider'] = "Are you sure you want to activate this provider?"; 
 $Text['no_stock'] = "Out of stock!!";
 $Text['stock_mov_type'] = "Movement type";
 
