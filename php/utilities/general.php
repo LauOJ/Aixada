@@ -376,7 +376,7 @@ function get_config($param_name, $default=null) {
 }
 
 function get_coop_logo() {
-    $custom = 'local_config/custom_img/logo.png';
+    $custom = 'img/logo.png';
     return file_exists($custom) ? $custom : 'img/logo-aixada.png';
 }
 
