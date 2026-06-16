@@ -82,9 +82,7 @@ try {
     <!-- Capçalera personalitzada -->
     <header class="login-header">
         <div class="logo">
-            <a href="https://lavinagreta.org">
-                <img src="img/logo-vinagreta.png" alt="La Vinagreta" style="height: 50px; width: auto;">
-            </a>
+            <img src="<?php echo get_coop_logo(); ?>" alt="<?php echo get_config('coop_name', 'Aixada'); ?>" style="height: 50px; width: auto;">
         </div>
 
         <nav class="nav-links">
