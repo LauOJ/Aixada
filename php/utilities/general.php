@@ -55,6 +55,7 @@ function create_session(
         't_created' => time(),
         't_saved' => time()
     );
+    set_aixada_auth_cookie($user_id);
     save_session();
 }
 
@@ -83,9 +84,53 @@ function is_created_session() {
  */
 function logout_session() {
     load_session();
+    clear_aixada_auth_cookie();
     session_regenerate_id(true);
     session_unset();
     session_destroy();
+}
+
+/**
+ * Sets a signed authentication cookie accessible across the full domain.
+ * Used to share login state with other apps on the same domain (e.g. WordPress).
+ * Requires 'wp_auth_secret' and 'cookie_domain' to be set in config.php.
+ *
+ * @param int $user_id The authenticated user's ID.
+ */
+function set_aixada_auth_cookie($user_id) {
+    $secret = get_config('wp_auth_secret', '');
+    $domain = get_config('cookie_domain', '');
+    if (empty($secret) || empty($domain)) return;
+
+    $expiry = time() + 28800; // 8 hours
+    $data   = $user_id . '|' . $expiry;
+    $hmac   = hash_hmac('sha256', $data, $secret);
+
+    setcookie('aixada_auth', $data . '|' . $hmac, [
+        'expires'  => $expiry,
+        'path'     => '/',
+        'domain'   => $domain,
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/**
+ * Clears the Aixada authentication cookie set by set_aixada_auth_cookie().
+ */
+function clear_aixada_auth_cookie() {
+    $domain = get_config('cookie_domain', '');
+    if (empty($domain)) return;
+
+    setcookie('aixada_auth', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'domain'   => $domain,
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
 }
 
 /**
