@@ -142,6 +142,24 @@ function is_aixada_logged_in() {
 }
 
 /**
+ * Redirects to the Aixada login page if the current WordPress page has the
+ * 'aixada-protected' tag and the user is not logged in to Aixada.
+ *
+ * To protect a page: add the tag 'aixada-protected' in the WordPress editor.
+ */
+function aixada_protect_tagged_pages()
+{
+    if (!is_singular()) return;
+    if (!has_tag('aixada-protected')) return;
+    if (is_aixada_logged_in()) return;
+
+    $login_url = 'https://lavinagreta.org/aixada/login.php?originating_uri=' . urlencode($_SERVER['REQUEST_URI']);
+    wp_redirect($login_url);
+    exit;
+}
+add_action('template_redirect', 'aixada_protect_tagged_pages');
+
+/**
  * Funció per obtenir el nom complet del membre d'Aixada
  */
 function get_aixada_member_name() {
