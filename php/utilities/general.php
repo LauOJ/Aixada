@@ -1,30 +1,48 @@
 <?php
 
+// These requires are needed when general.php is loaded directly (e.g. wordpress-aixada-integration.php).
+// In normal page flow, database.php already loads both, so require_once silently skips them.
 require_once(__ROOT__ . 'php'.DS.'inc'.DS.'database.php');
 require_once(__ROOT__ . 'local_config'.DS.'config.php');
 
+
+// ─── Session management ───────────────────────────────────────────────────────
+
 /**
- * Creates a Aixada session of the user.
+ * Creates a new Aixada session for the user after a successful login.
+ * Stores all user data (ID, roles, language, theme...) in $_SESSION['userdata'].
+ *
+ * @param int $user_id
+ * @param string $login
+ * @param int $uf_id
+ * @param int $member_id
+ * @param int $provider_id
+ * @param array $roles List of roles available to the user.
+ * @param string $current_role The active role.
+ * @param array $language_keys List of available language codes.
+ * @param array $language_names List of available language display names.
+ * @param string $current_language_key The active language code.
+ * @param string $theme The active UI theme.
  */
 function create_session(
-        $user_id, 
-        $login, 
-        $uf_id, 
-        $member_id, 
-        $provider_id, 
-        $roles, 
-        $current_role, 
-        $language_keys, 
-        $language_names, 
-        $current_language_key, 
+        $user_id,
+        $login,
+        $uf_id,
+        $member_id,
+        $provider_id,
+        $roles,
+        $current_role,
+        $language_keys,
+        $language_names,
+        $current_language_key,
         $theme
     ) {
     load_session();
     $_SESSION['userdata'] = array(
         'user_id' => $user_id,
         'login' => $login,
-        'uf_id' => $uf_id, 
-        'member_id' => $member_id, 
+        'uf_id' => $uf_id,
+        'member_id' => $member_id,
         'provider_id' => $provider_id,
         'roles' => $roles,
         'current_role' => $current_role,
@@ -37,11 +55,12 @@ function create_session(
         't_created' => time(),
         't_saved' => time()
     );
+    set_aixada_auth_cookie($user_id);
     save_session();
-} 
+}
 
 /**
- * Load php session if is not yet loaded.
+ * Starts the PHP session if it has not been started yet.
  */
 function load_session() {
     if (!isset($_SESSION)) {
@@ -50,7 +69,9 @@ function load_session() {
 }
 
 /**
- * Determines if the Aixada session of the user exist, returns true/false
+ * Returns true if the user has an active Aixada session, false otherwise.
+ *
+ * @return bool
  */
 function is_created_session() {
     load_session();
@@ -58,17 +79,62 @@ function is_created_session() {
 }
 
 /**
- * Logout Aixada session destroying php session.
+ * Destroys the current session securely.
+ * Regenerates the session ID first to prevent session fixation attacks.
  */
 function logout_session() {
     load_session();
+    clear_aixada_auth_cookie();
     session_regenerate_id(true);
     session_unset();
     session_destroy();
 }
 
 /**
- * Save Aixada session (only used in this general.php)
+ * Sets a signed authentication cookie accessible across the full domain.
+ * Used to share login state with other apps on the same domain (e.g. WordPress).
+ * Requires 'wp_auth_secret' and 'cookie_domain' to be set in config.php.
+ *
+ * @param int $user_id The authenticated user's ID.
+ */
+function set_aixada_auth_cookie($user_id) {
+    $secret = get_config('wp_auth_secret', '');
+    $domain = get_config('cookie_domain', '');
+    if (empty($secret) || empty($domain)) return;
+
+    $expiry = time() + 28800; // 8 hours
+    $data   = $user_id . '|' . $expiry;
+    $hmac   = hash_hmac('sha256', $data, $secret);
+
+    setcookie('aixada_auth', $data . '|' . $hmac, [
+        'expires'  => $expiry,
+        'path'     => '/',
+        'domain'   => $domain,
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/**
+ * Clears the Aixada authentication cookie set by set_aixada_auth_cookie().
+ */
+function clear_aixada_auth_cookie() {
+    $domain = get_config('cookie_domain', '');
+    if (empty($domain)) return;
+
+    setcookie('aixada_auth', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'domain'   => $domain,
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/**
+ * Persists the current session data and updates the last-saved timestamp.
  */
 function save_session() {
     $_SESSION['userdata']['t_saved'] = time();
@@ -76,28 +142,32 @@ function save_session() {
 }
 
 /**
- * Validate the Aixada session, throw error if the user is not logged in.
+ * Validates the current session. Throws AuthException if the user is not
+ * logged in, if the session has been inactive for more than 30 days,
+ * or if the client IP or browser has changed (possible session hijacking).
+ * Refreshes the session timestamp every 15 minutes.
+ *
+ * @throws AuthException
  */
 function validate_session() {
     load_session();
     if (!isset($_SESSION['userdata'])) {
         throw new AuthException("Not logged in");
     }
-    // For compatibility with old versions the creation tate is forced if it does not exist.
+    // For compatibility with old versions the creation date is forced if it does not exist.
     if (!isset($_SESSION['userdata']['t_saved'])) {
         $_SESSION['userdata']['t_saved'] = time();
         $_SESSION['userdata']['cli_addr'] = $_SERVER['REMOTE_ADDR'];
         $_SESSION['userdata']['cli_agent'] = $_SERVER['HTTP_USER_AGENT'];
     }
 
-    // Check if the session is still valid.
     if ((time() - $_SESSION['userdata']['t_saved']) > 30 * 86400 || // More than 30 days inactive
-        $_SESSION['userdata']['cli_addr'] !== $_SERVER['REMOTE_ADDR'] || // Client IP address is changed
-        $_SESSION['userdata']['cli_agent'] !== $_SERVER['HTTP_USER_AGENT'] // Client browser is changed
+        $_SESSION['userdata']['cli_addr'] !== $_SERVER['REMOTE_ADDR'] || // Client IP changed
+        $_SESSION['userdata']['cli_agent'] !== $_SERVER['HTTP_USER_AGENT'] // Client browser changed
     ) {
         logout_session();
         throw new AuthException("Not logged in");
-    } 
+    }
     if ((time() - $_SESSION['userdata']['t_saved']) > 15 * 60) { // > 15 min
         save_session();
         load_session();
@@ -105,7 +175,11 @@ function validate_session() {
 }
 
 /**
- * Returns a value of the Aixada session, throw error if is not logged in.
+ * Returns a value from the current session. Validates the session first.
+ *
+ * @param string $name The session key (e.g. 'user_id', 'login', 'current_role').
+ * @return mixed
+ * @throws AuthException if not logged in.
  */
 function get_session_value($name) {
     validate_session();
@@ -113,36 +187,43 @@ function get_session_value($name) {
 }
 
 /**
- * Returns the user_id of the logged user; wraps a check around this, in order to make sure
- * the value is set. 
+ * Returns the user_id of the logged-in user.
+ * @return int
  */
 function get_session_user_id() {
     return get_session_value('user_id');
 }
 
 /**
- * returns the uf of the logged user. 
+ * Returns the uf_id of the logged-in user.
+ * @return int
  */
 function get_session_uf_id() {
     return get_session_value('uf_id');
 }
 
 /**
- * Returns the member_id of the logged user. 
+ * Returns the member_id of the logged-in user.
+ * @return int
  */
 function get_session_member_id() {
     return get_session_value('member_id');
 }
 
 /**
- * Returns the login of the logged user. 
+ * Returns the login name of the logged-in user.
+ * @return string
  */
 function get_session_login() {
     return get_session_value('login');
 }
 
 /**
- * returns the language for the logged user
+ * Returns the active language code for the current user.
+ * Does NOT validate the session — safe to call before login (e.g. on login page).
+ * Falls back to the default language from config.php if no session exists.
+ *
+ * @return string Language code (e.g. 'ca-va', 'es', 'en').
  */
 function get_session_language() {
     if (is_created_session()) {
@@ -153,47 +234,52 @@ function get_session_language() {
 }
 
 /**
- * returns the theme for the logged user
+ * Returns the active UI theme for the current user.
+ * Falls back to the default theme from config.php if no session exists.
+ *
+ * @return string Theme name.
  */
 function get_session_theme() {
     if (is_created_session()) {
-		return $_SESSION['userdata']['theme'];
+        return $_SESSION['userdata']['theme'];
     } else {
-		return	configuration_vars::get_instance()->default_theme;
-    }	 
+        return configuration_vars::get_instance()->default_theme;
+    }
 }
 
 /**
- * retrieves active role of the logged user
+ * Returns the active role of the logged-in user.
+ *
+ * @return string Role name (e.g. 'Consumer', 'Hacker Commission').
  */
 function get_current_role()
 {
-    return get_session_value('current_role'); 
+    return get_session_value('current_role');
 }
 
 /**
-* Changes the role of a user. Information is written to $_SESSION['userdata'].
-*/
+ * Changes the active role of the current user.
+ * Only roles already assigned to the user are accepted.
+ *
+ * @param string $new_role The role to switch to.
+ * @throws AuthException if the role is not assigned to the user.
+ */
 function change_session_role($new_role) {
     validate_session();
     if (!in_array($new_role, $_SESSION['userdata']['roles'])) {
         throw new AuthException("Not logged in role. Available roles: " . implode(', ', $_SESSION['userdata']['roles']) . ". Requested: " . $new_role);
     }
     $_SESSION['userdata']['current_role'] = $new_role;
-    $_SESSION['userdata']['t_saved'] = time();
-    // Force session write
-    session_write_close();
-    // Reopen session immediately to ensure changes are persisted
-    session_start();
-    // Reload session data to verify the change was saved
-    if (isset($_SESSION['userdata']['current_role']) && $_SESSION['userdata']['current_role'] !== $new_role) {
-        throw new Exception("Failed to save role change. Expected: " . $new_role . ", Got: " . $_SESSION['userdata']['current_role']);
-    }
+    save_session();
 }
 
 /**
-* Changes the language of a user. Information is written to $_SESSION['userdata'].
-*/
+ * Changes the active language of the current user.
+ * Only languages available in the session are accepted.
+ *
+ * @param string $new_language_key The language code to switch to.
+ * @throws AuthException if the language is not valid.
+ */
 function change_session_language($new_language_key) {
     validate_session();
     if (!in_array($new_language_key, $_SESSION['userdata']['language_keys'])) {
@@ -203,74 +289,76 @@ function change_session_language($new_language_key) {
     save_session();
 }
 
+
+// ─── URL parameter helpers ────────────────────────────────────────────────────
+
 /**
- * 
- * Provides some basic logic to retrieve values from URL parameters. 
- * @param str $param_name the name of the parameter passed along 
- * @param $default a default value. if the parameter is not set, the default value will be used
- * @param str $transform basic string transforms applied to the value of the parameter
- * @throws Exception
+ * Reads a parameter from the HTTP request ($_REQUEST covers both GET and POST).
+ * Returns $default if the parameter is missing or empty.
+ * Throws an exception if neither the parameter nor a default is available.
+ *
+ * Special shortcut: passing -1 for 'uf_id', 'user_id' or 'member_id'
+ * automatically returns the value from the current session.
+ *
+ * Supported $transform values: 'lowercase', 'array2String', '' (none).
+ *
+ * @param string $param_name The request parameter name.
+ * @param mixed $default Default value if parameter is missing.
+ * @param string $transform Optional transformation to apply to the value.
+ * @return mixed
+ * @throws Exception if parameter is missing and no default is provided.
  */
 function get_param($param_name, $default=null, $transform = '') {
-	$value; 
+    $value = null;
 
-	if (isset($_REQUEST[$param_name])) {
-		$value = $_REQUEST[$param_name];
-		if (($value == '' || $value == 'undefined') && isset($default)) {
-			$value = $default;
-		} else if (($value == '' || $value == 'undefined') && !isset($default)) {
-			throw new Exception("get_param: Parameter: {$param_name} has no value and no default value");
-		}	
-			
-	} else if (isset($default) and $default !== null) {
-		$value= $default;
-	} else {
-		throw new Exception("get_param: Missing or wrong parameter name: {$param_name} in URL");
-	}
-	
-	//utility hack to retrieve uf_id or user_id from session. e.g. &uf_id=-1
-	if ($param_name == "uf_id" && $value==-1) {
-		$value = get_session_uf_id();	
-	} else if ($param_name == "user_id" && $value==-1) {
-		$value = get_session_user_id();
-	} else if ($param_name == "member_id" && $value==-1) {
-		$value = get_session_member_id();
-	}
-	
-	
-	switch ($transform) {
-		case 'lowercase':
-			$value = strtolower($value);
-			break;
-			
-		case '':
-			$value = $value; 
-			break;
-		
-		case 'array2String':
-			$str = "";
-			foreach ($value as $v) {
-				$str .= $v.",";
-			}
-			$value = rtrim($str,",");
-			break;
-			
-		default: 
-			throw new Exception("get_param: transform '{$transform}' on URL parameter not supported. ");
-			break;
-	}
-	return $value;
+    if (isset($_REQUEST[$param_name])) {
+        $value = $_REQUEST[$param_name];
+        if (($value == '' || $value == 'undefined') && isset($default)) {
+            $value = $default;
+        } else if (($value == '' || $value == 'undefined') && !isset($default)) {
+            throw new Exception("get_param: Parameter: {$param_name} has no value and no default value");
+        }
+    } else if (isset($default) and $default !== null) {
+        $value = $default;
+    } else {
+        throw new Exception("get_param: Missing or wrong parameter name: {$param_name} in URL");
+    }
+
+    // Shortcut: -1 means "use the current session value"
+    if ($param_name == "uf_id" && $value == -1) {
+        $value = get_session_uf_id();
+    } else if ($param_name == "user_id" && $value == -1) {
+        $value = get_session_user_id();
+    } else if ($param_name == "member_id" && $value == -1) {
+        $value = get_session_member_id();
+    }
+
+    switch ($transform) {
+        case 'lowercase':
+            $value = strtolower($value);
+            break;
+        case 'array2String':
+            $str = "";
+            foreach ($value as $v) {
+                $str .= $v.",";
+            }
+            $value = rtrim($str,",");
+            break;
+        case '':
+            break;
+        default:
+            throw new Exception("get_param: transform '{$transform}' on URL parameter not supported.");
+    }
+    return $value;
 }
 
 /**
+ * Like get_param() but ensures the returned value is numeric.
+ * Returns $default (if numeric) or null if the value is not numeric.
  *
- * Provides some basic logic to retrieve numeric values from URL parameters. 
- * @param string       $param_name  Name of the parameter passed along
- * @param number|string|null  $default     Default value used when parameter is
- *     not set (default value must bee numeric and if it is a string it will be
- *     converted to a number, otherwise null is used)
- * @return number|null Returns a number if parameter exist and it is numeric,
- *     otherwise returns $default.
+ * @param string $param_name
+ * @param number|null $default
+ * @return number|null
  */
 function get_param_numeric($param_name, $default=null) {
     $val = get_param($param_name, false);
@@ -281,14 +369,11 @@ function get_param_numeric($param_name, $default=null) {
 }
 
 /**
+ * Like get_param_numeric() but ensures the value is an integer (no decimals).
  *
- * Provides some basic logic to retrieve integer values from URL parameters. 
- * @param string    $param_name  Name of the parameter passed along
- * @param int|string|null $default Default value used when parameter is not set,
- *     (default value must bee a numeric value without decimals and if it is a
- *      string it will be converted to a integer, otherwise null is used)
- * @return int|null Returns a integer if parameter exist and it is a integer
- *     number, otherwise returns $default.
+ * @param string $param_name
+ * @param int|null $default
+ * @return int|null
  */
 function get_param_int($param_name, $default=null) {
     $val = get_param_numeric($param_name);
@@ -298,47 +383,44 @@ function get_param_int($param_name, $default=null) {
     return $val;
 }
 
-
 /**
- * Provides some basic logic to retrieve array of integers from URL parameters. 
- * @param string    $param_name  Name of the parameter passed along
- * @param array(int|string)|string|null  $default  Default value used when 
- *     parameter is not set (default value must bee a array of integers or a
- *     string that corresponds to a list integers, if not null is used as
- *     default)
- * @return array(int)|null Returns a array of integers if parameter exist and it
- *     is a array of integers, otherwise returns $default.
+ * Like get_param() but parses a comma-separated string into an array of integers.
+ * Returns null if any element is not an integer.
+ *
+ * @param string $param_name
+ * @param array|string|null $default
+ * @param string $separator Delimiter character (default ',').
+ * @return array|null
  */
 function get_param_array_int($param_name, $default=null, $separator=',') {
-	$val = get_param($param_name, false);
-	if ($val !== false) {
-		$str_array = explode($separator, $val);
-	} else {
-		if (!is_array($default) && !$default) { return null; } // exit
-		if (is_array($default)) {
-			$str_array = $default;
-		} else {
-			$str_array = explode($separator, $default);
-		}
-	}
-	$result = array();
-	foreach ($str_array as $item) {
-		if (!is_numeric($item) || !is_int($item+0)) { return null; } // exit
-		array_push($result, $item+0);
-	}
-	return $result;
+    $val = get_param($param_name, false);
+    if ($val !== false) {
+        $str_array = explode($separator, $val);
+    } else {
+        if (!is_array($default) && !$default) { return null; }
+        if (is_array($default)) {
+            $str_array = $default;
+        } else {
+            $str_array = explode($separator, $default);
+        }
+    }
+    $result = array();
+    foreach ($str_array as $item) {
+        if (!is_numeric($item) || !is_int($item+0)) { return null; }
+        array_push($result, $item+0);
+    }
+    return $result;
 }
 
 /**
+ * Like get_param() but validates and normalises a date value.
+ * Accepts any format via $input_format and always returns 'Y-m-d'.
+ * Returns null if the date is invalid and no valid default is provided.
  *
- * Provides some basic logic to retrieve date values from URL parameters. 
- * @param string      $param_name   Name of the parameter passed along
- * @param string|null $default      Default value used when parameter is not
- *     set, (default value must bee a valid date as format 'Y-m-d', if not a
- *     null is used as default)
- * @param string      $input_format Input date format, default is 'Y-m-d'
- * @return string|null Returns a date with format 'Y-m-d' if parameter exist
- *     and it is a valid date, otherwise returns $default.
+ * @param string $param_name
+ * @param string|null $default Default date in 'Y-m-d' format.
+ * @param string $input_format Expected input format (default 'Y-m-d').
+ * @return string|null Date in 'Y-m-d' format, or null.
  */
 function get_param_date($param_name, $default=null, $input_format='Y-m-d') {
     $val = get_param($param_name, false);
@@ -359,12 +441,16 @@ function get_param_date($param_name, $default=null, $input_format='Y-m-d') {
     return $date_o->format('Y-m-d');
 }
 
+
+// ─── Configuration helpers ────────────────────────────────────────────────────
+
 /**
- * 
- * Provides some basic logic to retrieve values from configuration on config.php
- * @param string $param_name the name of the configuration value. 
- * @param $default A default value, if configuration value is not set, the
- *     default value will be used.
+ * Reads a configuration value from config.php.
+ * Returns $default if the key is not defined.
+ *
+ * @param string $param_name The configuration key.
+ * @param mixed $default Default value if the key is not set.
+ * @return mixed
  */
 function get_config($param_name, $default=null) {
     $cfg = configuration_vars::get_instance();
@@ -375,16 +461,24 @@ function get_config($param_name, $default=null) {
     }
 }
 
+/**
+ * Returns the path to the cooperative's logo.
+ * If img/logo.png exists (placed manually per instance, gitignored),
+ * it is used. Otherwise falls back to the default Aixada logo.
+ *
+ * @return string Relative path to the logo image.
+ */
 function get_coop_logo() {
     $custom = 'img/logo.png';
     return file_exists($custom) ? $custom : 'img/logo-aixada.png';
 }
 
 /**
- * Tranform a $field_types assoc array to field_formats assoc array using the 
- *      configuration value $type_formats.
- * @param array(string) $field_types Associative array with field_name and type of format. 
- * @return array() $field_formats Associative array with field_name and format.
+ * Converts an array of field type codes into display format descriptors,
+ * based on the 'type_formats' configuration in config.php.
+ *
+ * @param array $field_types Associative array of field_name => type_code.
+ * @return array|null Associative array of field_name => format descriptor, or null if not configured.
  */
 function cnv_config_formats($field_types) {
     $cfg_formats = get_config('type_formats');
@@ -403,50 +497,59 @@ function cnv_config_formats($field_types) {
                 break;
             }
         }
-        
     }
     return $field_formats;
 }
 
+
+// ─── Internationalisation (i18n) ──────────────────────────────────────────────
+
 /**
- * Provides some basic logic to retrieve translations using the $Text array.
- * @param string $text_code The code of the text to translate.
- * @param $replace Associative array with the parameters to replace (search=>value)
- * @return Text translated
+ * Translates a text code using the active language's $Text array.
+ * If the code is not found, returns the code itself (useful for spotting missing translations).
+ * Supports placeholder substitution: {key} in the translated string is replaced by $replace['key'].
+ *
+ * @param string $text_code The translation key.
+ * @param array|null $replace Associative array of placeholder => value substitutions.
+ * @return string Translated (and substituted) string.
  */
 function i18n($text_code, $replace=null) {
-	global $Text;
-	if (!isset($Text[$text_code])) {
-		return $text_code;
-	}
-	$text = $Text[$text_code];
+    global $Text;
+    if (!isset($Text[$text_code])) {
+        return $text_code;
+    }
+    $text = $Text[$text_code];
     if ($replace && count($replace)){
-		$r_search = array();
-		$r_replace = array();
-		foreach ($replace as $key => $value) {
-			array_push($r_search, '{'.$key.'}');
-			array_push($r_replace, $value);
-		}
-		$text = str_replace($r_search, $r_replace, $text);
-	}
-	return $text;
+        $r_search = array();
+        $r_replace = array();
+        foreach ($replace as $key => $value) {
+            array_push($r_search, '{'.$key.'}');
+            array_push($r_replace, $value);
+        }
+        $text = str_replace($r_search, $r_replace, $text);
+    }
+    return $text;
 }
+
 /**
- * Same function as i18n but returns a escaped string safe to put into js code.
- * @param string $text_code The code of the text to translate.
- * @param $replace Associative array with the parameters to replace (search=>value)
- * @return Text translated and escaped
+ * Like i18n() but returns a string safe to embed in JavaScript code (quotes and special chars escaped).
+ *
+ * @param string $text_code The translation key.
+ * @param array|null $replace Placeholder substitutions.
+ * @return string Translated and JS-escaped string.
  */
 function i18n_js($text_code, $replace=null) {
     return to_js_str(i18n($text_code, $replace));
 }
+
 /**
- * Escapes a string to use into a js code as string,
- * @param string $text The text.
- * @return string Text with escapes.
+ * Escapes a string for safe embedding inside JavaScript string literals.
+ * Escapes backslashes, newlines, tabs, double quotes and single quotes.
+ *
+ * @param string $text
+ * @return string
  */
 function to_js_str($text) {
-    //return $text;
     return str_replace(
         array("\\",   "\n",  "\r",  "\t", '"',   "'"  ),
         array("\\\\", "\\n", "\\r", "\\t",'\\"', "\\'"),
@@ -454,15 +557,23 @@ function to_js_str($text) {
     );
 }
 
+
+// ─── Email ────────────────────────────────────────────────────────────────────
+
 /**
- * 
- * Sends a email message as html. Use internally php mail. The `from` email
- * address is set acording the key `$admin_email` defined in `config.php`.
- * @param str $to, 
- * @param str $subject
- * @param str $bodyHTML only the body of the html message.
- * @param array $options valid keys are: 'reply_to', 'cc', 'bcc', 'prepend_coop_name'
- * @return boolean as response of php mail.
+ * Sends an HTML email.
+ * The sender address is taken from 'admin_email' in config.php.
+ *
+ * Supports three sending modes configured via 'email_SMTP_host' in config.php:
+ * - Not set: uses PHP's built-in mail() function.
+ * - 'debug': writes the email to local_config/debug_mail/ instead of sending.
+ * - Any SMTP host: sends via Symfony Mailer over SMTP.
+ *
+ * @param string $to Recipient email address.
+ * @param string $subject Email subject.
+ * @param string $bodyHTML HTML body (without <html>/<head> wrapper).
+ * @param array $options Optional keys: 'reply_to', 'cc', 'bcc', 'prepend_coop_name'.
+ * @return bool True if the email was sent successfully.
  */
 function send_mail($to, $subject, $bodyHTML, $options=array())
 {
@@ -472,7 +583,7 @@ function send_mail($to, $subject, $bodyHTML, $options=array())
         $pos_root = strrpos($_SERVER['SCRIPT_NAME'], '/');
     }
     $ssl_on = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-    $url_root = (isset($_SERVER['HTTP_HOST']) ? 
+    $url_root = (isset($_SERVER['HTTP_HOST']) ?
                     $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']).
                 substr($_SERVER['SCRIPT_NAME'],0,$pos_root);
     // get HTML message
@@ -480,7 +591,7 @@ function send_mail($to, $subject, $bodyHTML, $options=array())
     if ($prepend_coop_name) {
         $subject = get_config('coop_name') . ': ' . $subject;
     }
-    $messageHTML = 
+    $messageHTML =
         '<html><head><title>'.$subject."</title></head>\r\n".
         '<body style="font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;">'.
         "\r\n".$bodyHTML."\r\n".
@@ -500,8 +611,8 @@ function send_mail($to, $subject, $bodyHTML, $options=array())
         $reply_to = $from;
     }
 
-    if (!get_config('email_SMTP_host')) { // Send using mail() of PHP
-        $headers = 
+    if (!get_config('email_SMTP_host')) { // Send using PHP's mail()
+        $headers =
             'From: '.$from."\r\n".
             'Reply-To: ' . $reply_to . "\r\n" .
             (isset($options['cc']) ? 'Cc:'.$options['cc']."\r\n" : '') .
@@ -514,7 +625,7 @@ function send_mail($to, $subject, $bodyHTML, $options=array())
         mb_internal_encoding("UTF-8");
         $subject64 = mb_encode_mimeheader($subject);
         return mail($to, $subject64, $messageHTML, $headers);
-    } elseif (get_config('email_SMTP_host') === 'debug') { // Don't send, only dump!
+    } elseif (get_config('email_SMTP_host') === 'debug') { // Write to file instead of sending
         return !!file_put_contents(
             __ROOT__ . '/local_config/debug_mail/mail_' . date("Y-m-d_H-i-s") . '.html',
             "<!DOCTYPE html><html>
@@ -529,25 +640,22 @@ function send_mail($to, $subject, $bodyHTML, $options=array())
             {$messageHTML}
             </body></html>"
         );
-    } else { // Send using smtp propotol
-        if (version_compare(PHP_VERSION, '7.4.0') >= 0) {
-            // Send using symfony-mailer
-            require_once __ROOT__ . 'external/php74/symfony-mailer/vendor/autoload.php';
-            require_once __ROOT__ . 'php/utilities/send_symfony_mail.php';
-            return send_symfony_mail($from, $reply_to, $to, $subject, $messageHTML, $options);
-        } else {
-            // Send using swiftmailer
-            require_once __ROOT__ . 'external/php53_2/swiftmailer-5.x/lib/swift_required.php';
-            require_once __ROOT__ . 'php/utilities/send_swiftmail.php';
-            return send_swiftmail($from, $reply_to, $to, $subject, $messageHTML, $options);
-        }
+    } else { // Send via SMTP using Symfony Mailer
+        require_once __ROOT__ . 'external/php74/symfony-mailer/vendor/autoload.php';
+        require_once __ROOT__ . 'php/utilities/send_symfony_mail.php';
+        return send_symfony_mail($from, $reply_to, $to, $subject, $messageHTML, $options);
     }
 }
 
+
+// ─── Database query helpers ───────────────────────────────────────────────────
+
 /**
- * Execute a stored query
- * @param array $args the arguments to be passed to the stored query; possibly empty
- * @return the result set
+ * Calls a stored procedure (CALL) with the given arguments.
+ * The first argument is the procedure name; subsequent arguments are its parameters.
+ *
+ * @return mysqli_result
+ * @throws DataException if arguments contain both ' and " characters.
  */
 function do_stored_query()
 {
@@ -569,7 +677,7 @@ function do_stored_query()
           if (strpos($arg, '"') !== false)
               throw new DataException('Cannot use both symbols \' and " in text');
           $strSQL .= '"' . $arg . '",';
-      } else 
+      } else
           $strSQL .= "'" . $arg . "',";
   }
   if (count($args))
@@ -580,10 +688,12 @@ function do_stored_query()
 }
 
 /**
- * Execute a SQL query and returns first row.
- * @param string $strSQL A SQL query
- * @param $not_found 
- * @return array The first row found or null if not found row.
+ * Executes a SQL query and returns the first row as an array.
+ * Returns $not_found if no rows are found.
+ *
+ * @param string $strSQL A SQL query string.
+ * @param mixed $not_found Value to return if no row is found (default null).
+ * @return array|mixed
  */
 function get_row_query($strSQL, $not_found = null) {
     $db = DBWrap::get_instance();
@@ -592,16 +702,18 @@ function get_row_query($strSQL, $not_found = null) {
     if (!$row) {
         return $not_found;
     }
-    $db->free_next_results();    
+    $db->free_next_results();
     return $row;
 }
 
 /**
- * Execute a SQL query and returs a list as a string of values on firt column.
- * @param string|array $strSQL A SQL query
- * @param string $separator
- * @param string $text_delimiter
- * @return string The list as a string or '' if no rows or are null value.
+ * Executes a SQL query and returns a flat string of values from the first column,
+ * joined by $separator.
+ *
+ * @param string|array $strSQL A SQL query string.
+ * @param string $separator Delimiter between values (default ',').
+ * @param string $text_delimiter Optional character to wrap each value (default '').
+ * @return string
  */
 function get_list_query($strSQL, $separator=',', $text_delimiter='') {
     return get_list_rs(
@@ -613,12 +725,14 @@ function get_list_query($strSQL, $separator=',', $text_delimiter='') {
 }
 
 /**
- * Walk a mysqli_result to assemble a list  as a string of values on firt column.
- * @param mysqli_query_type $rs
- * @param integer|string $field Field on result set, default is 0
- * @param string $separator
- * @param string $text_delimiter
- * @return string The list as a string or '' if no rows or are null value.
+ * Iterates a mysqli_result and returns a flat string of values from one column,
+ * joined by $separator.
+ *
+ * @param mysqli_result $rs
+ * @param int|string $field Column index or name (default 0).
+ * @param string $separator Delimiter between values (default ',').
+ * @param string $text_delimiter Optional character to wrap each value (default '').
+ * @return string
  */
 function get_list_rs($rs, $field=0, $separator=',', $text_delimiter='') {
     $list = array();
@@ -632,19 +746,25 @@ function get_list_rs($rs, $field=0, $separator=',', $text_delimiter='') {
     return implode($separator, $list);
 }
 
+
+// ─── XML generation (for jqGrid) ─────────────────────────────────────────────
+
+/**
+ * Converts a mysqli_result into a jqGrid-compatible XML string (<rowset>).
+ */
 class output_formatter {
   public function rowset_to_jqgrid_XML($rs, $total_entries=0, $page=0, $limit=0, $total_pages=0)
   {
     $strXML = '';
     if ($rs) {
       $strXML .= '<rowset>';
-      if ($page) 
-	$strXML .= '<page>' . $page . '</page>'; 
+      if ($page)
+	$strXML .= '<page>' . $page . '</page>';
       if ($total_pages)
 	$strXML .= '<total>' . $total_pages . '</total>';
       $strXML .= '<records>' . $total_entries . '</records>';
       $strXML .= "<rows>";
-      while ($row = $rs->fetch_assoc()) 
+      while ($row = $rs->fetch_assoc())
 	$strXML .= $this->row_to_XML($row);
       $rs->free();
       $strXML .= "</rows>";
@@ -655,15 +775,14 @@ class output_formatter {
 
   public function row_to_XML($row)
   {
-
       global $Text;
       $strXML = '<row id="' . $row['id'] . '">';
       $rowXML = '';
       foreach ($row as $field => $value) {
           if (isset($Text[$value]))
               $value = $Text[$value];
-          $rowXML 
-              .= '<' . $field . ' f="' . $field 
+          $rowXML
+              .= '<' . $field . ' f="' . $field
               . '"><![CDATA[' . clean_zeros($value) . "]]></$field>";
       }
 
@@ -672,7 +791,13 @@ class output_formatter {
   }
 }
 
-function stored_query_XML() //$queryname, $group_tag, $row_tag, $param)
+/**
+ * Executes a stored procedure and returns the results as an XML string.
+ * Arguments: procedure_name, group_tag, row_tag, [params...]
+ *
+ * @return string XML string.
+ */
+function stored_query_XML()
 {
   $params = func_get_args();
   $strSQL = array_shift($params);
@@ -681,45 +806,48 @@ function stored_query_XML() //$queryname, $group_tag, $row_tag, $param)
   array_unshift($params, $strSQL);
 
   $strXML = "<$group_tag>";
-//   $rs = ((count($params)>0) ? 
-// 	 do_stored_query($strSQL, $params)
-// 	 : do_stored_query($strSQL));
   $rs = do_stored_query($params);
   global $Text;
   while ($row = $rs->fetch_array()) {
-      $value = ( ($row_tag == 'description' and isset($Text[$row[1]])) ? 
+      $value = ( ($row_tag == 'description' and isset($Text[$row[1]])) ?
                  $Text[$row[1]] : $row[1] );
-      $strXML 
-          .= '<row><id f="id">' . $row[0] 
-          . '</id><' . $row_tag 
-          . ' f="' . $row_tag 
-          . '"><![CDATA[' . clean_zeros($value) . ']]></' . $row_tag 
-          . '></row>'; 
+      $strXML
+          .= '<row><id f="id">' . $row[0]
+          . '</id><' . $row_tag
+          . ' f="' . $row_tag
+          . '"><![CDATA[' . clean_zeros($value) . ']]></' . $row_tag
+          . '></row>';
   }
   $strXML .= "</$group_tag>";
   return $strXML;
 }
 
-// make variable argument list
+/**
+ * Like stored_query_XML() but returns full field data for each row.
+ *
+ * @return string XML string.
+ */
 function stored_query_XML_fields()
 {
     return rs_XML_fields(do_stored_query(func_get_args()));
 }
 
 /**
- * Execute a SQL query and returns a XML <rowset>.
- * @param string|array $strSQL A SQL query
- * @return string The XML
+ * Executes a SQL query and returns the results as a <rowset> XML string.
+ *
+ * @param string|array $strSQL A SQL query string.
+ * @return string XML string.
  */
 function query_XML_fields($strSQL) {
     return '<rowset>'.query_to_XML($strSQL).'</rowset>';
 }
 
 /**
- * Execute a SQL query and returns a list of XML <row>.
- * @param string|array $strSQL A SQL query
- * @param array(string)|null $field_formats Associative array with field_name and format.
- * @return string The XML
+ * Executes a SQL query and returns a list of <row> XML elements.
+ *
+ * @param string|array $strSQL A SQL query string.
+ * @param array|null $field_formats Optional format descriptors (from cnv_config_formats()).
+ * @return string XML string.
  */
 function query_to_XML($strSQL, $field_formats = null) {
     return rs_to_XML(
@@ -728,20 +856,22 @@ function query_to_XML($strSQL, $field_formats = null) {
 }
 
 /**
- * Walk a mysqli_result and returns a XML <rowset>.
+ * Wraps rs_to_XML() output in a <rowset> element.
+ *
  * @param mysqli_result $rs
- * @param array(string)|null $field_formats Associative array with field_name and format.
- * @return string The XML
+ * @param array|null $field_formats Optional format descriptors.
+ * @return string XML string.
  */
 function rs_XML_fields($rs, $field_formats = null) {
     return '<rowset>'.rs_to_XML($rs, $field_formats).'</rowset>';
 }
 
 /**
- * Walk a mysqli_result and returns a list of XML <row>.
+ * Iterates a mysqli_result and returns a list of <row> XML elements.
+ *
  * @param mysqli_result $rs
- * @param array(string)|null $field_formats Associative array with field_name and format. 
- * @return string The XML
+ * @param array|null $field_formats Optional format descriptors.
+ * @return string XML string.
  */
 function rs_to_XML($rs, $field_formats = null) {
     $strXML = '';
@@ -755,10 +885,13 @@ function rs_to_XML($rs, $field_formats = null) {
 }
 
 /**
- * Tranform a assoc array to a XML <row>.
- * @param array $ass_array A associative array
- * @param array(string)|null $field_formats Associative array with field_name and format. 
- * @return string The XML
+ * Converts an associative array (one DB row) into a <row> XML element.
+ * Applies optional field format transformations (dates, numbers).
+ * Translates 'description' field values via $Text if available.
+ *
+ * @param array $ass_array Associative array of field => value.
+ * @param array|null $field_formats Optional format descriptors.
+ * @return string XML string.
  */
 function array_to_XML($ass_array, $field_formats = null) {
     global $Text;
@@ -771,7 +904,7 @@ function array_to_XML($ass_array, $field_formats = null) {
         if ($field_formats && isset($field_formats[$field])) {
             $format = $field_formats[$field];
             if (isset($format['type'])) {
-                $format_f = $format['format'];                    
+                $format_f = $format['format'];
                 switch ($format['type']) {
                 case 'dates':
                     if (!$format_f) {
@@ -812,10 +945,16 @@ function array_to_XML($ass_array, $field_formats = null) {
                 clean_zeros($value)."]]></{$field}>";
         }
     }
-    return $strXML .= '</row>';    
+    return $strXML .= '</row>';
 }
 
-function query_XML() //$strSQL, $group_tag, $row_tag, $param1=0, $param2=0)
+/**
+ * Executes a SQL query and returns results as an XML string with a custom group and row tag.
+ * Arguments: sql_query, group_tag, row_tag, [params...]
+ *
+ * @return string XML string.
+ */
+function query_XML()
 {
   $params = func_get_args();
   $strSQL = array_shift($params);
@@ -826,19 +965,24 @@ function query_XML() //$strSQL, $group_tag, $row_tag, $param1=0, $param2=0)
   $strXML = "<$group_tag>";
   $rs = DBWrap::get_instance()->Execute($params);
   while ($row = $rs->fetch_array()) {
-      $value = ( ($row_tag == 'description' and isset($Text[$row[1]])) ? 
+      $value = ( ($row_tag == 'description' and isset($Text[$row[1]])) ?
                  $Text[$row[1]] : $row[1] );
-      $strXML 
-          .= '<row><id f="id">' . $row[0] 
-          . '</id><' . $row_tag 
-          . ' f="' . $row_tag 
-          . '"><![CDATA[' . $value . ']]></' . $row_tag 
-          . '></row>'; 
+      $strXML
+          .= '<row><id f="id">' . $row[0]
+          . '</id><' . $row_tag
+          . ' f="' . $row_tag
+          . '"><![CDATA[' . $value . ']]></' . $row_tag
+          . '></row>';
   }
   $strXML .= "</$group_tag>";
   return $strXML;
 }
 
+/**
+ * Like query_XML() but emits a compact format (no id element, just the row tag value).
+ *
+ * @return string XML string.
+ */
 function query_XML_compact()
 {
   $params = func_get_args();
@@ -850,24 +994,30 @@ function query_XML_compact()
   $strXML = "<$group_tag>";
   $rs = DBWrap::get_instance()->Execute($params);
   while ($row = $rs->fetch_array()) {
-    $strXML 
-      .= '<' . $row_tag 
-      . ' f="' . $row_tag 
-      . '"><![CDATA[' . $row[0] . ']]></' . $row_tag 
-      . '>'; 
+    $strXML
+      .= '<' . $row_tag
+      . ' f="' . $row_tag
+      . '"><![CDATA[' . $row[0] . ']]></' . $row_tag
+      . '>';
   }
   $strXML .= "</$group_tag>";
   return $strXML;
 }
 
+/**
+ * Calls a stored procedure with no parameters and returns results as XML.
+ *
+ * @param string $queryname The stored procedure name (also used as the XML group tag).
+ * @return string XML string.
+ */
 function query_XML_noparam($queryname)
 {
   $strXML = "<$queryname>";
   $rs = do_stored_query($queryname);
   while ($row = $rs->fetch_assoc()) {
-  	 $strXML .= "<row>";
+     $strXML .= "<row>";
       foreach ($row as $field => $value) {
-          if ($field == 'description' and isset($Text[$value])) 
+          if ($field == 'description' and isset($Text[$value]))
               $value = $Text[$value];
           $strXML .= "<{$field}>{$value}</{$field}>";
       }
@@ -877,22 +1027,31 @@ function query_XML_noparam($queryname)
   return $strXML;
 }
 
+/**
+ * Outputs an XML string to the browser with appropriate HTTP headers (no cache).
+ *
+ * @param string $str The XML content (without the XML declaration).
+ */
 function printXML($str) {
-  $newstr = '<?xml version="1.0" encoding="utf-8"?>';  
+  $newstr = '<?xml version="1.0" encoding="utf-8"?>';
   $newstr .= $str;
   header('Content-Type: text/xml');
   header('Last-Modified: '.date(DATE_RFC822));
   header('Pragma: no-cache');
   header('Cache-Control: no-cache, must-revalidate');
   header('Expires: '. date(DATE_RFC822, time() - 3600));
-  // header('Content-Length: ' . strlen($newstr)); // See comments of on #134
   echo $newstr;
 }
 
 
+// ─── Miscellaneous utilities ──────────────────────────────────────────────────
 
-
-
+/**
+ * Writes an HTML string to a file on disk.
+ *
+ * @param string $strHTML The HTML content to write.
+ * @param string $filename The target file path.
+ */
 function HTMLwrite($strHTML, $filename)
 {
   if(is_writeable($filename)) {
@@ -910,6 +1069,14 @@ function HTMLwrite($strHTML, $filename)
   }
 }
 
+/**
+ * Returns an XML string describing the navigation items available to a given role,
+ * based on the 'menu_config' setting in config.php.
+ *
+ * @param string $user_role The role to generate navigation for.
+ * @return string XML string.
+ * @throws Exception if the role is not defined in config.php.
+ */
 function get_config_menu($user_role)
 {
     $XML = "<navigation>\n";
@@ -919,34 +1086,39 @@ function get_config_menu($user_role)
     }
     foreach ($mconf[$user_role] as $navItem => $status) {
         $XML .= '<' . $navItem . '>' . $status . '</' . $navItem . ">\n";
-    } 
+    }
     return $XML . '</navigation>';
 }
 
-
+/**
+ * Returns an XML list of fields that are allowed to be imported for a given table,
+ * based on the 'allow_import_for' setting in config.php.
+ *
+ * @param string $db_table_name The database table name.
+ * @return string XML string.
+ * @throws Exception if imports are not configured for this table.
+ */
 function get_import_rights($db_table_name)
 {
-	//get the import rights for the db table and fields
-	$import_rights = configuration_vars::get_instance()->allow_import_for; 
-	
-	if (!isset($import_rights[$db_table_name])) {
+    $import_rights = configuration_vars::get_instance()->allow_import_for;
+
+    if (!isset($import_rights[$db_table_name])) {
         throw new Exception("Import error: no imports allowed for '" . $db_table_name . ".' Check local_config/config.php");
     }
     $xml = '<rows>';
-    
-	foreach ($import_rights[$db_table_name] as $field => $value) {
-	    		if ($value == 'allow') {
-		    		$xml .= '<row><db_field>'.$field.'</db_field></row>';
-	    		} 
-    		}
-	return $xml . "</rows>";
+    foreach ($import_rights[$db_table_name] as $field => $value) {
+        if ($value == 'allow') {
+            $xml .= '<row><db_field>'.$field.'</db_field></row>';
+        }
+    }
+    return $xml . "</rows>";
 }
 
 /**
- * Returns a XML body with a list of template names defined in 'config.php'
- * for a database table name.
+ * Returns an XML list of import template names for a given table.
+ *
  * @param string $db_table_name The database table name.
- * @return string The XML list of teplate names.
+ * @return string XML string.
  */
 function get_import_templates_list($db_table_name) {
     $templates = get_import_templates($db_table_name);
@@ -958,11 +1130,10 @@ function get_import_templates_list($db_table_name) {
 }
 
 /**
- * Returns a array of templates defined in 'config.php' for a database
- * table name.
+ * Returns the import templates defined in config.php for a given table.
+ *
  * @param string $db_table_name The database table name.
- * @return array The array of teplates, returns an empty array if no defined
- *      templates for this table.
+ * @return array Array of templates, or empty array if none defined.
  */
 function get_import_templates($db_table_name) {
     $cfg = configuration_vars::get_instance();
@@ -972,64 +1143,74 @@ function get_import_templates($db_table_name) {
             return $import_templates[$db_table_name];
         }
     }
-    // If not exists any template for this table returns a empty array.
     return array();
 }
 
+/**
+ * Returns an XML <select> element with options from a database table.
+ * Used to populate dropdown menus in the UI.
+ *
+ * @param string $table The table to query.
+ * @param string $field1 The value field (id).
+ * @param string $field2 The label field.
+ * @param string $field3 Optional additional field (added as addInfo attribute).
+ * @return string XML <select> string.
+ */
 function get_field_options_live($table, $field1, $field2, $field3='')
 {
     global $Text;
     $strXML = '<select>';
     if ($field3 != ''){
-    	$strSQL = 'select :1, :2, :3 from :4';
+        $strSQL = 'select :1, :2, :3 from :4';
     } else {
-    	$strSQL = 'select :1, :2 from :3';
-    }
-    
-    if (in_array($table, array('aixada_unit_measure'))) {
-	$strSQL .= ' order by name';
-    } else if (in_array($table, array('aixada_orderable_type'))) {
-	$strSQL .= ' order by description';
+        $strSQL = 'select :1, :2 from :3';
     }
 
-   
-	if ($field3 != ''){
-         $rs = DBWrap::get_instance()->Execute($strSQL, $field1, $field2, $field3, $table);    	       	
-        } else {
+    if (in_array($table, array('aixada_unit_measure'))) {
+        $strSQL .= ' order by name';
+    } else if (in_array($table, array('aixada_orderable_type'))) {
+        $strSQL .= ' order by description';
+    }
+
+    if ($field3 != ''){
+        $rs = DBWrap::get_instance()->Execute($strSQL, $field1, $field2, $field3, $table);
+    } else {
         $rs = DBWrap::get_instance()->Execute($strSQL, $field1, $field2, $table);
     }
-    
+
     if ($table == 'aixada_uf') {
         $strXML .= "<option value='-1'>".$Text['sel_uf']."</option>";
     }
     while ($row = $rs->fetch_array()) {
         $ot = (isset($Text[$row[1]]) ? $Text[$row[1]] : $row[1]);
         if ($table == 'aixada_uf'){
-            $ot = //$Text['uf_short'] . ' ' . 
-                $row[0] . ' ' . $ot;
+            $ot = $row[0] . ' ' . $ot;
         }
-        
-        if ($field3 != ''){
-         $strXML .= "<option value='{$row[0]}' addInfo='{$row[2]}'";        	       	
-        } else {
-        	$strXML .= "<option value='{$row[0]}'";
-        }
-                
 
-	if ($row[0] == 1) {
-	    $strXML .= ' selected';
-	}
-	$strXML .= ">{$ot}</option>";
+        if ($field3 != ''){
+            $strXML .= "<option value='{$row[0]}' addInfo='{$row[2]}'";
+        } else {
+            $strXML .= "<option value='{$row[0]}'";
+        }
+
+        if ($row[0] == 1) {
+            $strXML .= ' selected';
+        }
+        $strXML .= ">{$ot}</option>";
     }
     return $strXML . '</select>';
 }
 
-
+/**
+ * Returns an XML list of available UI themes (subdirectories of css/ui-themes/).
+ *
+ * @return string XML string.
+ */
 function get_existing_themes_XML()
 {
     $exclude_list = array(".", "..", "example.txt");
     $folders = array_diff( scandir(__ROOT__ . 'css/ui-themes'), $exclude_list);
-     
+
     $XML = '<themes>';
     foreach ($folders as $theme) {
         $XML .= "<theme><name>{$theme}</name></theme>";
@@ -1037,12 +1218,15 @@ function get_existing_themes_XML()
     return $XML . '</themes>';
 }
 
-
+/**
+ * Returns an associative array of available languages (code => display name),
+ * detected from the language files in local_config/lang/.
+ * Each file must contain a line like: $Text['ca-va'] = 'Català'
+ *
+ * @return array
+ */
 function existing_languages()
 {
-    // We require that a line of the form 
-    // $Text['es_es'] = 'Español'
-    // exists in each language file
     $languages = array();
     foreach (glob(__ROOT__ . "local_config/lang/*.php") as $lang_file) {
         $a = strpos($lang_file, 'lang/');
@@ -1050,7 +1234,7 @@ function existing_languages()
         $handle = @fopen($lang_file, "r");
         $line = fgets($handle);
         while (strpos($line, "Text['{$lang}']") === false and !feof($handle)) {
-            $line = fgets($handle);            
+            $line = fgets($handle);
         }
         if (feof($handle))
             $lang_desc = '';
@@ -1063,23 +1247,26 @@ function existing_languages()
     return $languages;
 }
 
+/**
+ * Returns an XML list of available languages detected from local_config/lang/.
+ *
+ * @return string XML string.
+ */
 function existing_languages_XML()
 {
-	$static = false; 
-    // We require that a line of the form 
-    // $Text['es_es'] = 'Español'
-    // exists in each language file
     $XML = '<languages>';
-    if ($static){
-    	$XML .= "<language><id>ca-va</id><description>Català (ca-va)</description></language><language><id>en</id><description>English (en)</description></language><language><id>es</id><description>Castellano (es)</description></language>";
-    } else {
-	    foreach (existing_languages() as $lang => $lang_desc) {
-	        $XML .= "<language><id>{$lang}</id><description>{$lang_desc} ({$lang})</description></language>";
-	    }
+    foreach (existing_languages() as $lang => $lang_desc) {
+        $XML .= "<language><id>{$lang}</id><description>{$lang_desc} ({$lang})</description></language>";
     }
     return $XML . '</languages>';
 }
 
+/**
+ * Returns an XML list of all defined user roles, taken from the 'forbidden_pages'
+ * keys in config.php.
+ *
+ * @return string XML string.
+ */
 function get_roles()
 {
     $XML = '<roles>';
@@ -1089,24 +1276,33 @@ function get_roles()
     return $XML . '</roles>';
 }
 
+/**
+ * Returns an XML list of commission roles (all roles except Consumer, Checkout, Producer).
+ *
+ * @return string XML string.
+ */
 function get_commissions()
 {
-
     $XML = '<rows>';
     foreach (array_keys(configuration_vars::get_instance()->forbidden_pages) as $role) {
         if (!in_array($role, array('Consumer', 'Checkout', 'Producer'))) {
-
             $XML .= "<row><description>{$role}</description></row>";
         }
     }
     return $XML . '</rows>';
 }
 
-
+/**
+ * Removes trailing zeros from decimal numbers for display purposes.
+ * e.g. "1.500" → "1.5", "2.000" → "2", "abc" → "abc"
+ *
+ * @param mixed $value
+ * @return mixed
+ */
 function clean_zeros($value)
 {
   return (isset($value) && (strpos($value, '.') !== false) ?
-	  rtrim(rtrim($value, '0'), '.') 
+	  rtrim(rtrim($value, '0'), '.')
 	  : $value);
 }
 
