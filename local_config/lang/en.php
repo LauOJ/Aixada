@@ -375,6 +375,10 @@ $Text['nav_myaccount'] = "My Account";
 
 $Text['nav_logout'] = "Sign out";
 $Text['nav_signedIn'] = "Signed in as ";
+$Text['nav_dashboard'] = "Back to dashboard";
+$Text['nav_mng_schedule_orders'] = "Schedule orders";
+$Text['nav_mng_providers_products'] = "Providers and products";
+$Text['nav_mng_manage_orders'] = "Manage orders";
 $Text['nav_can_checkout'] = "You may check out goods.";
 $Text['nav_try_to_checkout'] = "Be checkout";
 $Text['nav_stop_checkout'] = "Stop checkout";

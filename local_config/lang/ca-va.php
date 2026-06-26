@@ -403,6 +403,10 @@ $Text['nav_myaccount'] = "El meu compte";
 
 $Text['nav_logout'] = "Surt/Ix";
 $Text['nav_signedIn'] = "Heu accedit com a ";
+$Text['nav_dashboard'] = "Torna al tauler";
+$Text['nav_mng_schedule_orders'] = "Programar comandes";
+$Text['nav_mng_providers_products'] = "Proveïdors i productes";
+$Text['nav_mng_manage_orders'] = "Gestiona comandes";
 $Text['nav_can_checkout'] = "Podeu validar compres.";
 $Text['nav_try_to_checkout'] = "Comença a validar";
 $Text['nav_stop_checkout'] = "Deixa de validar";
