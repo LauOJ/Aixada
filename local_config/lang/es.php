@@ -410,6 +410,10 @@ $Text['nav_myaccount'] = "Mi cuenta";
 
 $Text['nav_logout'] = "Salir";
 $Text['nav_signedIn'] = "Has accedido como ";
+$Text['nav_dashboard'] = "Volver al panel";
+$Text['nav_mng_schedule_orders'] = "Programar pedidos";
+$Text['nav_mng_providers_products'] = "Proveedores y productos";
+$Text['nav_mng_manage_orders'] = "Gestionar pedidos";
 $Text['nav_can_checkout'] = "Puedes validar compras.";
 $Text['nav_try_to_checkout'] = "Empezar a validar";
 $Text['nav_stop_checkout'] = "Dejar de validar";

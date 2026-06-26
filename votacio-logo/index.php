@@ -113,7 +113,7 @@ h1 {
 <div class="grid">
 
     <div class="card">
-        <img src="Alokaos.png" alt="Proposta AloKaos">
+        <img src="AloKaos.png" alt="Proposta AloKaos">
         <div class="card-info">
             <h2>AloKaos</h2>
             <div class="links-proposta">
@@ -135,7 +135,7 @@ h1 {
     </div>
 
     <div class="card">
-        <img src="nec-studio.png" alt="Proposta Nec Studio">
+        <img src="Nec-Studio.png" alt="Proposta Nec Studio">
         <div class="card-info">
             <h2>Nec Studio</h2>
             <div class="links-proposta">
