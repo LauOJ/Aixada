@@ -50,14 +50,15 @@ function comprovarTorn($data){
   
     $i=0;
     $dataActual = date("Y/m/d");
+    $mateixTorn = null;
     $db = DBWrap::get_instance();
     $rs = $db ->Execute('select * from aixada_torns where dataTorn >=:1q order by dataTorn asc', $dataActual);
 
-    while($row = $rs->fetch_assoc()) 
-	    {    				
+    while($row = $rs->fetch_assoc())
+	    {
         $ufId = $row['ufTorn'];
 	    $rsUfs = $db ->Execute('select name from aixada_uf where id=:1q', $ufId);
-		while($rowufs = $rsUfs->fetch_assoc()){  
+		while($rowufs = $rsUfs->fetch_assoc()){
 	        $nomUf=$rowufs['name'];
 	    }
         if($row['dataTorn']!=$mateixTorn){?>

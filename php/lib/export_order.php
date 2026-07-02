@@ -28,8 +28,7 @@ class export_order extends abstract_export_manager {
 			$this->provider_id = $provider_id; 
 			$this->date_for_order = $date_for_order; 	
 		} else {
-			throw new Exception("Export order exeption: no order_id or provider_id / date specified!");	
-			exit; 			
+			throw new Exception("Export order exeption: no order_id or provider_id / date specified!");
 		}
 		
 		

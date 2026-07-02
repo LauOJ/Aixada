@@ -39,23 +39,21 @@ class export_products extends abstract_export_manager {
 		} else if (is_array($product_ids)){
 			if (count($product_ids)==0){
 				throw new Exception("Export products exception: missing ID(s) for products!");
-				exit; 
 			}
-			$this->product_ids = $product_ids; 
-				
+			$this->product_ids = $product_ids;
+
 		} else {
-			$this->products_ids = 0;
-			
+			$this->product_ids = 0;
+
 		}
-		
+
 		if ($provider_id > 0) {
-			$this->provider_id = $provider_id; 
+			$this->provider_id = $provider_id;
 		}
-		
-		
+
+
 		if ($provider_id == 0 && $product_ids==0){
-				throw new Exception("Export products exeption: no product ids and no provider id specified! Do either of both!");	
-				exit; 
+				throw new Exception("Export products exeption: no product ids and no provider id specified! Do either of both!");
 		}
 		
 		

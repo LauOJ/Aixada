@@ -29,7 +29,6 @@ class export_dates4products extends abstract_export_manager {
 		
 		if (!isset($provider_id) || $provider_id ==0){
 			throw new Exception("Export orderable dates exception: no provider_id specified");
-			exit;
 		}
 		
 		$this->from_date = ($from_date=='')? date('Y-m-d', strtotime('now')):$from_date; 
