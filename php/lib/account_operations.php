@@ -516,8 +516,7 @@ function get_account_extract_XML($account_id, $filter, $from_date, $to_date) {
 			$formats
 		);
 	default:
-		throw new Exception("account_extract: param={$filter} not supported");  
-		break;
+		throw new Exception("account_extract: param={$filter} not supported");
 	}
 }
 	
@@ -534,14 +533,12 @@ function get_account_extract_XML($account_id, $filter, $from_date, $to_date) {
         if (!isset($_operations[$account_operation])) {
             throw new Exception(
               "&account_operation=\"{$account_operation}\" is not configured.");
-            exit; 
         }
         $cfg_operation = $_operations[$account_operation]['accounts'];
         
         // chk Amount decimals
         if ($quantity != floor(round($quantity*100, 6))/100) {
             throw new Exception(i18n('mon_war_decimals'));
-            exit; 
         }
 
         // chk accounts and set description if not present
@@ -551,19 +548,16 @@ function get_account_extract_XML($account_id, $filter, $from_date, $to_date) {
             if ($o_params['sign']) {
                 if (!$quantity || $quantity <= 0) {
                     throw new Exception(i18n('mon_war_gt_zero'));
-                    exit; 
                 }
             }
             if (!isset($accounts[$account_id_name.'_id'])) {
                 throw new Exception(i18n('mon_war_accounts_not_set'));
-                exit;
             }
             if ($accounts[$account_id_name.'_id']==1000 && 
                     count($cfg_operation)>1) {
                 throw new Exception(i18n('mon_war_no_all_hu',
                     array('mon_all_active_uf'=>'"'.i18n('mon_all_active_uf').'"')
                 ));
-                exit;
             }
             if ($description == '' && isset($o_params['default_desc'])) {
 				$op_descr = i18n('mon_desc_'.$o_params['default_desc']);
@@ -571,7 +565,6 @@ function get_account_extract_XML($account_id, $filter, $from_date, $to_date) {
         }
 		if ($op_descr == '') {
 			throw new Exception(i18n('mon_war_description'));
-			exit;
 		}
         
         // All ok!, so do movements
@@ -697,7 +690,6 @@ function get_account_extract_XML($account_id, $filter, $from_date, $to_date) {
 				return 0;
 			} else {
 				throw new Exception("Account setup {$account_id} failed");
-				exit;
 			}
         }
     }

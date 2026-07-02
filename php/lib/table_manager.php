@@ -4,24 +4,8 @@
  * @package   Aixada
  */ 
 
-define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS);
-
-ob_start(); // Probably only needed for FirePHP(no longer used)
-
-// global abbreviations: 
-// rs  =  mysqli result resource
-
-/**
- * include files
- */
-
-/*$slash = explode('/', getenv('SCRIPT_NAME'));
-if (isset($slash[1])) {
-    $app = getenv('DOCUMENT_ROOT') . '/' . $slash[1] . '/';
-} else { // this happens when called by make
-    $app = '';
-}*/
+if (!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
+if (!defined('__ROOT__')) define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 require_once(__ROOT__ . 'php/lib/table_with_ref.php');
 
@@ -45,20 +29,6 @@ class table_manager extends table_with_ref
      {
        parent::__construct($table_name);
      }
-
-  /*
-      * Call this function to retrieve an instance of the class.  The
-      * class is defined static, so that only one instance for each table
-      * has to be created. This saves database accesses.
-      *
-  public static function get_instance ($table_name)
-  {
-    if (!array_key_exists($table_name, self::$_managed_tables)) {
-      self::$_managed_tables[$table_name] = new table_manager($table_name);
-    }
-    return self::$_managed_tables[$table_name];
-  }
-  */
 
   /** return an empty form, which the jquery/user then fills in to
       *  create a new row.
@@ -96,7 +66,7 @@ class table_manager extends table_with_ref
       return $arrData[$this->_primary_key];
     else { // the primary key was auto_increment
       $rs = $db->Execute('SELECT LAST_INSERT_ID()');
-      $row = mysqli_fetch_assoc($rs);
+      $row = $rs->fetch_assoc();
       return $row['LAST_INSERT_ID()'];
     }
   }
@@ -126,7 +96,6 @@ class table_manager extends table_with_ref
       $fields = array_intersect($fields, $present_fields);
     }
     $db = DBWrap::get_instance();
-	//$db->debug = true; 
     list($rs, $total_pages) 
       = $db->Select($fields, 
 		    $this->_table_name, 

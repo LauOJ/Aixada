@@ -76,7 +76,6 @@ class data_table {
 		
 		if (count($data_table) == 0){
     		throw new Exception ("Import error: the data table is empty. Nothing to import!!");
-    		exit; 
     	}
     	
 		$this->_data_table = $data_table; 
@@ -95,8 +94,7 @@ class data_table {
     	if (array_key_exists($db_table, $import_rights)){
     		$this->_db_table = $db_table; 
     	} else {
-    		throw new Exception("Import error: can't find table '{$db_table}' in the list of allowed import destinations. Check your config.php file.");      	
-    		exit;
+    		throw new Exception("Import error: can't find table '{$db_table}' in the list of allowed import destinations. Check your config.php file.");
     	}
 		
 		

@@ -28,7 +28,6 @@ class import_products extends abstract_import_manager {
 	    $rs = $db->Execute('select id from aixada_provider where id=:1q', $provider_id);
 		if ($rs->num_rows == 0){
 			throw new Exception("Import error: can't find provider #{$provider_id} in database!" );
-			exit;
 		}
 		$db->free_next_results();
 		

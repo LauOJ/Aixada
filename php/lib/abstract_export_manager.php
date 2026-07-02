@@ -1,8 +1,6 @@
 <?php
 
 
-ob_start(); // Probably only needed for FirePHP(no longer used)
-
 require_once(__ROOT__ . 'php/lib/exceptions.php');
 require_once(__ROOT__ . 'local_config/config.php');
 require_once(__ROOT__ . 'php/inc/database.php');
@@ -85,7 +83,7 @@ class abstract_export_manager {
     {
     	//if no filename is given, construct one
     	if ($filename == ""){
-			$this->filename = "Export_" . $export_table . date('Y-m-d_h:i');    		
+			$this->filename = "Export_" . $this->export_table . date('Y-m-d_Hi');
     	} else {
 	  		$this->filename = $filename;        	   
     	}
@@ -124,7 +122,6 @@ class abstract_export_manager {
     			break;
     		default:
     			throw new Exception("Export format {$format} not supported.");
-    			exit;
     			
     	}
     	
@@ -188,9 +185,8 @@ class abstract_export_manager {
 		//any results?
     	if ($this->xml_result == null || strlen($this->xml_result)==0){
     		throw new Exception("Export exception: Empty dataset. Nothing to be exported!");
-    		exit; 
     	}
-    	
+
     	//publish to public folder
     	$this->publish_copy();
     
