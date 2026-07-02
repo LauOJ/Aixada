@@ -1,7 +1,7 @@
 <?php
 
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 require_once(__ROOT__ . "local_config/config.php");
 require_once(__ROOT__ . "php/inc/database.php");
@@ -151,9 +151,8 @@ try{
             require_once(__ROOT__ . "php/lib/report_orders.php");
   			echo report_order::getHtml_orders($_GET);
       		exit;
-    default:  
-    	 throw new Exception("ctrlOrders: oper={$_REQUEST['oper']} not supported");  
-        break;
+    default:
+    	 throw new Exception("ctrlOrders: oper={$_REQUEST['oper']} not supported");
     }
 
 

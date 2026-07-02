@@ -33,10 +33,8 @@ class shop_item extends abstract_cart_row {
 		 
 		$this->_product_id = $product_id;
         $this->_quantity = $quantity;
-        $this->_cart_id = $cart_id; 
+        $this->_cart_id = $cart_id;
         $this->_unit_price_stamp = $unit_price_stamp;
-		
-		//parent::__construct(0, 0, $product_id, $quantity, $cart_id);
 	}
 
 	 //(cart_id, order_item_id, product_id, quantity, iva_percent, rev_tax_percent)
@@ -113,7 +111,6 @@ class shop_cart_manager extends abstract_cart_manager {
 			$rs = $db->Execute('select * from aixada_cart where id=:1q and ts_validated=0', $this->_cart_id);
     		if ($rs->num_rows == 0) {
     		 throw new Exception('shop_cart_manager::_make_rows: shop cart has already been validated!!');
-            	exit;
     		}
     		
     		$db->free_next_results();
@@ -124,7 +121,6 @@ class shop_cart_manager extends abstract_cart_manager {
     		
     		if (strtotime($this->_last_saved) < strtotime($row['ts_last_saved'])){
     			throw new Exception($Text['msg_err_cart_sync']);
-				exit; 	    			
     		}
     		
     		

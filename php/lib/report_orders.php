@@ -220,7 +220,7 @@ class report_order
         if ($where !== '') {
             $where = substr($where, 3);
         } else {
-            $where == '1=0';
+            $where = '1=0';
         }
         $strSQL =
             "select * from ({$this->getFrom_orderDetail()} where {$where}) r

@@ -368,7 +368,6 @@ class foreign_key_manager {
    */
   public function make_canned_list_all_query ($af_tablenames, $af_names, $af_aliases, $af_join_clauses, $af_after_which_field)
   {
-      global $Text;
     $select_clause = 'select';
     $join_clause = "\n    from " . $this->_table_name . ' ';
     list ($substituted_name, $substituted_alias, $table_alias) = 

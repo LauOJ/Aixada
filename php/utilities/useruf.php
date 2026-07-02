@@ -4,7 +4,7 @@
 require_once(__ROOT__ . 'php/inc/database.php');
 require_once(__ROOT__ . 'php/inc/authentication.inc.php');
 require_once(__ROOT__ . 'local_config/config.php');
-require_once ('general.php');
+require_once(__ROOT__ . 'php/utilities/general.php');
 require_once(__ROOT__ . 'local_config/lang/'.get_session_language() . '.php');
 
 /**
@@ -52,8 +52,6 @@ function create_user_member($uf_id){
 	
 	if($login_exists) {
 		throw new Exception("The login '" .$params['login']. "' already exists. Please choose another one");
-		exit; 
-		
 	} else {
 		echo do_stored_query('new_user_member', 
 				$params["login"],
@@ -136,8 +134,6 @@ function validate_field($table, $field, $value, $type='exists'){
 		    } else {
 		    	return 0;
 		    }
-		    DBWrap::get_instance()->free_next_results();
-		break;	
 	}
 	
 }

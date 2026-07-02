@@ -33,7 +33,6 @@ class export_providers extends abstract_export_manager {
 		} else if (is_array($provider_ids)){
 			if (count($provider_ids)==0){
 				throw new Exception("Export exception: missing ID(s) for provider!");
-				exit; 
 			}
 			$this->provider_ids = $provider_ids; 
 		}

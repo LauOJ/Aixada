@@ -1,16 +1,9 @@
 <?php
 
-if (version_compare(PHP_VERSION, '7.4.0') >= 0) {
-    require_once(__ROOT__ . 'external/php74/spreadsheet-reader/php-excel-reader/excel_reader2.php');
-    require_once(__ROOT__ . 'external/php74/spreadsheet-reader/SpreadsheetReader.php');
-} else {
-    require_once(__ROOT__ . 'external/php53_2/spreadsheet-reader/php-excel-reader/excel_reader2.php');
-    require_once(__ROOT__ . 'external/php53_2/spreadsheet-reader/SpreadsheetReader.php');
-}
+require_once(__ROOT__ . 'external/php74/spreadsheet-reader/php-excel-reader/excel_reader2.php');
+require_once(__ROOT__ . 'external/php74/spreadsheet-reader/SpreadsheetReader.php');
 
-ob_start(); // Probably only needed for FirePHP(no longer used)
-
-  /** 
+  /**
    * @package Aixada
    */ 
 
@@ -150,14 +143,12 @@ class abstract_import_manager {
     	if (array_key_exists($destination_table, $import_rights)){
     		$this->_db_table = $destination_table; 
     	} else {
-    		throw new Exception("Import error: can't find table '{$destination_table}' in the list of allowed import destinations. Check your config.php file.");      	
-    		exit;
+    		throw new Exception("Import error: can't find table '{$destination_table}' in the list of allowed import destinations. Check your config.php file.");
     	}
 
   	
         if ($data_table->count() == 0){
     		throw new Exception ("Import error: the data table is empty. Nothing to import!!");
-    		exit; 
     	} else {
     		$this->_import_data_table = $data_table; 
     	}
@@ -188,13 +179,10 @@ class abstract_import_manager {
     	//check if db_match_field is in map
     	if (!isset($this->_col_map[$this->_db_match_field])){
     		throw new Exception("Import error: required match field '{$this->_db_match_field}' not found. You are either trying to import the wrong data for this table or have not associated the right column in the table preview!");
-    		exit; 
-    		
     	}
     
 		if (count($this->_import_fields) == 0){
-			throw new Exception("Import error: can't find any allowed fields for importing into table '{$destination_table}'. Check your config.php!  ");	
-			exit; 
+			throw new Exception("Import error: can't find any allowed fields for importing into table '{$destination_table}'. Check your config.php!");
 		}
 		
 		
@@ -249,8 +237,7 @@ class abstract_import_manager {
 	    	//should be unique values
 			$dup = $this->_check_duplicates($update_ids);
 			if (count($dup) > 0){
-				throw new Exception ("Import error: unique reference required but empty/duplicate key found in table column '{$this->_db_match_field}': " . implode(",",$dup));
-				exit; 
+				throw new Exception ("Import error: unique reference required but empty/duplicate key found in table column '{$this->_db_match_field}': " . implode(",",$dup)); 
 			}
 	    		
     		$imported_rows_count += $this->update_rows($update_ids);

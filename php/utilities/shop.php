@@ -3,7 +3,7 @@
 
 require_once(__ROOT__ . 'php/inc/database.php');
 require_once(__ROOT__ . 'local_config/config.php');
-require_once ('general.php');
+require_once(__ROOT__ . 'php/utilities/general.php');
 
 
 
@@ -59,8 +59,7 @@ function get_purchase_in_range($filter='prevMonth', $uf_id=0, $from_date=0, $to_
 			break;
 			
 		default:
-			throw new Exception("get_orders_in_range: param={$time_period} not supported");  
-			break;
+			throw new Exception("get_purchase_in_range: param={$filter} not supported");
 	}
 	
 }

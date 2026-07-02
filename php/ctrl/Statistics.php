@@ -2,7 +2,7 @@
 
 
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 require_once(__ROOT__ . "php/utilities/statistics.php");
 require_once(__ROOT__ . "php/utilities/visualization.php");

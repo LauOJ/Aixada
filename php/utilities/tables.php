@@ -1,12 +1,5 @@
 <?php
 
-/*$slash = explode('/', getenv('SCRIPT_NAME'));
-if (isset($slash[1])) {
-    $app = getenv('DOCUMENT_ROOT') . '/' . $slash[1] . '/';
-} else { // this happens when called by make
-    $app = '';
-}*/
-
 require_once(__ROOT__ . 'php/inc/database.php');
 require_once(__ROOT__ . 'local_config/config.php');
 
@@ -123,7 +116,7 @@ function get_field_options ($tm, $field)
   $editvalues = ''; 
   foreach ($tm->get_key_cache($field) as $val => $desc)
     $editvalues .= $val . ':' . $desc . ';';
-  $editvalues = rtrim($col_model, ";");
+  $editvalues = rtrim($editvalues, ";");
   return $editvalues;
 }
 

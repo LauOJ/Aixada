@@ -19,7 +19,6 @@ class export_cart extends abstract_export_manager {
 		
 		if ($cart_id == 0){
 				throw new Exception("Export cart: no cart ID specified.");	
-				exit; 
 		}
 
 		$this->cart_id = $cart_id; 

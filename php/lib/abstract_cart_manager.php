@@ -166,7 +166,6 @@ class abstract_cart_manager {
     {
         if (!$uf_id) {
             throw new Exception('abstract_cart_manager::_construct: Need to specify uf_id');
-            exit;
         }
         $this->_uf_id = $uf_id;
         $this->_date = $date;

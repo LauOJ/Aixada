@@ -1,7 +1,7 @@
 <?php
 
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 require_once(__ROOT__ . "local_config/config.php");
 require_once(__ROOT__ . "php/inc/database.php");
@@ -31,7 +31,6 @@ try{
 				
 	    case 'delIncident':
 	        echo do_stored_query('delete_incident', get_param('incident_id'));
-	        //echo 1;
 	        exit;
 
 	    case 'getIncidentsListing':
@@ -43,9 +42,8 @@ try{
 	    	exit;
 
 	    	
-	    default:  
-	    	 throw new Exception("ctrlIncidents: oper={$_REQUEST['oper']} not supported");  
-	        break;
+	    default:
+	    	 throw new Exception("ctrlIncidents: oper={$_REQUEST['oper']} not supported");
     }
 
 

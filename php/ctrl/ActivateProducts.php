@@ -1,16 +1,13 @@
 <?php
 
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
-
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 require_once(__ROOT__ . "local_config/config.php");
 require_once(__ROOT__ . "php/inc/database.php");
 require_once(__ROOT__ . "php/utilities/general.php");
 require_once(__ROOT__ . "php/utilities/dates.php");
 require_once(__ROOT__ . "php/utilities/shop_and_order.php");
-
-//DBWrap::get_instance()->debug = true;
 
 try{
   validate_session(); // The user must be logged in.

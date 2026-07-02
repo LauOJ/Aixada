@@ -1,7 +1,7 @@
 <?php
 
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 require_once __ROOT__ . "local_config/config.php";
 require_once __ROOT__ . "php/inc/adminDatabase.php";
@@ -58,9 +58,8 @@ try{
 	  case 'backupDatabase_int':
             echo backup_as_internal('local_config/dbBkups/', get_backup_name());
             exit;    
-	  default:  
-    	throw new Exception("ctrlAdmin: oper={$_REQUEST['oper']} not supported");  
-        break;
+	  default:
+    	throw new Exception("ctrlAdmin: oper={$_REQUEST['oper']} not supported");
   }
 
  

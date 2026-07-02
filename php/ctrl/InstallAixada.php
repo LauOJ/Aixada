@@ -2,9 +2,9 @@
 ini_set('display_errors', 0); // Needed for CheckDbAccess() using PHP < v8.1 where mysqli produces warnings 
 
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
-if (!is_file('../../local_config/config.php')) {
+if (!is_file(__ROOT__ . 'local_config/config.php')) {
     header('HTTP/1.0 401 No Aixada config!');
     die("Configuration file 'local_config/config.php' does not exist!");
 }
@@ -160,9 +160,8 @@ try{
             
             logInstall('--> Finished correctly!', true);
             exit;
-        default:  
-            throw new Exception("ctrlAdmin: oper={$_REQUEST['oper']} not supported");  
-            break;
+        default:
+            throw new Exception("ctrlAdmin: oper={$_REQUEST['oper']} not supported");
     }
 } catch(Exception $e) {
     header('HTTP/1.0 401 Install error');

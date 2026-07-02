@@ -1,7 +1,5 @@
 <?php
 
-ob_start(); // Probably only needed for FirePHP(no longer used)
-
 require_once(__ROOT__ . 'php/lib/exceptions.php');
 require_once(__ROOT__ . 'local_config/config.php');
 require_once(__ROOT__ . 'php/inc/database.php');
@@ -11,7 +9,7 @@ require_once(__ROOT__ . 'php/inc/database.php');
 class account {
 
 
-	protected $account = 0; 
+	protected $account = 0;
 
 
 
@@ -24,9 +22,9 @@ class account {
 
 
 	protected function set_account($account_number){
-		$rs = do_stored_query('account_exists', $account_number); 
+		$rs = do_stored_query('account_exists', $account_number);
  		$row = $rs->fetch_array();
- 		
+
  		$nr = $row[0];
 
 		DBWrap::get_instance()->free_next_results();
@@ -35,7 +33,6 @@ class account {
 			$this->account = $account_number;
 		} else {
 			throw new Exception("Account number '{$account_number}' does not exists!");
-			exit;
 		}
 	}
 
@@ -45,7 +42,6 @@ class account {
 	protected function getBalance(){
 		if ($this->account <= 0){
 			throw new Exception("Account number is not set. Can't retrieve current balance;");
-			exit;
 		}
 		return do_stored_query('get_account_balance', $this->account);
 	}
@@ -53,15 +49,13 @@ class account {
 
 
 	protected function deposit($quantity, $description='', $operator_id, $payment_method_id=7, $currency_type_id=1){
-		
+
 		if ($quantity <= 0) {
 			throw new Exception("Deposit amount needs to be larger than zero!");
-			exit; 
 		}
 
 		if ($this->account == 0){
 			throw new Exception("Deposit error: account number is not set: {$this->account}");
-			exit;
 		}
 
 		do_stored_query('move_money',$quantity,  $this->account, $payment_method_id, $operator_id, $description, $currency_type_id);
@@ -74,12 +68,10 @@ class account {
 
 		if ($quantity <= 0) {
 			throw new Exception("Withdraw amount cannot be negative");
-			exit; 
 		}
 
 		if ($this->account == 0){
 			throw new Exception("Withdraw error: account number is not set: {$this->account}");
-			exit;
 		}
 
 

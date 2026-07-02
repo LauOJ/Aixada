@@ -8,8 +8,8 @@
  * @package Aixada
  */
 
-define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(__DIR__, 2) . DS);
+if (!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
+if (!defined('__ROOT__')) define('__ROOT__', dirname(__DIR__, 2) . DS);
 require_once(__ROOT__ . "/php/inc/header.inc.base.php");
 
 $tpl_print_orders    = configuration_vars::get_instance()->print_order_template;

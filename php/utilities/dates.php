@@ -3,7 +3,7 @@
 
 require_once(__ROOT__ . 'php/inc/database.php');
 require_once(__ROOT__ . 'local_config/config.php');
-require_once ('general.php');
+require_once(__ROOT__ . 'php/utilities/general.php');
 
 
 
@@ -152,16 +152,15 @@ function get_dates($which, $format = 'xml', $limit=117111451111, $from_date=0)
 	switch ($format){
 		case 'xml':
 			if ($which == 'today'){
-				$today = date('Y-m-d', strtotime("Today"));	
+				$today = date('Y-m-d', strtotime("Today"));
 				return '<row><date>'.$today.'</date></row>';
 			} else {
 				return printXML(stored_query_XML_fields($which, $from_date, $limit));
 			}
-			exit; 
-			
+
 		case 'array':
 			if ($which=='today'){
-				$today = date('Y-m-d', strtotime("Today"));	
+				$today = date('Y-m-d', strtotime("Today"));
 				return '["'.$today.'"]';
 			} else {
 
@@ -172,7 +171,6 @@ function get_dates($which, $format = 'xml', $limit=117111451111, $from_date=0)
 			    }
 				return rtrim($dates, ',') . ']';
 			}
-			exit;
 			 
 			
 		default: 
