@@ -1,7 +1,7 @@
 <?php
 
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 
 require_once(__ROOT__ . "external/php53_2/jquery-fileupload/UploadHandler.php");
@@ -18,9 +18,7 @@ require_once(__ROOT__ . "php/lib/export_dates4products.php");
 require_once(__ROOT__ . "php/lib/export_members.php");
 require_once(__ROOT__ . "php/utilities/general.php");
 
-ob_start(); // Probably only needed for FirePHP(no longer used)
-
-try{ 
+try{
 	validate_session(); // The user must be logged in.
 
  	switch (get_param('oper')) {
@@ -48,27 +46,17 @@ try{
 			if (!$outhandle)
 			    throw new Exception("Export exception. Could not open {$saveFileTo} to store fetched file. Make sure that local_config/upload is a writable directory");
 
-			if (version_compare(PHP_VERSION, '5.5.22') < 0) {
-			    // It seems that CURLOPT_FILE does not work with https addresses, output file remains empty
-			    // (It's what it was, I don't spend more time on it)
-			    $ch = curl_init($url);
-			    curl_setopt($ch, CURLOPT_FILE, $outhandle);
-			    curl_exec($ch);
-			    curl_close($ch);
-			} else {
-			    // As of PHP-5.5.22 this works with http & https addresses:
-			    $a = file_get_contents(
-			        $url,
-			        false,
-			        stream_context_create(array(
-			            "ssl"=>array(
-			                "verify_peer"=>false,
-			                "verify_peer_name"=>false,
-			            ),
-			        ))
-			    );
-			    fwrite($outhandle, $a);
-			}
+			$a = file_get_contents(
+			    $url,
+			    false,
+			    stream_context_create(array(
+			        "ssl" => array(
+			            "verify_peer"      => false,
+			            "verify_peer_name" => false,
+			        ),
+			    ))
+			);
+			fwrite($outhandle, $a);
 			fclose($outhandle);
 
  	 		echo $saveFileTo; 
@@ -226,45 +214,6 @@ try{
 			break;
 
 
-	/*
-	case 'exportAccountMovements':
-	    // require user to be econo-legal or hacker
-	    if ($_SESSION['userdata']['current_role'] != 'Hacker Commission' and
-		$_SESSION['userdata']['current_role'] != 'Econo-Legal Commission') {
-		throw new Exception('You do not have sufficient privileges to see account movements');
-	    }
-	    $account_id = get_param('account_id', -3);
-	    $from_date = get_param('from_date', strtotime('-1 month'));
-	    $from_date_day = date('Y-m-d', $from_date);
-	    $to_date = get_param('to_date', strtotime('now')); 
-	    $to_date_day = date('Y-m-d', $to_date);
-	    $to_date_next_day = date('Y-m-d', strtotime($to_date_day . ' +1 day'));
-	    $format = get_param('format', 'csv'); // or xml
-	    $xml = stored_query_XML_fields('aixada_account_list_all_query', 
-					   'ts', 
-					   'desc', 
-					   0, 
-					   1000000, 
-					   'account_id=' . $account_id . ' and ts between "' . $from_date_day . '" and "' . $to_date_next_day . '"');
-	    switch ($format) {
-	    case 'csv':
-		printCSV(XML2csv($xml), 'account_movements_' . $account_id . '_' . $from_date_day . '_' . $to_date_day . '.csv');
-		exit;
-
-	    case 'xml':
-		$metadata = array( 'name' => 'account', 
-				   'data' => array( 'account_id' => $account_id,
-						    'from_date' => $from_date_day,
-						    'to_date' => $to_date_day ));
-		printXML(XML_add_metadata($xml, 'account_movements', $metadata));
-		exit;
-
-	    default:
-		throw new Exception('Export file format"' . $format . '" not supported');
-	    }
-	    break;
-	    */
-	    
 	default:
 	    throw new Exception("ctrl Import: operation {$_REQUEST['oper']} not supported");
     

@@ -31,15 +31,16 @@ function backup_as_internal($output_folder, $backup_name)
     });
     try {
         $cv = configuration_vars::get_instance();
-        return $output_folder . backup_by_mysqli(
+        $result = $output_folder . backup_by_mysqli(
             $output_folder, $backup_name,
             $cv->db_host, $cv->db_name, $cv->db_user, $cv->db_password
         );
+        restore_error_handler();
+        return $result;
     } catch (Exception $e) {
         restore_error_handler();
         throw $e;
     }
-    restore_error_handler();
 }
 
 /**
