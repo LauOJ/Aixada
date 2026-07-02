@@ -1,6 +1,6 @@
 <?php
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 require_once(__ROOT__ . "local_config/config.php");
 require_once(__ROOT__ . "php/inc/database.php");
@@ -19,7 +19,7 @@ try{
 
     	//returns shopping cart(s) for logged user!  
     	case 'getShopCart':
-    		printXML(stored_query_XML_fields('get_shop_cart', get_param('date',0), get_session_uf_id(), get_param('shop_id',0),1), get_param('validated',0));
+    		printXML(stored_query_XML_fields('get_shop_cart', get_param('date',0), get_session_uf_id(), get_param('shop_id',0), 1));
     		exit;
     		
 
@@ -50,9 +50,8 @@ try{
 			exit; 	    	
 	    	
     		
-    default:  
-    	 throw new Exception("ctrlShop: oper={$_REQUEST['oper']} not supported");  
-        break;
+    default:
+    	 throw new Exception("ctrlShop: oper={$_REQUEST['oper']} not supported");
     }
 
 

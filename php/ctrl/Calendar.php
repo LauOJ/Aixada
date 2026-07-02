@@ -1,12 +1,15 @@
 <?php
 
     define('DS', DIRECTORY_SEPARATOR);
-    define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
-    require_once(__ROOT__ . "php/inc/database.php");
+    define('__ROOT__', dirname(__DIR__, 2) . DS);
     require_once(__ROOT__ . "local_config/config.php");
-    include '../lib/calendar_operations.php';
+    require_once(__ROOT__ . "php/inc/database.php");
+    require_once(__ROOT__ . "php/utilities/general.php");
+    require_once(__ROOT__ . "php/lib/calendar_operations.php");
   
-    switch ($_POST['oper']) {      
+    validate_session();
+
+    switch ($_POST['oper']) {
         case 'printTorn':
             $a = explode('-',$_POST['data']);
             $db = DBWrap::get_instance();
@@ -111,7 +114,7 @@
             
         default:
 	       throw new Exception(
-					    "ctrlAccount: operation {$_REQUEST['oper']} not supported");
+					    "ctrlCalendar: operation {$_REQUEST['oper']} not supported");
         }
 
  function ufsAnulada ($uf){

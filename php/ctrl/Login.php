@@ -1,8 +1,7 @@
 <?php
 
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
-
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 require_once(__ROOT__ . "local_config/config.php");
 require_once(__ROOT__ . "php/inc/database.php");
@@ -10,10 +9,6 @@ require_once(__ROOT__ . "php/inc/authentication.inc.php");
 require_once(__ROOT__ . "php/utilities/general.php");
 require_once(__ROOT__ . "php/utilities/useruf.php");
 require_once(__ROOT__ . "php/lib/exceptions.php");
-
-ob_start(); // Probably only needed for FirePHP(no longer used)
-
-DBWrap::get_instance()->debug = true;
 
 
 
@@ -23,8 +18,7 @@ try{
 	  case 'logout':
 	      try {
 	        logout_session();
-		  	$h = 'Location:' . __ROOT__ . 'login.php';
-	      } 
+	      }
 	      catch (AuthException $e) {
 	        die($e->getMessage());
 	      }
@@ -38,21 +32,15 @@ try{
 	      
 	      try {
 	          $auth = new Authentication();
-	          list($user_id, 
-	               $login, 
-	               $uf_id, 
-	               $member_id, 
-	               $provider_id, 
-	               $roles, 
-	               $current_role, 
-	               $current_language_key, 
+	          list($user_id,
+	               $login,
+	               $uf_id,
+	               $member_id,
+	               $provider_id,
+	               $roles,
+	               $current_role,
+	               $current_language_key,
 	               $theme) = $auth->check_credentials(get_param('login'), get_param('password'));
-              /* FIXME
-                    There a security issues here: 'login' and 'password' are posted unencrypted, and so is visible to everyone!
-                    Even encrypting the username/password is no solution, because anyone who intercepts the communication
-                    can just send the encrypted text without knowing what it decrypts to, but can log in anyways.
-                    The solution could be to implement an SSL protocol.
-              */
 	      	  
 	          $langs = existing_languages();
 	          create_session( 

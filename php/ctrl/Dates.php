@@ -1,30 +1,22 @@
 <?php
 
 define('DS', DIRECTORY_SEPARATOR);
-define('__ROOT__', dirname(dirname(dirname(__FILE__))).DS); 
+define('__ROOT__', dirname(__DIR__, 2) . DS);
 
 require_once(__ROOT__ . "local_config/config.php");
 require_once(__ROOT__ . "php/inc/database.php");
 require_once(__ROOT__ . "php/utilities/dates.php");
 require_once(__ROOT__ . "php/utilities/general.php");
 
-DBWrap::get_instance()->debug = true;
-
-function extract_data($what) {
-    return (isset($_REQUEST[$what]) ? $_REQUEST[$what] : '');
-}
-
 try{
     validate_session(); // The user must be logged in.
-    
-    $oper = extract_data('oper');
-    $date = extract_data('date');
 
-    
+    $oper = get_param('oper');
+
   switch ($oper) {
   	
   	case 'getToday':
-  		echo get_dates('today', $format='array');
+  		echo get_dates('today', 'array');
   		exit;
 
   	case 'getOrderableDates':
@@ -44,7 +36,7 @@ try{
   		exit;
   	
   	default:
-    	throw new Exception("ctrlDates: \"oper=" . $_REQUEST['oper'] . "\" not valid in query");
+    	throw new Exception("ctrlDates: \"oper={$oper}\" not valid in query");
   }
 } 
 
