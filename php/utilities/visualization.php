@@ -5,8 +5,6 @@ require_once(__ROOT__ . 'php/inc/database.php');
 require_once(__ROOT__ . 'php/utilities/general.php');
 require_once(__ROOT__ . 'local_config/config.php');
 
-ob_start(); // Probably only needed for FirePHP(no longer used)
-
 function product_prices_times_years($product_id_array, $year_array)
 {
     $query = 'select id, name from aixada_product where id in (';

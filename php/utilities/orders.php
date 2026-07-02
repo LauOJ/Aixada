@@ -838,8 +838,7 @@ function get_orders_in_range($time_period='ordersForToday', $uf_id=0, $from_date
 		
 		
 		default:
-			throw new Exception("get_orders_in_range: param={$time_period} not supported");  
-			break;
+			throw new Exception("get_orders_in_range: param={$time_period} not supported");
 	}
 
 	

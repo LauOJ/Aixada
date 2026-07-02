@@ -3,7 +3,7 @@
 
 require_once(__ROOT__. 'php/inc/database.php');
 require_once(__ROOT__. 'local_config/config.php');
-require_once ('general.php');
+require_once(__ROOT__ . 'php/utilities/general.php');
 require_once(__ROOT__ . 'local_config/lang/'.get_session_language() . '.php');
 
 
@@ -152,8 +152,7 @@ function get_incidents_in_range($filter, $from_date, $to_date, $filterType=1){
 			
 			
 		default:
-			throw new Exception("get_incidents_in_range: param={$filter} not supported");  
-			break;
+			throw new Exception("get_incidents_in_range: param={$filter} not supported");
 	}
 	
 }
