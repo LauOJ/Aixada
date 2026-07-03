@@ -2,7 +2,7 @@
 <?php
 // Redirigir al dashboard personalitzat si l'usuari està logat
 if (is_created_session()) {
-    header('Location: dashboard.php');
+    header('Location: ' . get_config('post_login_redirect', 'aixada_main.php'));
     exit;
 }
 
