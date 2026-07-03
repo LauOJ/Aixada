@@ -30,6 +30,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>Llistat de Contactes</title>
+    <?= aixada_custom_css() ?>
     <style>
         body { font-family: Arial, sans-serif; margin: 30px; }
         h1 { font-size: 1.4rem; margin-bottom: 16px; }
