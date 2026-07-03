@@ -22,7 +22,7 @@ try {
   	<link rel="stylesheet" type="text/css"   media="screen" href="js/aixadacart/aixadacart.css?v=<?=aixada_js_version();?>" />
   	<link rel="stylesheet" type="text/css"   media="screen" href="js/fgmenu/fg.menu.css"   />
     <link rel="stylesheet" type="text/css"   media="screen" href="css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
-    <link rel="stylesheet" type="text/css"   media="screen" href="css/vinagreta-custom.css?v=1.1"/>
+    <?= aixada_custom_css() ?>
      
 	<style>
 		.ui-state-disabled a {pointer-events: none;}

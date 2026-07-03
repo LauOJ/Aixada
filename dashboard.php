@@ -54,7 +54,7 @@ try {
 
     <link rel="stylesheet" type="text/css" media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui-themes/<?= $default_theme; ?>/jqueryui.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=4.9" />
+    <?= aixada_custom_css() ?>
 
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript" src="js/jqueryui/jqueryui.js"></script>
@@ -251,8 +251,8 @@ try {
                 <div class="dashboard-section contactes">
                     <h2>Llistats d'unitats familiars</h2>
                     <div class="button-group">
-                        <a href="https://www.lavinagreta.org/wp-content/plugins/llistats/PR1families.php" target="_blank" class="dashboard-button">SIMPLE</a>
-                        <a href="https://www.lavinagreta.org/wp-content/plugins/llistats/PR1contactes.php" target="_blank" class="dashboard-button">AMB CONTACTES</a>
+                        <a href="llistat_families.php" class="dashboard-button">SIMPLE</a>
+                        <a href="llistat_contactes.php" class="dashboard-button">AMB CONTACTES</a>
                     </div>
                 </div>
 

@@ -79,9 +79,8 @@ function aixada_js_src($useMenus = true, $rootJs = '')
 function aixada_custom_css()
 {
     global $aixada_vesion_lastDate;
-    $css_path = __ROOT__ . 'css' . DS . 'vinagreta-custom.css';
-    if (!file_exists($css_path)) {
+    if (!file_exists(__ROOT__ . 'css' . DS . 'custom.css')) {
         return '';
     }
-    return '<link rel="stylesheet" type="text/css" media="screen" href="css/vinagreta-custom.css?v=' . $aixada_vesion_lastDate . '"/>' . "\n";
+    return '<link rel="stylesheet" type="text/css" media="screen" href="css/custom.css?v=' . $aixada_vesion_lastDate . '"/>' . "\n";
 }
