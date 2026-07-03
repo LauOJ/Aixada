@@ -121,10 +121,7 @@ if (!isset($_SESSION)) {
                     url: "php/ctrl/Login.php",
 					data:dataSerial,		
 					success: function(response) {
-						console.log('AJAX SUCCESS - Response:', response);
-						console.log('Redirecting to dashboard.php');
-					    top.location.href = 'dashboard.php';
-					    
+					    top.location.href = '<?= htmlspecialchars(get_config('post_login_redirect', 'aixada_main.php')) ?>';
 					},
 					error : function(XMLHttpRequest, textStatus, errorThrown){
 						console.log('=== AJAX ERROR ===');
