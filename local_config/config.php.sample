@@ -284,7 +284,31 @@ class configuration_vars {
    */
   public $internet_connection = false;
 
+  /**
+   * SSO integration with WordPress.
+   * Set cookie_domain to the shared domain (e.g. '.example.org') to allow
+   * the Aixada session cookie to be read by WordPress on the same domain.
+   * Set wp_auth_secret to the HMAC secret shared with the WordPress plugin.
+   * Leave both empty if WordPress integration is not used.
+   */
+  public $cookie_domain  = '';
+  public $wp_auth_secret = '';
 
+  /**
+   * Optional URL of a custom dashboard shown after login.
+   * Displayed as the "Torna al tauler" link in the menu (if set).
+   * Leave empty if no custom dashboard is used.
+   * @var string
+   */
+  public $dashboard_url = '';
+
+  /**
+   * Page to redirect to after a successful login.
+   * Use 'dashboard.php' if a custom dashboard exists, or 'aixada_main.php'
+   * to go directly to the Aixada (default for cooperatives without a dashboard).
+   * @var string
+   */
+  public $post_login_redirect = 'aixada_main.php';
 
 
 
@@ -381,9 +405,9 @@ class configuration_vars {
 
   /**
    * Mailing list address for the incidents mail form (mail_incidencies.php).
-   * Override in staging config to avoid sending to the real list.
+   * Leave empty to send to individual user email addresses instead.
    */
-  public $incidents_mail_list = 'lavinagreta@lists.riseup.net';
+  public $incidents_mail_list = '';
 
   /**
   * CALENDARI
