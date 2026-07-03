@@ -251,8 +251,8 @@ try {
                 <div class="dashboard-section contactes">
                     <h2>Llistats d'unitats familiars</h2>
                     <div class="button-group">
-                        <a href="https://www.lavinagreta.org/wp-content/plugins/llistats/PR1families.php" target="_blank" class="dashboard-button">SIMPLE</a>
-                        <a href="https://www.lavinagreta.org/wp-content/plugins/llistats/PR1contactes.php" target="_blank" class="dashboard-button">AMB CONTACTES</a>
+                        <a href="llistat_families.php" class="dashboard-button">SIMPLE</a>
+                        <a href="llistat_contactes.php" class="dashboard-button">AMB CONTACTES</a>
                     </div>
                 </div>
 
