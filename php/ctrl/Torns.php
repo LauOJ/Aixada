@@ -144,10 +144,38 @@ function getEligibleUfs(array $excluded): array
     return $ufs;
 }
 
-function getRotationStart(string $task, array $eligible): int
+function getLastPeriodUfs(string $task, string $before): array
 {
-    $db  = DBWrap::get_instance();
-    $rs  = $db->Execute('SELECT ufTorn FROM aixada_torns WHERE task_type = :1q ORDER BY dataTorn DESC, ufTorn DESC LIMIT 1', $task);
+    $db = DBWrap::get_instance();
+    // Get all UFs from the most recent period before $before
+    $rs = $db->Execute(
+        'SELECT ufTorn FROM aixada_torns WHERE task_type = :1q AND dataTorn < :2q
+         ORDER BY dataTorn DESC LIMIT 20',
+        $task, $before
+    );
+    if (!($row = $rs->fetch_assoc())) return [];
+    // Find all UFs from that same date
+    $rs2 = $db->Execute(
+        'SELECT ufTorn FROM aixada_torns WHERE task_type = :1q AND dataTorn =
+         (SELECT MAX(dataTorn) FROM aixada_torns WHERE task_type = :1q AND dataTorn < :2q)',
+        $task, $before
+    );
+    $ufs = [];
+    while ($r = $rs2->fetch_assoc()) {
+        $ufs[] = (int)$r['ufTorn'];
+    }
+    return $ufs;
+}
+
+function getRotationStart(string $task, array $eligible, string $startDate): int
+{
+    // Find the last UF assigned before startDate and continue from there
+    $db = DBWrap::get_instance();
+    $rs = $db->Execute(
+        'SELECT ufTorn FROM aixada_torns WHERE task_type = :1q AND dataTorn < :2q
+         ORDER BY dataTorn DESC, ufTorn ASC LIMIT 1',
+        $task, $startDate
+    );
     if ($row = $rs->fetch_assoc()) {
         $last = (int)$row['ufTorn'];
         $pos  = array_search($last, $eligible);
@@ -158,17 +186,19 @@ function getRotationStart(string $task, array $eligible): int
     return 0;
 }
 
-function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible): array
+function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible, array $lastPeriod): array
 {
-    $n       = count($eligible);
-    $picked  = [];
-    $tried   = 0;
+    $n        = count($eligible);
+    $picked   = [];
+    $deferred = []; // in lastPeriod — avoid if possible
+    $tried    = 0;
 
-    while (count($picked) < $count && $tried < $n * 2) {
+    while ((count($picked) + count($deferred)) < $count && $tried < $n * 2) {
         $candidate = $eligible[$rotIdx % $n];
         $rotIdx    = ($rotIdx + 1) % $n;
         $tried++;
 
+        // Check incompatible with already picked
         $conflict = false;
         foreach ($picked as $already) {
             $a = min($candidate, $already);
@@ -180,12 +210,23 @@ function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible)
                 }
             }
         }
-        if (!$conflict) {
+        if ($conflict) continue;
+
+        // Defer UFs from last period — prefer not to repeat consecutively
+        if (in_array($candidate, $lastPeriod)) {
+            $deferred[] = $candidate;
+        } else {
             $picked[] = $candidate;
         }
     }
 
-    return $picked;
+    // Fill remaining slots with deferred UFs (last resort)
+    foreach ($deferred as $uf) {
+        if (count($picked) >= $count) break;
+        $picked[] = $uf;
+    }
+
+    return array_slice($picked, 0, $count);
 }
 
 function generateTorns(string $task, string $start, string $end): void
@@ -195,7 +236,7 @@ function generateTorns(string $task, string $start, string $end): void
 
     $count        = (int)($cfg[$task . '_count'] ?? ($task === 'repartiment' ? 6 : 3));
     $freq_weeks   = (int)($cfg[$task . '_freq']  ?? ($task === 'repartiment' ? 1 : 2));
-    $excluded     = $cfg['excluded']      ?? [];
+    $excluded     = $cfg['excluded']       ?? [];
     $no_resp      = $cfg['no_responsible'] ?? [];
     $incompatible = array_map(fn($p) => [(int)$p[0], (int)$p[1]], $cfg['incompatible'] ?? []);
 
@@ -205,13 +246,14 @@ function generateTorns(string $task, string $start, string $end): void
     $db->Execute('DELETE FROM aixada_torns WHERE task_type = :1q AND dataTorn >= :2q AND dataTorn <= :3q',
                  $task, $start, $end);
 
-    $rotIdx  = getRotationStart($task, $eligible);
-    $current = strtotime($start);
-    $endTs   = strtotime($end);
+    $rotIdx     = getRotationStart($task, $eligible, $start);
+    $lastPicked = getLastPeriodUfs($task, $start);
+    $current    = strtotime($start);
+    $endTs      = strtotime($end);
 
     while ($current <= $endTs) {
         $date   = date('Y-m-d', $current);
-        $picked = pickUfs($count, $rotIdx, $eligible, $incompatible);
+        $picked = pickUfs($count, $rotIdx, $eligible, $incompatible, $lastPicked);
 
         $responsable = null;
         if ($task === 'repartiment') {
@@ -229,7 +271,8 @@ function generateTorns(string $task, string $start, string $end): void
                          $date, $uf, $task, $is_resp);
         }
 
-        $current = strtotime($date . ' +' . $freq_weeks . ' weeks');
+        $lastPicked = $picked;
+        $current    = strtotime($date . ' +' . $freq_weeks . ' weeks');
     }
 }
 
