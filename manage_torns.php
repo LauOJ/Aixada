@@ -27,18 +27,32 @@
         .incompatible-add select { font-size: 0.82rem; max-width: 130px; }
         .generate-row           { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 8px; }
         .generate-row > div > label { display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 3px; }
-        .week-block             { margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
-        .week-header            { background: #3a3a5c; color: white; padding: 5px 12px; font-weight: bold; font-size: 0.88rem; }
-        .week-body              { padding: 8px 12px; }
-        .task-label             { font-size: 0.75rem; font-weight: bold; color: #555; text-transform: uppercase; letter-spacing: 0.04em; margin: 6px 0 3px; }
-        .torn-row               { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; font-size: 0.88rem; padding: 2px 0; }
-        .torn-row .uf-name      { min-width: 120px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .torn-row.responsable .uf-name { font-weight: bold; color: #1b5e20; }
-        .responsable-badge      { background: #2e7d32; color: white; font-size: 0.68rem; padding: 1px 5px; border-radius: 10px; white-space: nowrap; }
-        .neteja-row             { border-left: 3px solid #1565c0; padding-left: 8px; }
-        .repartiment-row        { border-left: 3px solid #2e7d32; padding-left: 8px; }
-        select.uf-select        { min-width: 140px; }
-        .no-torns               { color: #999; font-style: italic; font-size: 0.85rem; margin: 4px 0; }
+        .month-block        { margin-bottom: 24px; }
+        .month-header       { background: #3a3a5c; color: white; padding: 7px 14px; font-size: 0.92rem;
+                              font-weight: bold; text-transform: uppercase; letter-spacing: 0.07em;
+                              border-radius: 4px 4px 0 0; }
+        .torns-table        { width: 100%; border-collapse: collapse; border: 1px solid #ccc; border-top: none; }
+        .torns-table thead th { background: #f0f0f4; padding: 5px 12px; font-size: 0.78rem;
+                                text-transform: uppercase; color: #555; letter-spacing: 0.04em;
+                                text-align: left; border-bottom: 2px solid #ccc; }
+        .torns-table tbody tr:last-child td { border-bottom: none; }
+        .torns-table td     { padding: 6px 12px; vertical-align: top; border-bottom: 1px solid #eee; }
+        .week-cell          { width: 110px; background: #fafafa; }
+        .week-dates         { font-weight: bold; font-size: 0.88rem; color: #333; }
+        .week-rep-day       { font-size: 0.78rem; color: #2e7d32; margin-top: 3px; }
+        .rep-cell           { border-left: 3px solid #2e7d32; }
+        .net-cell           { border-left: 3px solid #1565c0; }
+        .uf-entry           { display: flex; align-items: center; gap: 6px; padding: 2px 0; font-size: 0.88rem; flex-wrap: wrap; }
+        .uf-entry .uf-name  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
+        .uf-entry.responsable .uf-name { font-weight: bold; color: #1b5e20; }
+        .resp-star          { color: #2e7d32; font-size: 0.85rem; min-width: 12px; text-align: center; }
+        select.uf-select    { min-width: 140px; }
+        .no-torns           { color: #999; font-style: italic; font-size: 0.85rem; margin: 4px 0; }
+        button.btn-sm {
+            padding: 1px 6px; font-size: 0.75rem; cursor: pointer;
+            border: 1px solid #ccc; background: #f5f5f5; border-radius: 2px; color: #555;
+        }
+        button.btn-sm:hover { background: #e8e8e8; border-color: #999; color: #333; }
         button {
             padding: 2px 9px; font-size: 0.82rem; cursor: pointer;
             border: 1px solid #aaa; background: linear-gradient(to bottom, #f7f7f7, #e4e4e4);
@@ -137,7 +151,9 @@
 <script>
 var allUfs = [];
 var incompatiblePairs = [];
-var dayNamesCat = ['Diumenge','Dilluns','Dimarts','Dimecres','Dijous','Divendres','Dissabte'];
+var monthNamesCat = ['Gener','Febrer','Març','Abril','Maig','Juny','Juliol','Agost','Setembre','Octubre','Novembre','Desembre'];
+var dayNamesCat   = ['Dg','Dl','Dm','Dc','Dj','Dv','Ds'];
+var shortMonths   = ['gen','feb','mar','abr','mai','jun','jul','ago','set','oct','nov','des'];
 
 $(document).ready(function() {
     loadUfs(function() {
@@ -265,75 +281,109 @@ function renderUpcoming(weeks) {
         $('#torns_list').html('<p class="no-torns">No hi ha torns programats.</p>');
         return;
     }
-    var html = '';
+
+    var months = {}, monthOrder = [];
     weeks.forEach(function(week) {
-        var from = formatDate(week.week_start), to = formatDate(week.week_end);
-        var repDateStr = '';
-        if (week.repartiment && week.repartiment.length > 0) {
-            var d = new Date(week.repartiment[0].date + 'T00:00:00');
-            repDateStr = ' <span style="font-weight:normal;font-size:0.8rem;opacity:0.8">('+dayNamesCat[d.getDay()]+' '+d.getDate()+'/'+(d.getMonth()+1)+')</span>';
+        var d   = new Date(week.week_start + 'T00:00:00');
+        var key = d.getFullYear() + '-' + d.getMonth();
+        if (!months[key]) {
+            months[key] = {year: d.getFullYear(), month: d.getMonth(), weeks: []};
+            monthOrder.push(key);
         }
-        html += '<div class="week-block">'
-              + '<div class="week-header">Del '+from+' al '+to+repDateStr+'</div>'
-              + '<div class="week-body">';
+        months[key].weeks.push(week);
+    });
 
-        if (week.repartiment && week.repartiment.length > 0) {
-            html += '<div class="task-label" style="color:#2e7d32">Repartiment</div>';
-            week.repartiment.forEach(function(entry) {
-                var resp = entry.is_responsible ? '<span class="responsable-badge">Responsable</span>' : '';
-                var cls  = 'torn-row repartiment-row' + (entry.is_responsible ? ' responsable' : '');
-                html += '<div class="'+cls+'" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="repartiment">'
-                      + '<span class="uf-name">'+entry.uf_id+' - '+entry.name+'</span>'
-                      + resp
-                      + ' <button class="btn-canviar" onclick="showEdit(this)">Canvia</button>'
-                      + (entry.is_responsible ? '' : ' <button onclick="setResponsable(\''+entry.date+'\','+entry.uf_id+')">Fer responsable</button>')
-                      + ' <button onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'repartiment\')">✕</button>'
-                      + '</div>';
-            });
-        }
+    var html = '';
+    monthOrder.forEach(function(key) {
+        var m = months[key];
+        html += '<div class="month-block">'
+              + '<div class="month-header">'+monthNamesCat[m.month]+' '+m.year+'</div>'
+              + '<table class="torns-table">'
+              + '<thead><tr><th>Setmana</th><th>Repartiment</th><th>Neteja</th></tr></thead>'
+              + '<tbody>';
 
-        if (week.neteja && week.neteja.length > 0) {
-            html += '<div class="task-label" style="color:#1565c0">Neteja</div>';
-            week.neteja.forEach(function(entry) {
-                html += '<div class="torn-row neteja-row" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="neteja">'
-                      + '<span class="uf-name">'+entry.uf_id+' - '+entry.name+'</span>'
-                      + ' <button class="btn-canviar" onclick="showEdit(this)">Canvia</button>'
-                      + ' <button onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'neteja\')">✕</button>'
-                      + '</div>';
-            });
-        }
+        m.weeks.forEach(function(week) {
+            var s = new Date(week.week_start + 'T00:00:00');
+            var e = new Date(week.week_end   + 'T00:00:00');
+            var weekLabel = s.getMonth() === e.getMonth()
+                ? s.getDate() + '–' + e.getDate() + ' ' + shortMonths[e.getMonth()]
+                : s.getDate() + ' ' + shortMonths[s.getMonth()] + ' – ' + e.getDate() + ' ' + shortMonths[e.getMonth()];
 
-        if ((!week.repartiment || !week.repartiment.length) && (!week.neteja || !week.neteja.length)) {
-            html += '<p class="no-torns">Sense torns assignats.</p>';
-        }
-        html += '</div></div>';
+            var repDayLabel = '';
+            if (week.repartiment && week.repartiment.length > 0) {
+                var rd = new Date(week.repartiment[0].date + 'T00:00:00');
+                repDayLabel = '<div class="week-rep-day">'+dayNamesCat[rd.getDay()]+' '+rd.getDate()+'/'+(rd.getMonth()+1)+'</div>';
+            }
+
+            // Repartiment column
+            var repHtml = '';
+            if (week.repartiment && week.repartiment.length > 0) {
+                week.repartiment.forEach(function(entry) {
+                    var isResp = !!entry.is_responsible;
+                    var cls    = 'uf-entry' + (isResp ? ' responsable' : '');
+                    var star   = '<span class="resp-star">'+(isResp ? '★' : '')+'</span>';
+                    repHtml += '<div class="'+cls+'" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="repartiment">'
+                             + star
+                             + '<span class="uf-name">'+entry.name+'</span>'
+                             + ' <button class="btn-sm" onclick="showEdit(this)">canvia</button>'
+                             + (isResp ? '' : ' <button class="btn-sm" onclick="setResponsable(\''+entry.date+'\','+entry.uf_id+')">resp.</button>')
+                             + ' <button class="btn-sm" onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'repartiment\')">✕</button>'
+                             + '</div>';
+                });
+            } else {
+                repHtml = '<span class="no-torns">—</span>';
+            }
+
+            // Neteja column
+            var netHtml = '';
+            if (week.neteja && week.neteja.length > 0) {
+                week.neteja.forEach(function(entry) {
+                    netHtml += '<div class="uf-entry" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="neteja">'
+                             + '<span class="resp-star"></span>'
+                             + '<span class="uf-name">'+entry.name+'</span>'
+                             + ' <button class="btn-sm" onclick="showEdit(this)">canvia</button>'
+                             + ' <button class="btn-sm" onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'neteja\')">✕</button>'
+                             + '</div>';
+                });
+            } else {
+                netHtml = '<span class="no-torns">—</span>';
+            }
+
+            html += '<tr>'
+                  + '<td class="week-cell"><div class="week-dates">'+weekLabel+'</div>'+repDayLabel+'</td>'
+                  + '<td class="rep-cell">'+repHtml+'</td>'
+                  + '<td class="net-cell">'+netHtml+'</td>'
+                  + '</tr>';
+        });
+
+        html += '</tbody></table></div>';
     });
     $('#torns_list').html(html);
 }
 
 function showEdit(btn) {
-    var row    = $(btn).closest('.torn-row');
-    var date   = row.data('date');
-    var old_uf = row.data('uf');
-    var task   = row.data('task');
+    var entry  = $(btn).closest('.uf-entry');
+    var date   = entry.data('date');
+    var old_uf = entry.data('uf');
+    var task   = entry.data('task');
 
-    if (row.find('select.edit-select').length) {
-        row.find('select.edit-select, .btn-confirm-edit').remove();
+    if (entry.find('select.edit-select').length) {
+        entry.find('select.edit-select, .btn-confirm-edit').remove();
         return;
     }
 
-    var sel = $('<select class="edit-select uf-select"></select>');
+    var sel = $('<select class="edit-select" style="font-size:0.82rem;max-width:160px"></select>');
     allUfs.forEach(function(uf) {
         sel.append($('<option>').val(uf.id).text(uf.id+' - '+uf.name));
     });
     sel.val(old_uf);
-    var btnOk = $('<button class="btn-confirm-edit">OK</button>').click(function() {
+    var btnOk = $('<button class="btn-confirm-edit btn-sm">OK</button>').click(function() {
         var new_uf = parseInt(sel.val());
         if (new_uf === old_uf) { sel.remove(); $(this).remove(); return; }
         $.post('php/ctrl/Torns.php', {oper:'updateTorn', date:date, old_uf:old_uf, new_uf:new_uf, task:task},
             function() { loadUpcoming(); });
     });
-    row.append(sel).append(btnOk);
+    entry.append(sel).append(btnOk);
 }
 
 function setResponsable(date, uf) {
