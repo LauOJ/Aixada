@@ -32,7 +32,7 @@
         .week-body              { padding: 8px 12px; }
         .task-label             { font-size: 0.75rem; font-weight: bold; color: #555; text-transform: uppercase; letter-spacing: 0.04em; margin: 6px 0 3px; }
         .torn-row               { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; font-size: 0.88rem; padding: 2px 0; }
-        .torn-row .uf-name      { min-width: 160px; }
+        .torn-row .uf-name      { min-width: 120px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .torn-row.responsable .uf-name { font-weight: bold; color: #1b5e20; }
         .responsable-badge      { background: #2e7d32; color: white; font-size: 0.68rem; padding: 1px 5px; border-radius: 10px; white-space: nowrap; }
         .neteja-row             { border-left: 3px solid #1565c0; padding-left: 8px; }
