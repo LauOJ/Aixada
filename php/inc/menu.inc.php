@@ -108,7 +108,6 @@
 
 		<li><a href="manage_providers.php"><?php echo $Text['nav_mng_providers'];?></a></li>
 		<?php if (get_config('calendari')) { ?>
-		<li><a href="manage_calendar.php"><?php echo $Text['nav_mng_calendar'];?></a></li>
 		<li><a href="torns.php">Torns</a></li>
 		<li><a href="manage_torns.php">Gestió de torns</a></li>
 		<?php } ?>
