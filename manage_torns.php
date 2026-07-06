@@ -48,18 +48,14 @@
         .resp-star          { color: #2e7d32; font-size: 0.85rem; min-width: 12px; text-align: center; }
         select.uf-select    { min-width: 140px; }
         .no-torns           { color: #999; font-style: italic; font-size: 0.85rem; margin: 4px 0; }
-        button.btn-sm {
-            padding: 1px 6px; font-size: 0.75rem; cursor: pointer;
-            border: 1px solid #ccc; background: #f5f5f5; border-radius: 2px; color: #555;
-        }
-        button.btn-sm:hover { background: #e8e8e8; border-color: #999; color: #333; }
-        button {
+        .torns-btn, .btn-sm {
             padding: 2px 9px; font-size: 0.82rem; cursor: pointer;
             border: 1px solid #aaa; background: linear-gradient(to bottom, #f7f7f7, #e4e4e4);
             border-radius: 3px; color: #333;
         }
-        button:hover  { background: linear-gradient(to bottom, #ececec, #d8d8d8); border-color: #888; }
-        button:active { background: #d0d0d0; }
+        .btn-sm { padding: 1px 6px; font-size: 0.75rem; border-color: #ccc; background: #f5f5f5; }
+        .torns-btn:hover, .btn-sm:hover { background: linear-gradient(to bottom, #ececec, #d8d8d8); border-color: #888; }
+        .torns-btn:active, .btn-sm:active { background: #d0d0d0; }
     </style>
 </head>
 <body>
@@ -113,12 +109,12 @@
                         <select id="incompat_uf1"></select>
                         <span>+</span>
                         <select id="incompat_uf2"></select>
-                        <button onclick="addIncompatible()">Afegir</button>
+                        <button class="torns-btn" onclick="addIncompatible()">Afegir</button>
                     </div>
                 </div>
             </div>
             <br>
-            <button onclick="saveConfig()">Desa configuració</button>
+            <button class="torns-btn" onclick="saveConfig()">Desa configuració</button>
         </div>
 
         <!-- GENERATE -->
@@ -128,12 +124,12 @@
                 <div>
                     <label>Repartiment — data d'inici</label>
                     <input type="date" id="start_repartiment" />
-                    <button onclick="generate('repartiment')">Genera repartiment</button>
+                    <button class="torns-btn" onclick="generate('repartiment')">Genera repartiment</button>
                 </div>
                 <div>
                     <label>Neteja — data d'inici</label>
                     <input type="date" id="start_neteja" />
-                    <button onclick="generate('neteja')">Genera neteja</button>
+                    <button class="torns-btn" onclick="generate('neteja')">Genera neteja</button>
                 </div>
             </div>
             <small style="color:#777">Es generaran els torns des de la data triada fins a avui + mesos d'antel·lació. Els torns existents en aquest període s'esborraran.</small>

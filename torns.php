@@ -179,7 +179,7 @@ function showEdit(btn) {
     });
     sel.val(old_uf);
 
-    var btnOk = $('<button class="btn-confirm-edit" style="padding:1px 6px;font-size:0.78rem">OK</button>').click(function() {
+    var btnOk = $('<button class="btn-confirm-edit btn-canvia-sm">OK</button>').click(function() {
         var new_uf = parseInt(sel.val());
         if (new_uf === old_uf) { sel.remove(); $(this).remove(); return; }
         $.post('php/ctrl/Torns.php', {oper:'updateTorn', date:date, old_uf:old_uf, new_uf:new_uf, task:task},
