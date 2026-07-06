@@ -53,13 +53,13 @@
             border: 1px solid #ccc; background: #f5f5f5; border-radius: 2px; color: #555;
         }
         button.btn-sm:hover { background: #e8e8e8; border-color: #999; color: #333; }
-        button {
+        #stagewrap button {
             padding: 2px 9px; font-size: 0.82rem; cursor: pointer;
             border: 1px solid #aaa; background: linear-gradient(to bottom, #f7f7f7, #e4e4e4);
             border-radius: 3px; color: #333;
         }
-        button:hover  { background: linear-gradient(to bottom, #ececec, #d8d8d8); border-color: #888; }
-        button:active { background: #d0d0d0; }
+        #stagewrap button:hover  { background: linear-gradient(to bottom, #ececec, #d8d8d8); border-color: #888; }
+        #stagewrap button:active { background: #d0d0d0; }
     </style>
 </head>
 <body>
