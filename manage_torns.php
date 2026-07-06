@@ -6,6 +6,7 @@
     <title><?= $Text['global_title'] ?> - Gestió de torns</title>
     <link rel="stylesheet" type="text/css" media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui-themes/<?= $default_theme ?>/jqueryui.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="js/fgmenu/fg.menu.css" />
     <?= aixada_custom_css() ?>
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript" src="js/jqueryui/jqueryui.js"></script>
