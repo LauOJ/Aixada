@@ -26,7 +26,8 @@ INSERT IGNORE INTO aixada_torns_config VALUES
     ('repartiment_freq',  '1'),
     ('neteja_count',      '3'),
     ('neteja_freq',       '2'),
-    ('advance_months',    '2');
+    ('advance_months',    '2'),
+    ('repartiment_day',   '4');
 
 CREATE TABLE IF NOT EXISTS aixada_torns_restriction (
     type  VARCHAR(20) NOT NULL,

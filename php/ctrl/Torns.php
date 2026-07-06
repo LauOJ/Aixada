@@ -17,7 +17,7 @@ switch ($_POST['oper'] ?? '') {
         break;
 
     case 'saveConfig':
-        $scalars = ['repartiment_count', 'repartiment_freq', 'neteja_count', 'neteja_freq', 'advance_months'];
+        $scalars = ['repartiment_count', 'repartiment_freq', 'neteja_count', 'neteja_freq', 'advance_months', 'repartiment_day'];
         foreach ($scalars as $key) {
             if (isset($_POST[$key])) {
                 $db->Execute('INSERT INTO aixada_torns_config (setting, value) VALUES (:1q, :2q)

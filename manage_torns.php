@@ -11,32 +11,41 @@
     <script type="text/javascript" src="js/jqueryui/jqueryui.js"></script>
     <?= aixada_js_src() ?>
     <style>
-        .torns-section      { margin: 20px 0; padding: 16px; border: 1px solid #ccc; border-radius: 4px; background: #fafafa; }
-        .torns-section h2   { margin: 0 0 12px; font-size: 1.1rem; }
-        .torns-grid         { display: flex; gap: 24px; flex-wrap: wrap; }
-        .torns-col          { flex: 1; min-width: 220px; }
-        .torns-col label    { display: block; margin-bottom: 4px; font-weight: bold; font-size: 0.9rem; }
-        .torns-col input[type=number] { width: 60px; }
-        .uf-checkboxes      { max-height: 180px; overflow-y: auto; border: 1px solid #ddd; padding: 6px; border-radius: 3px; background: #fff; }
-        .uf-checkboxes label { font-weight: normal; display: flex; align-items: center; gap: 6px; padding: 2px 0; }
-        .incompatible-list  { list-style: none; padding: 0; margin: 0 0 8px; }
-        .incompatible-list li { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-        .incompatible-add   { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
-        .week-block         { margin-bottom: 20px; }
-        .week-header        { background: #3a3a5c; color: white; padding: 6px 12px; border-radius: 3px 3px 0 0; font-weight: bold; }
-        .week-body          { border: 1px solid #ccc; border-top: none; padding: 10px 12px; }
-        .task-label         { font-size: 0.8rem; font-weight: bold; color: #666; text-transform: uppercase; margin: 8px 0 4px; }
-        .torn-row           { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-        .torn-row .uf-name  { min-width: 180px; }
+        .torns-section          { margin: 20px 0; padding: 14px 16px; border: 1px solid #ccc; border-radius: 4px; background: #fafafa; }
+        .torns-section h2       { margin: 0 0 12px; font-size: 1.05rem; }
+        .torns-grid             { display: flex; gap: 20px; flex-wrap: wrap; }
+        .torns-col              { flex: 1; min-width: 200px; }
+        .torns-col > label      { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem; }
+        .config-row             { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+        .config-row label       { font-weight: bold; font-size: 0.85rem; min-width: 185px; margin: 0; }
+        .config-row input[type=number] { width: 55px; }
+        .uf-checkboxes          { max-height: 160px; overflow-y: auto; border: 1px solid #ddd; padding: 4px 6px; border-radius: 3px; background: #fff; font-size: 0.82rem; }
+        .uf-checkboxes label    { font-weight: normal; display: flex; align-items: center; gap: 5px; padding: 1px 0; }
+        .incompatible-list      { list-style: none; padding: 0; margin: 0 0 6px; font-size: 0.82rem; }
+        .incompatible-list li   { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+        .incompatible-add       { display: flex; gap: 6px; align-items: center; margin-top: 6px; font-size: 0.82rem; }
+        .incompatible-add select { font-size: 0.82rem; max-width: 130px; }
+        .generate-row           { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 8px; }
+        .generate-row > div > label { display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 3px; }
+        .week-block             { margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
+        .week-header            { background: #3a3a5c; color: white; padding: 5px 12px; font-weight: bold; font-size: 0.88rem; }
+        .week-body              { padding: 8px 12px; }
+        .task-label             { font-size: 0.75rem; font-weight: bold; color: #555; text-transform: uppercase; letter-spacing: 0.04em; margin: 6px 0 3px; }
+        .torn-row               { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; font-size: 0.88rem; padding: 2px 0; }
+        .torn-row .uf-name      { min-width: 160px; }
         .torn-row.responsable .uf-name { font-weight: bold; color: #1b5e20; }
-        .responsable-badge  { background: #2e7d32; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; }
-        .btn-generate       { margin-top: 10px; }
-        .generate-row       { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 10px; }
-        .generate-row label { font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 4px; }
-        select.uf-select    { min-width: 160px; }
-        .no-torns           { color: #999; font-style: italic; font-size: 0.9rem; }
-        .neteja-row         { border-left: 3px solid #1565c0; padding-left: 8px; }
-        .repartiment-row    { border-left: 3px solid #2e7d32; padding-left: 8px; }
+        .responsable-badge      { background: #2e7d32; color: white; font-size: 0.68rem; padding: 1px 5px; border-radius: 10px; white-space: nowrap; }
+        .neteja-row             { border-left: 3px solid #1565c0; padding-left: 8px; }
+        .repartiment-row        { border-left: 3px solid #2e7d32; padding-left: 8px; }
+        select.uf-select        { min-width: 140px; }
+        .no-torns               { color: #999; font-style: italic; font-size: 0.85rem; margin: 4px 0; }
+        button {
+            padding: 2px 9px; font-size: 0.82rem; cursor: pointer;
+            border: 1px solid #aaa; background: linear-gradient(to bottom, #f7f7f7, #e4e4e4);
+            border-radius: 3px; color: #333;
+        }
+        button:hover  { background: linear-gradient(to bottom, #ececec, #d8d8d8); border-color: #888; }
+        button:active { background: #d0d0d0; }
     </style>
 </head>
 <body>
@@ -50,15 +59,33 @@
             <h2>Configuració</h2>
             <div class="torns-grid">
                 <div class="torns-col">
-                    <label>Repartiment — UF per torn</label>
-                    <input type="number" id="repartiment_count" min="1" max="20" value="6" />
-                    <label style="margin-top:10px">Neteja — UF per torn</label>
-                    <input type="number" id="neteja_count" min="1" max="20" value="3" />
-                    <label style="margin-top:10px">Mesos d'antel·lació</label>
-                    <input type="number" id="advance_months" min="1" max="12" value="2" />
+                    <div class="config-row">
+                        <label>Repartiment — UFs per torn</label>
+                        <input type="number" id="repartiment_count" min="1" max="20" value="6" />
+                    </div>
+                    <div class="config-row">
+                        <label>Neteja — UFs per torn</label>
+                        <input type="number" id="neteja_count" min="1" max="20" value="3" />
+                    </div>
+                    <div class="config-row">
+                        <label>Mesos d'antel·lació</label>
+                        <input type="number" id="advance_months" min="1" max="12" value="2" />
+                    </div>
+                    <div class="config-row">
+                        <label>Dia del repartiment</label>
+                        <select id="repartiment_day">
+                            <option value="1">Dilluns</option>
+                            <option value="2">Dimarts</option>
+                            <option value="3">Dimecres</option>
+                            <option value="4" selected>Dijous</option>
+                            <option value="5">Divendres</option>
+                            <option value="6">Dissabte</option>
+                            <option value="0">Diumenge</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="torns-col">
-                    <label>UF excloses (no participen mai)</label>
+                    <label>UF excloses</label>
                     <div class="uf-checkboxes" id="excluded_ufs"></div>
                 </div>
                 <div class="torns-col">
@@ -69,9 +96,9 @@
                     <label>Parelles incompatibles (no al mateix torn)</label>
                     <ul class="incompatible-list" id="incompatible_list"></ul>
                     <div class="incompatible-add">
-                        <select id="incompat_uf1" class="uf-select"></select>
+                        <select id="incompat_uf1"></select>
                         <span>+</span>
-                        <select id="incompat_uf2" class="uf-select"></select>
+                        <select id="incompat_uf2"></select>
                         <button onclick="addIncompatible()">Afegir</button>
                     </div>
                 </div>
@@ -87,15 +114,15 @@
                 <div>
                     <label>Repartiment — data d'inici</label>
                     <input type="date" id="start_repartiment" />
-                    <button class="btn-generate" onclick="generate('repartiment')">Genera repartiment</button>
+                    <button onclick="generate('repartiment')">Genera repartiment</button>
                 </div>
                 <div>
                     <label>Neteja — data d'inici</label>
                     <input type="date" id="start_neteja" />
-                    <button class="btn-generate" onclick="generate('neteja')">Genera neteja</button>
+                    <button onclick="generate('neteja')">Genera neteja</button>
                 </div>
             </div>
-            <small style="color:#666">Es generaran els torns des de la data triada fins a avui + mesos d'antel·lació configurats. Els torns existents en aquest període s'esborraran.</small>
+            <small style="color:#777">Es generaran els torns des de la data triada fins a avui + mesos d'antel·lació. Els torns existents en aquest període s'esborraran.</small>
         </div>
 
         <!-- REVIEW -->
@@ -110,13 +137,13 @@
 <script>
 var allUfs = [];
 var incompatiblePairs = [];
+var dayNamesCat = ['Diumenge','Dilluns','Dimarts','Dimecres','Dijous','Divendres','Dissabte'];
 
 $(document).ready(function() {
     loadUfs(function() {
         loadConfig();
         loadUpcoming();
     });
-    // default start dates to today
     var today = new Date().toISOString().slice(0,10);
     $('#start_repartiment').val(today);
     $('#start_neteja').val(today);
@@ -155,6 +182,7 @@ function loadConfig() {
         $('#repartiment_count').val(cfg.repartiment_count || 6);
         $('#neteja_count').val(cfg.neteja_count || 3);
         $('#advance_months').val(cfg.advance_months || 2);
+        $('#repartiment_day').val(cfg.repartiment_day !== undefined ? cfg.repartiment_day : 4);
 
         (cfg.excluded || []).forEach(function(id) {
             $('.exc-cb[value="'+id+'"]').prop('checked', true);
@@ -190,10 +218,7 @@ function addIncompatible() {
     if (a === b) { alert('Tria dues UF diferents.'); return; }
     var p1 = Math.min(a,b), p2 = Math.max(a,b);
     var exists = incompatiblePairs.some(function(p) { return p[0]===p1 && p[1]===p2; });
-    if (!exists) {
-        incompatiblePairs.push([p1, p2]);
-        renderIncompatList();
-    }
+    if (!exists) { incompatiblePairs.push([p1, p2]); renderIncompatList(); }
 }
 
 function removeIncompat(i) {
@@ -202,7 +227,7 @@ function removeIncompat(i) {
 }
 
 function saveConfig() {
-    var excluded      = $('.exc-cb:checked').map(function() { return parseInt($(this).val()); }).get();
+    var excluded       = $('.exc-cb:checked').map(function() { return parseInt($(this).val()); }).get();
     var no_responsible = $('.resp-cb:checked').map(function() { return parseInt($(this).val()); }).get();
     $.post('php/ctrl/Torns.php', {
         oper:              'saveConfig',
@@ -211,6 +236,7 @@ function saveConfig() {
         neteja_count:      $('#neteja_count').val(),
         neteja_freq:       2,
         advance_months:    $('#advance_months').val(),
+        repartiment_day:   $('#repartiment_day').val(),
         excluded:          JSON.stringify(excluded),
         no_responsible:    JSON.stringify(no_responsible),
         incompatible:      JSON.stringify(incompatiblePairs)
@@ -224,9 +250,7 @@ function generate(task) {
     if (!start) { alert('Tria una data d\'inici.'); return; }
     var months = $('#advance_months').val();
     $.post('php/ctrl/Torns.php', {oper:'generateTorns', task:task, start:start, months:months},
-        function(data) {
-            renderUpcoming(JSON.parse(data));
-        }
+        function(data) { renderUpcoming(JSON.parse(data)); }
     );
 }
 
@@ -244,15 +268,20 @@ function renderUpcoming(weeks) {
     var html = '';
     weeks.forEach(function(week) {
         var from = formatDate(week.week_start), to = formatDate(week.week_end);
+        var repDateStr = '';
+        if (week.repartiment && week.repartiment.length > 0) {
+            var d = new Date(week.repartiment[0].date + 'T00:00:00');
+            repDateStr = ' <span style="font-weight:normal;font-size:0.8rem;opacity:0.8">('+dayNamesCat[d.getDay()]+' '+d.getDate()+'/'+(d.getMonth()+1)+')</span>';
+        }
         html += '<div class="week-block">'
-              + '<div class="week-header">Del '+from+' al '+to+'</div>'
+              + '<div class="week-header">Del '+from+' al '+to+repDateStr+'</div>'
               + '<div class="week-body">';
 
         if (week.repartiment && week.repartiment.length > 0) {
             html += '<div class="task-label" style="color:#2e7d32">Repartiment</div>';
             week.repartiment.forEach(function(entry) {
                 var resp = entry.is_responsible ? '<span class="responsable-badge">Responsable</span>' : '';
-                var cls  = entry.is_responsible ? 'torn-row repartiment-row responsable' : 'torn-row repartiment-row';
+                var cls  = 'torn-row repartiment-row' + (entry.is_responsible ? ' responsable' : '');
                 html += '<div class="'+cls+'" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="repartiment">'
                       + '<span class="uf-name">'+entry.uf_id+' - '+entry.name+'</span>'
                       + resp
@@ -277,7 +306,6 @@ function renderUpcoming(weeks) {
         if ((!week.repartiment || !week.repartiment.length) && (!week.neteja || !week.neteja.length)) {
             html += '<p class="no-torns">Sense torns assignats.</p>';
         }
-
         html += '</div></div>';
     });
     $('#torns_list').html(html);
@@ -289,7 +317,10 @@ function showEdit(btn) {
     var old_uf = row.data('uf');
     var task   = row.data('task');
 
-    if (row.find('select.edit-select').length) { row.find('select.edit-select').remove(); row.find('.btn-confirm-edit').remove(); return; }
+    if (row.find('select.edit-select').length) {
+        row.find('select.edit-select, .btn-confirm-edit').remove();
+        return;
+    }
 
     var sel = $('<select class="edit-select uf-select"></select>');
     allUfs.forEach(function(uf) {
