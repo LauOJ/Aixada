@@ -243,6 +243,16 @@ function generateTorns(string $task, string $start, string $end): void
     $eligible = getEligibleUfs($excluded);
     if (empty($eligible)) return;
 
+    // Snap repartiment start date to the configured day of week
+    if ($task === 'repartiment') {
+        $repDay = (int)($cfg['repartiment_day'] ?? 4);
+        $dow    = (int)date('w', strtotime($start));
+        if ($dow !== $repDay) {
+            $diff  = ($repDay - $dow + 7) % 7;
+            $start = date('Y-m-d', strtotime($start . ' +' . $diff . ' days'));
+        }
+    }
+
     $db->Execute('DELETE FROM aixada_torns WHERE task_type = :1q AND dataTorn >= :2q AND dataTorn <= :3q',
                  $task, $start, $end);
 
