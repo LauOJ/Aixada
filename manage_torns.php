@@ -104,6 +104,10 @@
                     <div class="uf-checkboxes" id="no_responsible_ufs"></div>
                 </div>
                 <div class="torns-col">
+                    <label>UFs noves <span style="font-weight:normal;font-size:0.82rem;color:#666">(es prioritzen en el torn quan toca per última opció)</span></label>
+                    <div class="uf-checkboxes" id="nova_ufs"></div>
+                </div>
+                <div class="torns-col">
                     <label>Parelles incompatibles (no al mateix torn)</label>
                     <ul class="incompatible-list" id="incompatible_list"></ul>
                     <div class="incompatible-add">
@@ -177,9 +181,14 @@ function renderUfCheckboxes() {
         var label = uf.id + ' - ' + uf.name;
         excHtml  += '<label><input type="checkbox" class="exc-cb"  value="'+uf.id+'"> '+label+'</label>';
         respHtml += '<label><input type="checkbox" class="resp-cb" value="'+uf.id+'"> '+label+'</label>';
+        var novaHtml = '';
+    allUfs.forEach(function(uf) {
+        var label = uf.id + ' – ' + uf.name;
+        novaHtml += '<label><input type="checkbox" class="nova-cb" value="'+uf.id+'"> '+label+'</label>';
     });
     $('#excluded_ufs').html(excHtml);
     $('#no_responsible_ufs').html(respHtml);
+    $('#nova_ufs').html(novaHtml);
 }
 
 function renderIncompatSelects() {
@@ -202,6 +211,9 @@ function loadConfig() {
         });
         (cfg.no_responsible || []).forEach(function(id) {
             $('.resp-cb[value="'+id+'"]').prop('checked', true);
+        });
+        (cfg.nova || []).forEach(function(id) {
+            $('.nova-cb[value="'+id+'"]').prop('checked', true);
         });
         incompatiblePairs = (cfg.incompatible || []).map(function(p) {
             return [parseInt(p[0]), parseInt(p[1])];
@@ -242,6 +254,7 @@ function removeIncompat(i) {
 function saveConfig() {
     var excluded       = $('.exc-cb:checked').map(function() { return parseInt($(this).val()); }).get();
     var no_responsible = $('.resp-cb:checked').map(function() { return parseInt($(this).val()); }).get();
+    var nova           = $('.nova-cb:checked').map(function() { return parseInt($(this).val()); }).get();
     $.post('php/ctrl/Torns.php', {
         oper:              'saveConfig',
         repartiment_count: $('#repartiment_count').val(),
@@ -252,6 +265,7 @@ function saveConfig() {
         repartiment_day:   $('#repartiment_day').val(),
         excluded:          JSON.stringify(excluded),
         no_responsible:    JSON.stringify(no_responsible),
+        nova:              JSON.stringify(nova),
         incompatible:      JSON.stringify(incompatiblePairs)
     }, function() {
         $.showMsg({msg: 'Configuració desada.', type: 'ok'});

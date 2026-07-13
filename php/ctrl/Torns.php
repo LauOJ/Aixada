@@ -32,6 +32,10 @@ switch ($_POST['oper'] ?? '') {
         foreach (json_decode($_POST['no_responsible'] ?? '[]') as $uf_id) {
             $db->Execute('INSERT IGNORE INTO aixada_torns_restriction VALUES (:1q, :2q)', 'no_responsible', (int)$uf_id);
         }
+        $db->Execute('DELETE FROM aixada_torns_restriction WHERE type = :1q', 'nova');
+        foreach (json_decode($_POST['nova'] ?? '[]') as $uf_id) {
+            $db->Execute('INSERT IGNORE INTO aixada_torns_restriction VALUES (:1q, :2q)', 'nova', (int)$uf_id);
+        }
         $db->Execute('DELETE FROM aixada_torns_incompatible');
         foreach (json_decode($_POST['incompatible'] ?? '[]') as $pair) {
             $a = min((int)$pair[0], (int)$pair[1]);
@@ -116,8 +120,9 @@ function getTornsConfig(): array
     }
 
     $rs = $db->Execute("SELECT type, uf_id FROM aixada_torns_restriction");
-    $cfg['excluded']      = [];
+    $cfg['excluded']       = [];
     $cfg['no_responsible'] = [];
+    $cfg['nova']           = [];
     while ($row = $rs->fetch_assoc()) {
         $cfg[$row['type']][] = (int)$row['uf_id'];
     }
@@ -134,7 +139,7 @@ function getTornsConfig(): array
 function getEligibleUfs(array $excluded): array
 {
     $db  = DBWrap::get_instance();
-    $rs  = $db->Execute('SELECT id, name FROM aixada_uf WHERE active = 1 ORDER BY id');
+    $rs  = $db->Execute("SELECT id FROM aixada_uf WHERE active = 1 AND name NOT LIKE '%LLIURE%' ORDER BY id");
     $ufs = [];
     while ($row = $rs->fetch_assoc()) {
         if (!in_array((int)$row['id'], $excluded)) {
@@ -167,6 +172,22 @@ function getLastPeriodUfs(string $task, string $before): array
     return $ufs;
 }
 
+function getRecentAssignmentCount(string $task, string $since): array
+{
+    $db = DBWrap::get_instance();
+    $rs = $db->Execute(
+        'SELECT ufTorn, COUNT(*) as cnt FROM aixada_torns
+         WHERE task_type = :1q AND dataTorn >= :2q
+         GROUP BY ufTorn',
+        $task, $since
+    );
+    $counts = [];
+    while ($row = $rs->fetch_assoc()) {
+        $counts[(int)$row['ufTorn']] = (int)$row['cnt'];
+    }
+    return $counts;
+}
+
 function getRotationStart(string $task, array $eligible, string $startDate): int
 {
     // Find the last UF assigned before startDate and continue from there
@@ -186,44 +207,56 @@ function getRotationStart(string $task, array $eligible, string $startDate): int
     return 0;
 }
 
-function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible, array $lastPeriod): array
+function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible, array $lastPeriod, array $recentCount = [], int $maxRecent = 2, array $nova = []): array
 {
-    $n        = count($eligible);
-    $picked   = [];
-    $deferred = []; // in lastPeriod — avoid if possible
-    $tried    = 0;
+    $n                  = count($eligible);
+    $picked             = [];
+    $deferred_consec    = []; // was in last period, not freq-capped
+    $deferred_freq      = []; // freq-capped, not in last period
+    $deferred_both      = []; // freq-capped AND in last period
+    $tried              = 0;
 
-    while ((count($picked) + count($deferred)) < $count && $tried < $n * 2) {
+    while (count($picked) < $count && $tried < $n * 3) {
         $candidate = $eligible[$rotIdx % $n];
         $rotIdx    = ($rotIdx + 1) % $n;
         $tried++;
 
-        // Check incompatible with already picked
+        // Skip if incompatible with already picked
         $conflict = false;
         foreach ($picked as $already) {
             $a = min($candidate, $already);
             $b = max($candidate, $already);
             foreach ($incompatible as $pair) {
-                if ($pair[0] === $a && $pair[1] === $b) {
-                    $conflict = true;
-                    break 2;
-                }
+                if ($pair[0] === $a && $pair[1] === $b) { $conflict = true; break 2; }
             }
         }
         if ($conflict) continue;
 
-        // Defer UFs from last period — prefer not to repeat consecutively
-        if (in_array($candidate, $lastPeriod)) {
-            $deferred[] = $candidate;
-        } else {
+        $isConsec = in_array($candidate, $lastPeriod);
+        $isCapped = ($recentCount[$candidate] ?? 0) >= $maxRecent;
+
+        if (!$isConsec && !$isCapped) {
             $picked[] = $candidate;
+        } elseif ($isConsec && !$isCapped) {
+            $deferred_consec[] = $candidate;
+        } elseif (!$isConsec && $isCapped) {
+            $deferred_freq[] = $candidate;
+        } else {
+            $deferred_both[] = $candidate;
         }
     }
 
-    // Fill remaining slots with deferred UFs (last resort)
-    foreach ($deferred as $uf) {
-        if (count($picked) >= $count) break;
-        $picked[] = $uf;
+    // Fill remaining slots from deferred lists in priority order.
+    // Within each level, nova UFs go first.
+    foreach ([$deferred_consec, $deferred_freq, $deferred_both] as $deferred) {
+        $novaFirst = array_merge(
+            array_values(array_filter($deferred, fn($u) => in_array($u, $nova))),
+            array_values(array_filter($deferred, fn($u) => !in_array($u, $nova)))
+        );
+        foreach ($novaFirst as $uf) {
+            if (count($picked) >= $count) break 2;
+            $picked[] = $uf;
+        }
     }
 
     return array_slice($picked, 0, $count);
@@ -238,10 +271,14 @@ function generateTorns(string $task, string $start, string $end): void
     $freq_weeks   = (int)($cfg[$task . '_freq']  ?? ($task === 'repartiment' ? 1 : 2));
     $excluded     = $cfg['excluded']       ?? [];
     $no_resp      = $cfg['no_responsible'] ?? [];
+    $nova         = $cfg['nova']           ?? [];
     $incompatible = array_map(fn($p) => [(int)$p[0], (int)$p[1]], $cfg['incompatible'] ?? []);
 
     $eligible = getEligibleUfs($excluded);
     if (empty($eligible)) return;
+
+    $since       = date('Y-m-d', strtotime('-2 months'));
+    $recentCount = getRecentAssignmentCount($task, $since);
 
     // Snap repartiment start to the configured day of week.
     // DELETE from the original start so old off-day data is also removed.
@@ -265,7 +302,7 @@ function generateTorns(string $task, string $start, string $end): void
 
     while ($current <= $endTs) {
         $date   = date('Y-m-d', $current);
-        $picked = pickUfs($count, $rotIdx, $eligible, $incompatible, $lastPicked);
+        $picked = pickUfs($count, $rotIdx, $eligible, $incompatible, $lastPicked, $recentCount, 2, $nova);
 
         $responsable = null;
         if ($task === 'repartiment') {
