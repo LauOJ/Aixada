@@ -139,7 +139,12 @@ function getTornsConfig(): array
 function getEligibleUfs(array $excluded): array
 {
     $db  = DBWrap::get_instance();
-    $rs  = $db->Execute("SELECT id FROM aixada_uf WHERE active = 1 AND name NOT LIKE '%LLIURE%' ORDER BY id");
+    $rs  = $db->Execute(
+        'SELECT DISTINCT u.id FROM aixada_uf u
+         INNER JOIN aixada_user usr ON usr.uf_id = u.id
+         WHERE u.active = 1
+         ORDER BY u.id'
+    );
     $ufs = [];
     while ($row = $rs->fetch_assoc()) {
         if (!in_array((int)$row['id'], $excluded)) {
