@@ -1,5 +1,6 @@
-<?php include "php/inc/header.inc.php" ?>
-<?php 
+<?php include "php/inc/header.inc.php";
+require_role([ROLE_ADMIN]);
+?><?php
 
     $table_name = get_param('table');
     $data_manager = null;

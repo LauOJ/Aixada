@@ -9,10 +9,17 @@
 
         // Role selector
         echo '<select size="0" name="role_select" id="role_select">';
+        $role_labels = [
+            ROLE_CONSUMIDORA => 'Consumidora',
+            ROLE_RESPONSABLE => 'Responsable',
+            ROLE_TRESORERIA  => 'Tresoreria',
+            ROLE_TORNS       => 'Torns',
+            ROLE_ADMIN       => 'Admin',
+        ];
         foreach (get_session_value('roles') as $role) {
-            $rt = isset($Text[$role]) ? $Text[$role] : "TRANSLATE[$role]";
+            $label    = $role_labels[$role] ?? $role;
             $selected = ($role == get_current_role()) ? ' selected' : '';
-            echo '<option' . $selected . ' value="' . $role . '">' . $rt . '</option>';
+            echo '<option' . $selected . ' value="' . $role . '">' . $label . '</option>';
         }
         echo '</select> ';
 
@@ -57,8 +64,10 @@
 <a tabindex="3" href="shop_and_orderstock.php?what=Shop" 	id="navShop" class="menuTop"><?php echo $Text['nav_shop'];?></a>
 <?php } ?>
 <a tabindex="4" href="shop_and_order.php?what=Order" 		id="navOrder" class="menuTop"><?php echo $Text['nav_order'];?></a>
-<a tabindex="5" href="#" 			id="navManage" class="menuTop"><?php echo $Text['nav_mng'];?></a>
-<?php if (get_current_role() != 'Consumer') { ?>
+<?php if (current_role_in([ROLE_RESPONSABLE, ROLE_TRESORERIA, ROLE_TORNS, ROLE_ADMIN])) { ?>
+<a tabindex="5" href="#" id="navManage" class="menuTop"><?php echo $Text['nav_mng'];?></a>
+<?php } ?>
+<?php if (current_role_in([ROLE_ADMIN])) { ?>
 <a tabindex="6" href="#" id="navReport" class="menuTop"><?php echo $Text['nav_report'];?></a>
 <a tabindex="7" href="#" id="navIncidents" class="menuTop"><?php echo $Text['nav_incidents'];?></a>
 <?php } ?>
@@ -70,43 +79,32 @@
 	<ul>
 		<li><a href="manage_orders.php?filter=pastMonth"><?php echo $Text['nav_wiz_orders']; ?></a></li>
 		<li><a href="mail_incidencies.php"><?php echo $Text['nav_wiz_incidents_mail']; ?></a></li>
+		<?php if (get_config('calendari')) { ?>
+		<li><a href="torns.php">Torns</a></li>
+		<?php } ?>
 	</ul>
 </div>
 
 
 <div id="navManageItems" class="hidden">
 	<ul>
-		<?php if (get_current_role() == 'Consumer') { ?>
+		<?php if (current_role_in([ROLE_RESPONSABLE, ROLE_ADMIN])) { ?>
 		<li><a href="manage_orderable_products.php"><?php echo $Text['nav_mng_schedule_orders']; ?></a></li>
-		<li><a href="manage_providers.php"><?php echo $Text['nav_mng_providers_products']; ?></a></li>
-		<li><a href="manage_orders.php"><?php echo $Text['nav_mng_manage_orders']; ?></a></li>
-		<?php } elseif (get_current_role() == 'Accounts Commission') { ?>
-		<li><a href="manage_money.php"><?php echo $Text['nav_mng_money'];?></a>
-			<ul>
-				<li><a href="manage_data.php?table=aixada_account_desc"><?php echo $Text['nav_mng_accdec']; ?></a></li>
-				<li><a href="manage_data.php?table=aixada_payment_method"><?php echo $Text['nav_mng_paymeth']; ?></a></li>
-			</ul>
-		</li>
-		<?php } else { ?>
+		<li><a href="manage_providers.php"><?php echo $Text['nav_mng_providers'];?></a></li>
+		<li><a href="manage_orders.php"><?php echo $Text['nav_mng_orders'];?></a></li>
+		<?php } ?>
+		<?php if (current_role_in([ROLE_TRESORERIA, ROLE_ADMIN])) { ?>
+		<li><a href="manage_money.php"><?php echo $Text['nav_mng_money'];?></a></li>
+		<?php } ?>
+		<?php if (current_role_in([ROLE_TORNS, ROLE_ADMIN]) && get_config('calendari')) { ?>
+		<li><a href="manage_torns.php">Gestió de torns</a></li>
+		<?php } ?>
+		<?php if (current_role_in([ROLE_ADMIN])) { ?>
 		<li><a href="manage_ufmember.php"><?php echo $Text['uf_short'];?> & <?php echo $Text['nav_mng_member'];?></a>
 			<ul>
-				<li>
-				<?php
-					if (get_current_role() == 'Hacker Commission') {
-						echo '<a href="activate_all_roles.php">';
-					} else {
-						echo '<a href="activate_roles.php">';
-					}
-					echo $Text['nav_mng_roles'];
-				?>
-				</a></li>
+				<li><a href="activate_all_roles.php"><?php echo $Text['nav_mng_roles'];?></a></li>
 			</ul>
 		</li>
-
-		<li><a href="manage_providers.php"><?php echo $Text['nav_mng_providers'];?></a></li>
-		<?php if (get_config('calendari')) { ?>
-		<li><a href="manage_calendar.php"><?php echo $Text['nav_mng_calendar'];?></a></li>
-		<?php } ?>
 		<li><a href="manage_providers.php"><?php echo $Text['nav_mng_products'];?></a>
 			<ul>
 				<li><a href="manage_orderable_products.php"><?php echo $Text['nav_mng_deactivate'];?></a></li>
@@ -115,7 +113,6 @@
 				<li><a href="manage_data.php?table=aixada_rev_tax_type"><?php echo $Text['nav_mng_revtax']; ?></a></li>
 			</ul>
 		</li>
-		<li><a href="manage_orders.php"><?php echo $Text['nav_mng_orders'];?></a></li>
 		<li><a href="manage_money.php"><?php echo $Text['nav_mng_money'];?></a>
 			<ul>
 				<li><a href="manage_data.php?table=aixada_account_desc"><?php echo $Text['nav_mng_accdec']; ?></a></li>

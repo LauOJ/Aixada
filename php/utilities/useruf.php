@@ -174,7 +174,7 @@ function reset_password($user_id)
 	global $Text;  
 	
 	//only admin 
-	 if (get_current_role() != 'Hacker Commission')
+	 if (get_current_role() !== ROLE_ADMIN)
           throw new Exception($Text['msg_err_adminStuff']);
 
     return reset_password_for_user($user_id, false);

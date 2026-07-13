@@ -25,7 +25,7 @@ try{
 
   case 'getDeactivatedRoles':
       $rs = do_stored_query('get_active_roles', $user_id);
-      $roles = array_keys(configuration_vars::get_instance()->forbidden_pages);
+      $roles = ROLES_ALL;
       $active_roles = array();
       while ($row = $rs->fetch_array()) {
           $active_roles[] = $row[0];
