@@ -141,7 +141,7 @@ function getEligibleUfs(array $excluded): array
     $db  = DBWrap::get_instance();
     $rs  = $db->Execute(
         'SELECT DISTINCT u.id FROM aixada_uf u
-         INNER JOIN aixada_user usr ON usr.uf_id = u.id
+         INNER JOIN aixada_member m ON m.uf_id = u.id AND m.active = 1
          WHERE u.active = 1
          ORDER BY u.id'
     );
