@@ -93,7 +93,12 @@ switch ($_POST['oper'] ?? '') {
         break;
 
     case 'getUfs':
-        $rs   = $db->Execute('SELECT id, name FROM aixada_uf WHERE active = 1 ORDER BY id');
+        $rs   = $db->Execute(
+            'SELECT DISTINCT u.id, u.name FROM aixada_uf u
+             INNER JOIN aixada_member m ON m.uf_id = u.id AND m.active = 1
+             WHERE u.active = 1
+             ORDER BY u.id'
+        );
         $ufs  = [];
         while ($row = $rs->fetch_assoc()) {
             $ufs[] = $row;
@@ -212,6 +217,21 @@ function getRotationStart(string $task, array $eligible, string $startDate): int
     return 0;
 }
 
+function getLastResponsable(string $before): ?int
+{
+    $db = DBWrap::get_instance();
+    $rs = $db->Execute(
+        'SELECT ufTorn FROM aixada_torns
+         WHERE task_type = :1q AND is_responsible = 1 AND dataTorn < :2q
+         ORDER BY dataTorn DESC LIMIT 1',
+        'repartiment', $before
+    );
+    if ($row = $rs->fetch_assoc()) {
+        return (int)$row['ufTorn'];
+    }
+    return null;
+}
+
 function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible, array $lastPeriod, array $recentCount = [], int $maxRecent = 2, array $nova = [], int $maxNova = 3): array
 {
     $n                 = count($eligible);
@@ -299,10 +319,11 @@ function generateTorns(string $task, string $start, string $end): void
     $db->Execute('DELETE FROM aixada_torns WHERE task_type = :1q AND dataTorn >= :2q AND dataTorn <= :3q',
                  $task, $deleteFrom, $end);
 
-    $rotIdx     = getRotationStart($task, $eligible, $start);
-    $lastPicked = getLastPeriodUfs($task, $start);
-    $current    = strtotime($start);
-    $endTs      = strtotime($end);
+    $rotIdx          = getRotationStart($task, $eligible, $start);
+    $lastPicked      = getLastPeriodUfs($task, $start);
+    $lastResponsable = ($task === 'repartiment') ? getLastResponsable($start) : null;
+    $current         = strtotime($start);
+    $endTs           = strtotime($end);
 
     while ($current <= $endTs) {
         $date   = date('Y-m-d', $current);
@@ -311,11 +332,20 @@ function generateTorns(string $task, string $start, string $end): void
         $responsable = null;
         if ($task === 'repartiment') {
             foreach ($picked as $uf) {
-                if (!in_array($uf, $no_resp)) {
+                if (!in_array($uf, $no_resp) && $uf !== $lastResponsable) {
                     $responsable = $uf;
                     break;
                 }
             }
+            if ($responsable === null) {
+                foreach ($picked as $uf) {
+                    if (!in_array($uf, $no_resp)) {
+                        $responsable = $uf;
+                        break;
+                    }
+                }
+            }
+            $lastResponsable = $responsable;
         }
 
         foreach ($picked as $uf) {

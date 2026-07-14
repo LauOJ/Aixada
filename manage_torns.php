@@ -188,6 +188,17 @@ function renderUfCheckboxes() {
     $('#nova_ufs').html(novaHtml);
 }
 
+$(document).on('change', '.exc-cb', function() {
+    var id = $(this).val();
+    var $novaLabel = $('.nova-cb[value="'+id+'"]').closest('label');
+    if ($(this).is(':checked')) {
+        $('.nova-cb[value="'+id+'"]').prop('checked', false);
+        $novaLabel.hide();
+    } else {
+        $novaLabel.show();
+    }
+});
+
 function renderIncompatSelects() {
     var opts = allUfs.map(function(uf) {
         return '<option value="'+uf.id+'">'+uf.id+' - '+uf.name+'</option>';
@@ -205,6 +216,7 @@ function loadConfig() {
 
         (cfg.excluded || []).forEach(function(id) {
             $('.exc-cb[value="'+id+'"]').prop('checked', true);
+            $('.nova-cb[value="'+id+'"]').prop('checked', false).closest('label').hide();
         });
         (cfg.no_responsible || []).forEach(function(id) {
             $('.resp-cb[value="'+id+'"]').prop('checked', true);
