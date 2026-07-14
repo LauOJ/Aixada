@@ -104,7 +104,7 @@
                     <div class="uf-checkboxes" id="no_responsible_ufs"></div>
                 </div>
                 <div class="torns-col">
-                    <label>UFs noves <span style="font-weight:normal;font-size:0.82rem;color:#666">(es prioritzen en el torn quan toca per última opció)</span></label>
+                    <label>UFs noves <span style="font-weight:normal;font-size:0.82rem;color:#666">(màxim 3 per torn, per no agrupar-les totes juntes)</span></label>
                     <div class="uf-checkboxes" id="nova_ufs"></div>
                 </div>
                 <div class="torns-col">
@@ -176,14 +176,11 @@ function loadUfs(callback) {
 }
 
 function renderUfCheckboxes() {
-    var excHtml = '', respHtml = '';
+    var excHtml = '', respHtml = '', novaHtml = '';
     allUfs.forEach(function(uf) {
         var label = uf.id + ' - ' + uf.name;
         excHtml  += '<label><input type="checkbox" class="exc-cb"  value="'+uf.id+'"> '+label+'</label>';
         respHtml += '<label><input type="checkbox" class="resp-cb" value="'+uf.id+'"> '+label+'</label>';
-        var novaHtml = '';
-    allUfs.forEach(function(uf) {
-        var label = uf.id + ' – ' + uf.name;
         novaHtml += '<label><input type="checkbox" class="nova-cb" value="'+uf.id+'"> '+label+'</label>';
     });
     $('#excluded_ufs').html(excHtml);

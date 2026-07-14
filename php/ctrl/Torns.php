@@ -212,21 +212,21 @@ function getRotationStart(string $task, array $eligible, string $startDate): int
     return 0;
 }
 
-function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible, array $lastPeriod, array $recentCount = [], int $maxRecent = 2, array $nova = []): array
+function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible, array $lastPeriod, array $recentCount = [], int $maxRecent = 2, array $nova = [], int $maxNova = 3): array
 {
-    $n                  = count($eligible);
-    $picked             = [];
-    $deferred_consec    = []; // was in last period, not freq-capped
-    $deferred_freq      = []; // freq-capped, not in last period
-    $deferred_both      = []; // freq-capped AND in last period
-    $tried              = 0;
+    $n                 = count($eligible);
+    $picked            = [];
+    $deferred_consec   = [];
+    $deferred_freq     = [];
+    $deferred_both     = [];
+    $deferred_nova_cap = []; // nova UFs deferred because the group already has maxNova nova UFs
+    $tried             = 0;
 
     while (count($picked) < $count && $tried < $n * 3) {
         $candidate = $eligible[$rotIdx % $n];
         $rotIdx    = ($rotIdx + 1) % $n;
         $tried++;
 
-        // Skip if incompatible with already picked
         $conflict = false;
         foreach ($picked as $already) {
             $a = min($candidate, $already);
@@ -237,11 +237,16 @@ function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible,
         }
         if ($conflict) continue;
 
-        $isConsec = in_array($candidate, $lastPeriod);
-        $isCapped = ($recentCount[$candidate] ?? 0) >= $maxRecent;
+        $isConsec  = in_array($candidate, $lastPeriod);
+        $isCapped  = ($recentCount[$candidate] ?? 0) >= $maxRecent;
+        $isNova    = in_array($candidate, $nova);
+        $novaSoFar = count(array_filter($picked, fn($u) => in_array($u, $nova)));
+        $novaFull  = $isNova && $novaSoFar >= $maxNova;
 
-        if (!$isConsec && !$isCapped) {
+        if (!$isConsec && !$isCapped && !$novaFull) {
             $picked[] = $candidate;
+        } elseif ($novaFull) {
+            $deferred_nova_cap[] = $candidate;
         } elseif ($isConsec && !$isCapped) {
             $deferred_consec[] = $candidate;
         } elseif (!$isConsec && $isCapped) {
@@ -251,14 +256,8 @@ function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible,
         }
     }
 
-    // Fill remaining slots from deferred lists in priority order.
-    // Within each level, nova UFs go first.
-    foreach ([$deferred_consec, $deferred_freq, $deferred_both] as $deferred) {
-        $novaFirst = array_merge(
-            array_values(array_filter($deferred, fn($u) => in_array($u, $nova))),
-            array_values(array_filter($deferred, fn($u) => !in_array($u, $nova)))
-        );
-        foreach ($novaFirst as $uf) {
+    foreach ([$deferred_consec, $deferred_freq, $deferred_both, $deferred_nova_cap] as $deferred) {
+        foreach ($deferred as $uf) {
             if (count($picked) >= $count) break 2;
             $picked[] = $uf;
         }
@@ -307,7 +306,7 @@ function generateTorns(string $task, string $start, string $end): void
 
     while ($current <= $endTs) {
         $date   = date('Y-m-d', $current);
-        $picked = pickUfs($count, $rotIdx, $eligible, $incompatible, $lastPicked, $recentCount, 2, $nova);
+        $picked = pickUfs($count, $rotIdx, $eligible, $incompatible, $lastPicked, $recentCount, 2, $nova, 3);
 
         $responsable = null;
         if ($task === 'repartiment') {
