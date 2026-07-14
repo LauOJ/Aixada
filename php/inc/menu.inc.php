@@ -70,6 +70,9 @@
 	<ul>
 		<li><a href="manage_orders.php?filter=pastMonth"><?php echo $Text['nav_wiz_orders']; ?></a></li>
 		<li><a href="mail_incidencies.php"><?php echo $Text['nav_wiz_incidents_mail']; ?></a></li>
+		<?php if (get_config('calendari')) { ?>
+		<li><a href="torns.php">Torns</a></li>
+		<?php } ?>
 	</ul>
 </div>
 
@@ -105,7 +108,7 @@
 
 		<li><a href="manage_providers.php"><?php echo $Text['nav_mng_providers'];?></a></li>
 		<?php if (get_config('calendari')) { ?>
-		<li><a href="manage_calendar.php"><?php echo $Text['nav_mng_calendar'];?></a></li>
+		<li><a href="manage_torns.php">Gestió de torns</a></li>
 		<?php } ?>
 		<li><a href="manage_providers.php"><?php echo $Text['nav_mng_products'];?></a>
 			<ul>
