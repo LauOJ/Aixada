@@ -20,19 +20,16 @@ require_role([ROLE_ADMIN]);
 	 * currently requested may be edited by the user in the current role.
 	 */
     function may_edit_table($data_table) {
+        if (!is_created_session()) { return false; }
+        if (current_role_in([ROLE_ADMIN])) { return true; }
         $table_aux = strstr($data_table, '_');
         $prefix = strstr($data_table, '_', true);
         if ($prefix !== 'aixada') {
             $table_aux = '_' . $prefix.$table_aux;
         }
-        if (is_created_session()) {
-            $rights_of = get_config('rights_of');
-            $current_role = get_current_role();
-            if (in_array('may_edit' . $table_aux, $rights_of[$current_role])) {
-                return true;
-            }
-        }
-        return false;
+        $rights_of = get_config('rights_of');
+        $current_role = get_current_role();
+        return isset($rights_of[$current_role]) && in_array('may_edit' . $table_aux, $rights_of[$current_role]);
     }
 
     $is_edit = 'false';
