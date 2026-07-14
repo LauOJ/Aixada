@@ -53,14 +53,7 @@
         .col-uf             { width: 42px; color: #777; white-space: nowrap; }
         .col-phone          { white-space: nowrap; color: #555; }
         .no-torns           { color: #999; font-style: italic; font-size: 0.85rem; margin: 4px 0; }
-        .torns-btn, .btn-sm {
-            padding: 2px 9px; font-size: 0.82rem; cursor: pointer;
-            border: 1px solid #aaa; background: linear-gradient(to bottom, #f7f7f7, #e4e4e4);
-            border-radius: 3px; color: #333;
-        }
-        .btn-sm { padding: 1px 6px; font-size: 0.75rem; border-color: #ccc; background: #f5f5f5; }
-        .torns-btn:hover, .btn-sm:hover { background: linear-gradient(to bottom, #ececec, #d8d8d8); border-color: #888; }
-        .torns-btn:active, .btn-sm:active { background: #d0d0d0; }
+        .btn-sm.ui-button { padding: 1px 6px !important; font-size: 0.75rem !important; min-width: 0; }
     </style>
 </head>
 <body>
@@ -81,10 +74,6 @@
                     <div class="config-row">
                         <label>Neteja — UFs per torn</label>
                         <input type="number" id="neteja_count" min="1" max="20" value="3" />
-                    </div>
-                    <div class="config-row">
-                        <label>Mesos d'antel·lació</label>
-                        <input type="number" id="advance_months" min="1" max="12" value="2" />
                     </div>
                     <div class="config-row">
                         <label>Dia del repartiment</label>
@@ -119,11 +108,11 @@
                     <select id="incompat_uf1" style="min-width:200px"></select>
                     <span>+</span>
                     <select id="incompat_uf2" style="min-width:200px"></select>
-                    <button class="torns-btn" onclick="addIncompatible()">Afegir</button>
+                    <button class="ui-button ui-corner-all" onclick="addIncompatible()">Afegir</button>
                 </div>
             </div>
             <br>
-            <button class="torns-btn" onclick="saveConfig()">Desa configuració</button>
+            <button class="ui-button ui-corner-all" onclick="saveConfig()">Desa configuració</button>
         </div>
 
         <!-- GENERATE -->
@@ -136,7 +125,7 @@
                         <input type="date" id="start_repartiment" />
                         <span style="color:#888;font-size:0.85rem">fins a</span>
                         <input type="date" id="end_repartiment" />
-                        <button class="torns-btn" onclick="generate('repartiment')">Genera repartiment</button>
+                        <button class="ui-button ui-corner-all" onclick="generate('repartiment')">Genera repartiment</button>
                     </div>
                 </div>
                 <div>
@@ -145,7 +134,7 @@
                         <input type="date" id="start_neteja" />
                         <span style="color:#888;font-size:0.85rem">fins a</span>
                         <input type="date" id="end_neteja" />
-                        <button class="torns-btn" onclick="generate('neteja')">Genera neteja</button>
+                        <button class="ui-button ui-corner-all" onclick="generate('neteja')">Genera neteja</button>
                     </div>
                 </div>
             </div>
@@ -178,6 +167,7 @@ $(document).ready(function() {
     var twoMonthsStr = twoMonths.toISOString().slice(0,10);
     $('#start_repartiment, #start_neteja').val(today);
     $('#end_repartiment, #end_neteja').val(twoMonthsStr);
+    $('button.ui-button').button();
 });
 
 function loadUfs(callback) {
@@ -225,7 +215,6 @@ function loadConfig() {
         var cfg = JSON.parse(data);
         $('#repartiment_count').val(cfg.repartiment_count || 6);
         $('#neteja_count').val(cfg.neteja_count || 3);
-        $('#advance_months').val(cfg.advance_months || 2);
         $('#repartiment_day').val(cfg.repartiment_day !== undefined ? cfg.repartiment_day : 4);
 
         (cfg.excluded || []).forEach(function(id) {
@@ -251,7 +240,7 @@ function renderIncompatList() {
     incompatiblePairs.forEach(function(pair, i) {
         var n1 = ufName(pair[0]), n2 = ufName(pair[1]);
         html += '<li>'+pair[0]+' ('+n1+') + '+pair[1]+' ('+n2+')'
-              + ' <button onclick="removeIncompat('+i+')">✕</button></li>';
+              + ' <button class="ui-button ui-corner-all btn-sm" onclick="removeIncompat('+i+')">✕</button></li>';
     });
     $('#incompatible_list').html(html || '<li class="no-torns">Cap parella incompatible</li>');
 }
@@ -285,7 +274,6 @@ function saveConfig() {
         repartiment_freq:  1,
         neteja_count:      $('#neteja_count').val(),
         neteja_freq:       2,
-        advance_months:    $('#advance_months').val(),
         repartiment_day:   $('#repartiment_day').val(),
         excluded:          JSON.stringify(excluded),
         no_responsible:    JSON.stringify(no_responsible),
@@ -364,13 +352,14 @@ function renderUpcoming(weeks) {
                              + '<td>'+entry.name+'</td>'
                              + '<td class="col-phone">'+(entry.phone || '')+'</td>'
                              + '<td>'
-                             + '<button class="btn-sm" onclick="showEdit(this)">canvia</button>'
-                             + (isResp ? '' : ' <button class="btn-sm" onclick="setResponsable(\''+entry.date+'\','+entry.uf_id+')">resp.</button>')
-                             + ' <button class="btn-sm" onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'repartiment\')">✕</button>'
+                             + '<button class="ui-button ui-corner-all btn-sm" onclick="showEdit(this)">canvia</button>'
+                             + (isResp ? '' : ' <button class="ui-button ui-corner-all btn-sm" onclick="setResponsable(\''+entry.date+'\','+entry.uf_id+')">resp.</button>')
+                             + ' <button class="ui-button ui-corner-all btn-sm" onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'repartiment\')">✕</button>'
                              + '</td>'
                              + '</tr>';
                 });
-                repHtml += '</tbody></table>';
+                repHtml += '</tbody></table>'
+                        + '<div style="margin-top:5px"><button class="ui-button ui-corner-all btn-sm" onclick="showAddExtra(this,\''+week.repartiment[0].date+'\',\'repartiment\')">+ UF extra</button></div>';
             } else {
                 repHtml = '<span class="no-torns">—</span>';
             }
@@ -385,12 +374,13 @@ function renderUpcoming(weeks) {
                              + '<td>'+entry.name+'</td>'
                              + '<td class="col-phone">'+(entry.phone || '')+'</td>'
                              + '<td>'
-                             + '<button class="btn-sm" onclick="showEdit(this)">canvia</button>'
-                             + ' <button class="btn-sm" onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'neteja\')">✕</button>'
+                             + '<button class="ui-button ui-corner-all btn-sm" onclick="showEdit(this)">canvia</button>'
+                             + ' <button class="ui-button ui-corner-all btn-sm" onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'neteja\')">✕</button>'
                              + '</td>'
                              + '</tr>';
                 });
-                netHtml += '</tbody></table>';
+                netHtml += '</tbody></table>'
+                        + '<div style="margin-top:5px"><button class="ui-button ui-corner-all btn-sm" onclick="showAddExtra(this,\''+week.neteja[0].date+'\',\'neteja\')">+ UF extra</button></div>';
             } else {
                 netHtml = '<span class="no-torns">—</span>';
             }
@@ -424,13 +414,28 @@ function showEdit(btn) {
         sel.append($('<option>').val(uf.id).text(uf.id+' - '+uf.name));
     });
     sel.val(old_uf);
-    var btnOk = $('<button class="btn-confirm-edit btn-sm">OK</button>').click(function() {
+    var btnOk = $('<button class="ui-button ui-corner-all btn-sm btn-confirm-edit">OK</button>').click(function() {
         var new_uf = parseInt(sel.val());
         if (new_uf === old_uf) { sel.remove(); $(this).remove(); return; }
         $.post('php/ctrl/Torns.php', {oper:'updateTorn', date:date, old_uf:old_uf, new_uf:new_uf, task:task},
             function() { loadUpcoming(); });
     });
-    entry.append(sel).append(btnOk);
+    td.append(sel).append(btnOk);
+}
+
+function showAddExtra(btn, date, task) {
+    var $btn = $(btn);
+    var $existing = $btn.siblings('.extra-add-row');
+    if ($existing.length) { $existing.remove(); return; }
+    var sel = $('<select style="font-size:0.82rem;margin-left:6px"></select>');
+    allUfs.forEach(function(uf) {
+        sel.append($('<option>').val(uf.id).text(uf.id + ' - ' + uf.name));
+    });
+    var btnOk = $('<button class="ui-button ui-corner-all btn-sm" style="margin-left:4px">Afegir</button>').click(function() {
+        var uf = parseInt(sel.val());
+        $.post('php/ctrl/Torns.php', {oper:'addTorn', date:date, uf:uf, task:task}, function() { loadUpcoming(); });
+    });
+    $('<span class="extra-add-row"></span>').append(sel).append(btnOk).insertAfter($btn);
 }
 
 function setResponsable(date, uf) {
