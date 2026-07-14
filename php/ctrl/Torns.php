@@ -366,7 +366,8 @@ function getUpcomingTorns(int $months): array
     $end   = date('Y-m-d', strtotime('+' . $months . ' months'));
 
     $rs = $db->Execute(
-        'SELECT t.dataTorn, t.ufTorn, t.task_type, t.is_responsible, u.name
+        'SELECT t.dataTorn, t.ufTorn, t.task_type, t.is_responsible, u.name,
+                (SELECT m.phone1 FROM aixada_member m WHERE m.uf_id = u.id AND m.active = 1 ORDER BY m.id LIMIT 1) AS phone
          FROM aixada_torns t
          JOIN aixada_uf u ON u.id = t.ufTorn
          WHERE t.dataTorn >= :1q AND t.dataTorn <= :2q
@@ -392,6 +393,7 @@ function getUpcomingTorns(int $months): array
             'date'           => $row['dataTorn'],
             'uf_id'          => (int)$row['ufTorn'],
             'name'           => $row['name'],
+            'phone'          => $row['phone'] ?? '',
             'is_responsible' => (int)$row['is_responsible'],
         ];
     }
