@@ -118,7 +118,11 @@ class Authentication
         }
 
         $roles        = $this->_ask_roles($db, $row['id']);
-        $current_role = in_array(ROLE_CONSUMIDORA, $roles) ? ROLE_CONSUMIDORA : (isset($roles[0]) ? $roles[0] : '');
+        $current_role = '';
+        foreach (array_reverse(ROLES_ALL) as $r) {
+            if (in_array($r, $roles)) { $current_role = $r; break; }
+        }
+        if ($current_role === '') { $current_role = isset($roles[0]) ? $roles[0] : ''; }
         $theme        = $row['gui_theme'] ?: 'start';
 
         return array($row['id'], $row['login'], $row['uf_id'], $row['member_id'], $row['provider_id'], $roles, $current_role, $row['language'], $theme);
