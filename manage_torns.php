@@ -111,15 +111,15 @@
                     <label>UFs noves <span style="font-weight:normal;font-size:0.82rem;color:#666">(màxim 3 per torn)</span></label>
                     <div class="uf-checkboxes" id="nova_ufs"></div>
                 </div>
-                <div class="torns-col">
-                    <label>Parelles incompatibles (no al mateix torn)</label>
-                    <ul class="incompatible-list" id="incompatible_list"></ul>
-                    <div class="incompatible-add">
-                        <select id="incompat_uf1"></select>
-                        <span>+</span>
-                        <select id="incompat_uf2"></select>
-                        <button class="torns-btn" onclick="addIncompatible()">Afegir</button>
-                    </div>
+            </div>
+            <div style="margin-top:14px">
+                <label style="font-weight:bold;font-size:0.85rem;display:block;margin-bottom:6px">Parelles incompatibles (no al mateix torn)</label>
+                <ul class="incompatible-list" id="incompatible_list"></ul>
+                <div class="incompatible-add">
+                    <select id="incompat_uf1" style="min-width:200px"></select>
+                    <span>+</span>
+                    <select id="incompat_uf2" style="min-width:200px"></select>
+                    <button class="torns-btn" onclick="addIncompatible()">Afegir</button>
                 </div>
             </div>
             <br>
@@ -204,12 +204,12 @@ function renderUfCheckboxes() {
 
 $(document).on('change', '.exc-cb', function() {
     var id = $(this).val();
-    var $novaLabel = $('.nova-cb[value="'+id+'"]').closest('label');
     if ($(this).is(':checked')) {
-        $('.nova-cb[value="'+id+'"]').prop('checked', false);
-        $novaLabel.hide();
+        $('.resp-cb[value="'+id+'"]').prop('checked', true);
+        $('.nova-cb[value="'+id+'"]').prop('checked', false).closest('label').hide();
     } else {
-        $novaLabel.show();
+        $('.resp-cb[value="'+id+'"]').prop('checked', false);
+        $('.nova-cb[value="'+id+'"]').closest('label').show();
     }
 });
 
@@ -230,6 +230,7 @@ function loadConfig() {
 
         (cfg.excluded || []).forEach(function(id) {
             $('.exc-cb[value="'+id+'"]').prop('checked', true);
+            $('.resp-cb[value="'+id+'"]').prop('checked', true);
             $('.nova-cb[value="'+id+'"]').prop('checked', false).closest('label').hide();
         });
         (cfg.no_responsible || []).forEach(function(id) {
