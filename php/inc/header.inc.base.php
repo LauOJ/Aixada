@@ -84,3 +84,10 @@ function aixada_custom_css()
     }
     return '<link rel="stylesheet" type="text/css" media="screen" href="css/custom.css?v=' . $aixada_vesion_lastDate . '"/>' . "\n";
 }
+
+function aixada_mobile_head()
+{
+    global $aixada_vesion_lastDate;
+    return '<meta name="viewport" content="width=device-width, initial-scale=1">' . "\n"
+         . '<link rel="stylesheet" type="text/css" media="screen" href="css/mobile.css?v=' . $aixada_vesion_lastDate . '"/>' . "\n";
+}
