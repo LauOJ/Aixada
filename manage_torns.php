@@ -104,7 +104,7 @@
                     <div class="uf-checkboxes" id="no_responsible_ufs"></div>
                 </div>
                 <div class="torns-col">
-                    <label>UFs noves <span style="font-weight:normal;font-size:0.82rem;color:#666">(màxim 3 per torn, per no agrupar-les totes juntes)</span></label>
+                    <label>UFs noves <span style="font-weight:normal;font-size:0.82rem;color:#666">(màxim 3 per torn)</span></label>
                     <div class="uf-checkboxes" id="nova_ufs"></div>
                 </div>
                 <div class="torns-col">
