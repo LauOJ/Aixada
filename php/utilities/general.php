@@ -257,6 +257,39 @@ function get_current_role()
     return get_session_value('current_role');
 }
 
+// Role constants — single source of truth for role names
+const ROLE_CONSUMIDORA = 'consumidora';
+const ROLE_RESPONSABLE = 'responsable';
+const ROLE_TRESORERIA  = 'tresoreria';
+const ROLE_TORNS       = 'torns';
+const ROLE_ADMIN       = 'admin';
+
+// All valid roles in order from least to most privileged
+const ROLES_ALL = [
+    ROLE_CONSUMIDORA,
+    ROLE_RESPONSABLE,
+    ROLE_TRESORERIA,
+    ROLE_TORNS,
+    ROLE_ADMIN,
+];
+
+function current_role_in(array $roles): bool
+{
+    return in_array(get_current_role(), $roles);
+}
+
+function require_role(array $roles): void
+{
+    if (!current_role_in($roles)) {
+        if (headers_sent()) {
+            echo '<script>window.location="aixada_main.php";</script>';
+        } else {
+            header('Location: aixada_main.php');
+        }
+        exit;
+    }
+}
+
 /**
  * Changes the active role of the current user.
  * Only roles already assigned to the user are accepted.
@@ -1270,22 +1303,22 @@ function existing_languages_XML()
 function get_roles()
 {
     $XML = '<roles>';
-    foreach (array_keys(configuration_vars::get_instance()->forbidden_pages) as $role) {
+    foreach (ROLES_ALL as $role) {
         $XML .= "<role><description>{$role}</description></role>";
     }
     return $XML . '</roles>';
 }
 
 /**
- * Returns an XML list of commission roles (all roles except Consumer, Checkout, Producer).
+ * Returns an XML list of non-base roles (all roles except consumidora).
  *
  * @return string XML string.
  */
 function get_commissions()
 {
     $XML = '<rows>';
-    foreach (array_keys(configuration_vars::get_instance()->forbidden_pages) as $role) {
-        if (!in_array($role, array('Consumer', 'Checkout', 'Producer'))) {
+    foreach (ROLES_ALL as $role) {
+        if ($role !== ROLE_CONSUMIDORA) {
             $XML .= "<row><description>{$role}</description></row>";
         }
     }

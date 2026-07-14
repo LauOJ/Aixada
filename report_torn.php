@@ -1,5 +1,6 @@
 <?php 
 	include "php/inc/header.inc.php";
+	require_role([ROLE_ADMIN]);
 	require_once(__ROOT__.'php/lib/account_writers.php');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
