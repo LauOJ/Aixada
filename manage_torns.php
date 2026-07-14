@@ -131,17 +131,25 @@
             <h2>Genera torns</h2>
             <div class="generate-row">
                 <div>
-                    <label>Repartiment — data d'inici</label>
-                    <input type="date" id="start_repartiment" />
-                    <button class="torns-btn" onclick="generate('repartiment')">Genera repartiment</button>
+                    <label>Repartiment</label>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px">
+                        <input type="date" id="start_repartiment" />
+                        <span style="color:#888;font-size:0.85rem">fins a</span>
+                        <input type="date" id="end_repartiment" />
+                        <button class="torns-btn" onclick="generate('repartiment')">Genera repartiment</button>
+                    </div>
                 </div>
                 <div>
-                    <label>Neteja — data d'inici</label>
-                    <input type="date" id="start_neteja" />
-                    <button class="torns-btn" onclick="generate('neteja')">Genera neteja</button>
+                    <label>Neteja</label>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px">
+                        <input type="date" id="start_neteja" />
+                        <span style="color:#888;font-size:0.85rem">fins a</span>
+                        <input type="date" id="end_neteja" />
+                        <button class="torns-btn" onclick="generate('neteja')">Genera neteja</button>
+                    </div>
                 </div>
             </div>
-            <small style="color:#777">Es generaran els torns des de la data triada fins a avui + mesos d'antel·lació. Els torns existents en aquest període s'esborraran.</small>
+            <small style="color:#777">Els torns existents en el període seleccionat s'esborraran i es regeneraran.</small>
         </div>
 
         <!-- REVIEW -->
@@ -166,8 +174,10 @@ $(document).ready(function() {
         loadUpcoming();
     });
     var today = new Date().toISOString().slice(0,10);
-    $('#start_repartiment').val(today);
-    $('#start_neteja').val(today);
+    var twoMonths = new Date(); twoMonths.setMonth(twoMonths.getMonth() + 2);
+    var twoMonthsStr = twoMonths.toISOString().slice(0,10);
+    $('#start_repartiment, #start_neteja').val(today);
+    $('#end_repartiment, #end_neteja').val(twoMonthsStr);
 });
 
 function loadUfs(callback) {
@@ -287,9 +297,10 @@ function saveConfig() {
 
 function generate(task) {
     var start = $('#start_'+task).val();
-    if (!start) { alert('Tria una data d\'inici.'); return; }
-    var months = $('#advance_months').val();
-    $.post('php/ctrl/Torns.php', {oper:'generateTorns', task:task, start:start, months:months},
+    var end   = $('#end_'+task).val();
+    if (!start || !end) { alert('Tria la data d\'inici i la data de fi.'); return; }
+    if (end <= start)   { alert('La data de fi ha de ser posterior a l\'inici.'); return; }
+    $.post('php/ctrl/Torns.php', {oper:'generateTorns', task:task, start:start, end:end},
         function(data) { renderUpcoming(JSON.parse(data)); }
     );
 }

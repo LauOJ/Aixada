@@ -48,12 +48,13 @@ switch ($_POST['oper'] ?? '') {
         break;
 
     case 'generateTorns':
-        $task    = $_POST['task'];   // 'repartiment' or 'neteja'
-        $start   = $_POST['start'];  // 'YYYY-MM-DD'
-        $months  = (int)($_POST['months'] ?? getTornsConfig()['advance_months']);
-        $end     = date('Y-m-d', strtotime($start . ' +' . $months . ' months'));
+        $task  = $_POST['task'];
+        $start = $_POST['start'];
+        $end   = $_POST['end'];
         generateTorns($task, $start, $end);
-        echo json_encode(getUpcomingTorns($months));
+        $cfgMonths = (int)(getTornsConfig()['advance_months'] ?? 2);
+        $endMonths = (int)ceil((strtotime($end) - strtotime(date('Y-m-d'))) / (30 * 24 * 3600));
+        echo json_encode(getUpcomingTorns(max($cfgMonths, $endMonths)));
         break;
 
     case 'getUpcoming':
