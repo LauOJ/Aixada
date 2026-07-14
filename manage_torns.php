@@ -43,11 +43,15 @@
         .week-rep-day       { font-size: 0.78rem; color: #2e7d32; margin-top: 3px; }
         .rep-cell           { border-left: 3px solid #2e7d32; }
         .net-cell           { border-left: 3px solid #1565c0; }
-        .uf-entry           { display: flex; align-items: center; gap: 6px; padding: 2px 0; font-size: 0.88rem; flex-wrap: wrap; }
-        .uf-entry .uf-name  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
-        .uf-entry.responsable .uf-name { font-weight: bold; color: #1b5e20; }
-        .resp-star          { color: #2e7d32; font-size: 0.85rem; min-width: 12px; text-align: center; }
         select.uf-select    { min-width: 140px; }
+        .group-table        { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .group-table th     { font-size: 0.75rem; color: #888; text-align: left; padding: 2px 6px 4px;
+                              border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
+        .group-table td     { padding: 4px 6px; vertical-align: middle; border-bottom: 1px solid #f2f2f2; }
+        .group-table tbody tr:last-child td { border-bottom: none; }
+        .group-table tr.responsable td { font-weight: bold; color: #1b5e20; }
+        .col-uf             { width: 42px; color: #777; white-space: nowrap; }
+        .col-phone          { white-space: nowrap; color: #555; }
         .no-torns           { color: #999; font-style: italic; font-size: 0.85rem; margin: 4px 0; }
         .torns-btn, .btn-sm {
             padding: 2px 9px; font-size: 0.82rem; cursor: pointer;
@@ -338,18 +342,23 @@ function renderUpcoming(weeks) {
             // Repartiment column
             var repHtml = '';
             if (week.repartiment && week.repartiment.length > 0) {
+                repHtml = '<table class="group-table"><thead><tr><th>UF</th><th>Nom</th><th>Telèfon</th><th></th></tr></thead><tbody>';
                 week.repartiment.forEach(function(entry) {
                     var isResp = !!entry.is_responsible;
-                    var cls    = 'uf-entry' + (isResp ? ' responsable' : '');
-                    var star   = '<span class="resp-star">'+(isResp ? '★' : '')+'</span>';
-                    repHtml += '<div class="'+cls+'" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="repartiment">'
-                             + star
-                             + '<span class="uf-name">'+entry.name+'</span>'
-                             + ' <button class="btn-sm" onclick="showEdit(this)">canvia</button>'
+                    var cls    = isResp ? 'responsable' : '';
+                    var ufNum  = entry.uf_id + (isResp ? ' ★' : '');
+                    repHtml += '<tr class="'+cls+'" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="repartiment">'
+                             + '<td class="col-uf">'+ufNum+'</td>'
+                             + '<td>'+entry.name+'</td>'
+                             + '<td class="col-phone">'+(entry.phone || '')+'</td>'
+                             + '<td>'
+                             + '<button class="btn-sm" onclick="showEdit(this)">canvia</button>'
                              + (isResp ? '' : ' <button class="btn-sm" onclick="setResponsable(\''+entry.date+'\','+entry.uf_id+')">resp.</button>')
                              + ' <button class="btn-sm" onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'repartiment\')">✕</button>'
-                             + '</div>';
+                             + '</td>'
+                             + '</tr>';
                 });
+                repHtml += '</tbody></table>';
             } else {
                 repHtml = '<span class="no-torns">—</span>';
             }
@@ -357,14 +366,19 @@ function renderUpcoming(weeks) {
             // Neteja column
             var netHtml = '';
             if (week.neteja && week.neteja.length > 0) {
+                netHtml = '<table class="group-table"><thead><tr><th>UF</th><th>Nom</th><th>Telèfon</th><th></th></tr></thead><tbody>';
                 week.neteja.forEach(function(entry) {
-                    netHtml += '<div class="uf-entry" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="neteja">'
-                             + '<span class="resp-star"></span>'
-                             + '<span class="uf-name">'+entry.name+'</span>'
-                             + ' <button class="btn-sm" onclick="showEdit(this)">canvia</button>'
+                    netHtml += '<tr data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="neteja">'
+                             + '<td class="col-uf">'+entry.uf_id+'</td>'
+                             + '<td>'+entry.name+'</td>'
+                             + '<td class="col-phone">'+(entry.phone || '')+'</td>'
+                             + '<td>'
+                             + '<button class="btn-sm" onclick="showEdit(this)">canvia</button>'
                              + ' <button class="btn-sm" onclick="deleteTorn(\''+entry.date+'\','+entry.uf_id+',\'neteja\')">✕</button>'
-                             + '</div>';
+                             + '</td>'
+                             + '</tr>';
                 });
+                netHtml += '</tbody></table>';
             } else {
                 netHtml = '<span class="no-torns">—</span>';
             }
@@ -382,13 +396,14 @@ function renderUpcoming(weeks) {
 }
 
 function showEdit(btn) {
-    var entry  = $(btn).closest('.uf-entry');
-    var date   = entry.data('date');
-    var old_uf = entry.data('uf');
-    var task   = entry.data('task');
+    var row    = $(btn).closest('tr');
+    var date   = row.data('date');
+    var old_uf = row.data('uf');
+    var task   = row.data('task');
+    var td     = $(btn).closest('td');
 
-    if (entry.find('select.edit-select').length) {
-        entry.find('select.edit-select, .btn-confirm-edit').remove();
+    if (td.find('select.edit-select').length) {
+        td.find('select.edit-select, .btn-confirm-edit').remove();
         return;
     }
 

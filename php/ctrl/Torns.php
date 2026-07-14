@@ -367,7 +367,15 @@ function getUpcomingTorns(int $months): array
 
     $rs = $db->Execute(
         'SELECT t.dataTorn, t.ufTorn, t.task_type, t.is_responsible, u.name,
-                (SELECT m.phone1 FROM aixada_member m WHERE m.uf_id = u.id AND m.active = 1 ORDER BY m.id LIMIT 1) AS phone
+                (SELECT GROUP_CONCAT(
+                    CASE
+                        WHEN NULLIF(TRIM(m.phone1),\'\') IS NOT NULL AND NULLIF(TRIM(m.phone2),\'\') IS NOT NULL
+                            THEN CONCAT(TRIM(m.phone1), \' / \', TRIM(m.phone2))
+                        WHEN NULLIF(TRIM(m.phone1),\'\') IS NOT NULL THEN TRIM(m.phone1)
+                        WHEN NULLIF(TRIM(m.phone2),\'\') IS NOT NULL THEN TRIM(m.phone2)
+                    END
+                    SEPARATOR \', \')
+                 FROM aixada_member m WHERE m.uf_id = u.id AND m.active = 1) AS phone
          FROM aixada_torns t
          JOIN aixada_uf u ON u.id = t.ufTorn
          WHERE t.dataTorn >= :1q AND t.dataTorn <= :2q
