@@ -106,8 +106,7 @@ try {
     <div id="wrap" style="margin-top: 70px;">
 
         <!-- Missatge personalitzat -->
-        <div class="dashboard-welcome" style="position: relative;">
-            <a href="votacio-logo/" target="_blank" style="position: absolute; top: 12px; right: 12px; background: #f0faf0; color: #1b5e20; border: 2px solid #2e7d32; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem; transition: background 0.2s, color 0.2s;" onmouseover="this.style.background='#2e7d32';this.style.color='white';" onmouseout="this.style.background='#f0faf0';this.style.color='#1b5e20';">VOTA LA NOVA IMATGE!</a>
+        <div class="dashboard-welcome">
             <h1>Hola, <?php echo htmlspecialchars($member_name); ?>!</h1>
             <div class="user-info-grid">
                 <div class="info-card">
