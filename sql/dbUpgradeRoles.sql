@@ -21,4 +21,11 @@ DELETE FROM aixada_user_role WHERE role IN (
     'Consumer Commission'
 );
 
+-- Give all users both consumidora and responsable as baseline
+INSERT IGNORE INTO aixada_user_role (user_id, role)
+SELECT id, 'consumidora' FROM aixada_user;
+
+INSERT IGNORE INTO aixada_user_role (user_id, role)
+SELECT id, 'responsable' FROM aixada_user;
+
 -- Note: 'torns' role does not exist yet — assign manually via activate_roles after running this script.
