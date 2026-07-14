@@ -8,9 +8,10 @@
             " | " . $Text['uf_long'] . ' ' . get_session_value('uf_id');
 
         // Role selector
+        $role_labels = ['consumidora'=>'Consumidora','responsable'=>'Responsable','tresoreria'=>'Tresoreria','torns'=>'Torns','admin'=>'Admin'];
         echo '<select size="0" name="role_select" id="role_select">';
         foreach (get_session_value('roles') as $role) {
-            $rt = isset($Text[$role]) ? $Text[$role] : "TRANSLATE[$role]";
+            $rt = $role_labels[$role] ?? (isset($Text[$role]) ? $Text[$role] : $role);
             $selected = ($role == get_current_role()) ? ' selected' : '';
             echo '<option' . $selected . ' value="' . $role . '">' . $rt . '</option>';
         }
@@ -173,16 +174,13 @@
 </div>
 <script>
 (function ($) {
-    if (!window.matchMedia('(max-width: 768px)').matches) { return; }
     var $toggle = $('#mob-menu-toggle');
     var $menu   = $('#topMenu');
-    $toggle.show();
     $toggle.on('click', function () {
         var open = $menu.hasClass('mob-open');
         $menu.toggleClass('mob-open', !open);
         $toggle.attr('aria-expanded', String(!open));
     });
-    // Direct nav links close the menu
     $('#navHome, #navOrder, #navShop').on('click', function () {
         $menu.removeClass('mob-open');
         $toggle.attr('aria-expanded', 'false');

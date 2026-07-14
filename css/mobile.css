@@ -1,6 +1,7 @@
-/* Aixada responsive/mobile styles
-   Applies only inside @media (max-width: 768px) — desktop layout untouched.
-*/
+/* Aixada responsive/mobile styles */
+
+/* Hamburger hidden on desktop */
+#mob-menu-toggle { display: none; }
 
 @media (max-width: 768px) {
 
@@ -25,9 +26,9 @@
         line-height: 1.8;
     }
 
-    /* ─── Hamburger button (shown by JS) ─── */
+    /* ─── Hamburger button ─── */
     #mob-menu-toggle {
-        display: none;
+        display: block;
         float: right;
         cursor: pointer;
         font-size: 1.5rem;
@@ -35,7 +36,7 @@
         padding: 5px 10px;
         background: none;
         border: none;
-        color: inherit;
+        color: white;
         margin-top: 2px;
     }
 
@@ -175,6 +176,44 @@
     .member-add {
         margin-left: 8px;
         margin-right: 8px;
+    }
+
+    /* ─── Dashboard: força columna única ─── */
+    .dashboard-content {
+        grid-template-columns: 1fr !important;
+        padding: 0 0.5rem !important;
+        gap: 1rem !important;
+    }
+    .dashboard-welcome {
+        margin: 0.5rem auto !important;
+        padding: 1rem !important;
+    }
+    .dashboard-welcome h1 {
+        font-size: 1.4rem !important;
+    }
+    .login-header {
+        padding: 0.5rem 1rem !important;
+    }
+    .login-header .nav-links ul {
+        gap: 0.5rem !important;
+        flex-wrap: wrap;
+    }
+
+    /* ─── jQuery UI tabs: compactar ─── */
+    .ui-tabs .ui-tabs-nav {
+        display: flex !important;
+        flex-wrap: wrap;
+        padding: 0 !important;
+    }
+    .ui-tabs .ui-tabs-nav li {
+        flex: 1 1 auto;
+        margin: 0 !important;
+    }
+    .ui-tabs .ui-tabs-nav li a {
+        padding: 6px 10px !important;
+        font-size: 0.82rem !important;
+        display: block;
+        text-align: center;
     }
 
     /* ─── jQuery UI dialogs: cap width ─── */
