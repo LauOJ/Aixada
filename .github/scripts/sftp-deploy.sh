@@ -44,17 +44,16 @@ echo "Deleted: $(echo "$DELETED" | grep -c . || true) files"
   echo "set sftp:auto-confirm yes"
   echo "set net:timeout 30"
   echo "set net:max-retries 3"
+  echo "set cmd:fail-exit true"
   echo "open -u ${SFTP_USER},${SFTP_PASSWORD} sftp://${SFTP_HOST}"
 
-  # Create directories (ignore errors if already exist)
-  echo "set cmd:fail-exit false"
+  # Create directories (mkdir -p is safe even if they already exist)
   while IFS= read -r file; do
     [ -z "$file" ] && continue
     is_excluded "$file" && continue
     dir=$(dirname "$file")
-    [ "$dir" != "." ] && echo "mkdir ${REMOTE_PATH}/${dir}"
+    [ "$dir" != "." ] && echo "mkdir -p ${REMOTE_PATH}/${dir}"
   done <<< "$CHANGED"
-  echo "set cmd:fail-exit true"
 
   # Upload changed files
   while IFS= read -r file; do

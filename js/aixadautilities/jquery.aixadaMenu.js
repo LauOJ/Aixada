@@ -121,6 +121,20 @@ $(function(){
 
 	});
 
-
+    // Mobile hamburger: inject if menu.inc.php is serving a cached version without it
+    var $bar = $('#menuBgBar');
+    if ($bar.length && !$('#mob-menu-toggle').length) {
+        var $btn = $('<button id="mob-menu-toggle" aria-label="Menu" aria-expanded="false">&#9776;</button>');
+        $bar.prepend($btn);
+        $btn.on('click', function () {
+            var open = $('#topMenu').hasClass('mob-open');
+            $('#topMenu').toggleClass('mob-open', !open);
+            $(this).attr('aria-expanded', String(!open));
+        });
+        $('#navHome, #navOrder, #navShop').on('click', function () {
+            $('#topMenu').removeClass('mob-open');
+            $('#mob-menu-toggle').attr('aria-expanded', 'false');
+        });
+    }
 
 });
