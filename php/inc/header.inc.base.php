@@ -79,15 +79,21 @@ function aixada_js_src($useMenus = true, $rootJs = '')
 function aixada_custom_css()
 {
     global $aixada_vesion_lastDate;
-    if (!file_exists(__ROOT__ . 'css' . DS . 'custom.css')) {
+    $file = __ROOT__ . 'css' . DS . 'custom.css';
+    if (!file_exists($file)) {
         return '';
     }
-    return '<link rel="stylesheet" type="text/css" media="screen" href="css/custom.css?v=' . $aixada_vesion_lastDate . '"/>' . "\n";
+    // Use the file's modification time as cache-buster so every deploy of the
+    // CSS forces browsers to refetch it (the global version is frozen).
+    $v = @filemtime($file) ?: $aixada_vesion_lastDate;
+    return '<link rel="stylesheet" type="text/css" media="screen" href="css/custom.css?v=' . $v . '"/>' . "\n";
 }
 
 function aixada_mobile_head()
 {
     global $aixada_vesion_lastDate;
+    $file = __ROOT__ . 'css' . DS . 'mobile.css';
+    $v = (file_exists($file) ? @filemtime($file) : false) ?: $aixada_vesion_lastDate;
     return '<meta name="viewport" content="width=device-width, initial-scale=1">' . "\n"
-         . '<link rel="stylesheet" type="text/css" media="screen" href="css/mobile.css?v=' . $aixada_vesion_lastDate . '"/>' . "\n";
+         . '<link rel="stylesheet" type="text/css" media="screen" href="css/mobile.css?v=' . $v . '"/>' . "\n";
 }
