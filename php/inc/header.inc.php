@@ -35,3 +35,21 @@ try {
     header("Location: login.php?originating_uri=" . $_SERVER['REQUEST_URI']);
     exit;
 }
+
+// Mobile redirect: consumidora on a mobile device → app UI
+if (is_created_session()) {
+    if (isset($_GET['force_desktop'])) {
+        $_SESSION['aixada_desktop_mode'] = true;
+    }
+    $is_mobile_page  = strpos($_SERVER['PHP_SELF'] ?? '', '/mobile/') !== false;
+    $is_desktop_mode = !empty($_SESSION['aixada_desktop_mode']);
+    if (!$is_mobile_page && !$is_desktop_mode) {
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        if (preg_match('/Mobile|Android|iPhone|iPad|iPod|Windows Phone/i', $ua)
+            && in_array(get_current_role(), ['consumidora', 'Consumer', 'Consumidora'])) {
+            $base = rtrim(dirname($_SERVER['PHP_SELF'] ?? '/'), '/\\') . '/';
+            header('Location: ' . $base . 'mobile/index.php');
+            exit;
+        }
+    }
+}
