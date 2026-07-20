@@ -54,7 +54,6 @@ try {
 
     <link rel="stylesheet" type="text/css" media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui-themes/<?= $default_theme; ?>/jqueryui.css" />
-    <?= aixada_mobile_head() ?>
     <?= aixada_custom_css() ?>
 
     <script type="text/javascript" src="js/jquery/jquery.js"></script>

@@ -51,7 +51,6 @@
 
 
 <div class="ui-widget-header ui-corner-all" id="menuBgBar">
-<button id="mob-menu-toggle" aria-label="Menu" aria-expanded="false">&#9776;</button>
 <div  id="topMenu">
 <a tabindex="1" href="aixada_main.php" 	id="navHome" class="menuTop"><?php echo $Text['nav_home'];?></a>
 <a tabindex="2" href="#" 	id="navWizard" class="menuTop"><?php echo $Text['nav_wiz'];?></a>
@@ -172,18 +171,3 @@
 		<li><a href="report_account.php?what=my_account"><?php echo $Text['nav_myaccount_account'];?></a></li>
 	</ul>
 </div>
-<script>
-(function ($) {
-    var $toggle = $('#mob-menu-toggle');
-    var $menu   = $('#topMenu');
-    $toggle.on('click', function () {
-        var open = $menu.hasClass('mob-open');
-        $menu.toggleClass('mob-open', !open);
-        $toggle.attr('aria-expanded', String(!open));
-    });
-    $('#navHome, #navOrder, #navShop').on('click', function () {
-        $menu.removeClass('mob-open');
-        $toggle.attr('aria-expanded', 'false');
-    });
-}(jQuery));
-</script>

@@ -88,12 +88,3 @@ function aixada_custom_css()
     $v = @filemtime($file) ?: $aixada_vesion_lastDate;
     return '<link rel="stylesheet" type="text/css" media="screen" href="css/custom.css?v=' . $v . '"/>' . "\n";
 }
-
-function aixada_mobile_head()
-{
-    global $aixada_vesion_lastDate;
-    $file = __ROOT__ . 'css' . DS . 'mobile.css';
-    $v = (file_exists($file) ? @filemtime($file) : false) ?: $aixada_vesion_lastDate;
-    return '<meta name="viewport" content="width=device-width, initial-scale=1">' . "\n"
-         . '<link rel="stylesheet" type="text/css" media="screen" href="css/mobile.css?v=' . $v . '"/>' . "\n";
-}
