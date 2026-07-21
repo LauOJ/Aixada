@@ -36,20 +36,38 @@ try {
     exit;
 }
 
-// Mobile redirect: consumidora on a mobile device → app UI
+// On a mobile device the default role is consumidora (everyone has it) and
+// the user is sent to the app UI. Other roles/tasks are meant for the desktop
+// web view, reachable via ?force_desktop=1 ("Vista web completa").
 if (is_created_session()) {
     if (isset($_GET['force_desktop'])) {
         $_SESSION['aixada_desktop_mode'] = true;
     }
     $is_mobile_page  = strpos($_SERVER['PHP_SELF'] ?? '', '/mobile/') !== false;
     $is_desktop_mode = !empty($_SESSION['aixada_desktop_mode']);
-    if (!$is_mobile_page && !$is_desktop_mode) {
+    if (!$is_desktop_mode) {
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-        if (preg_match('/Mobile|Android|iPhone|iPad|iPod|Windows Phone/i', $ua)
-            && in_array(get_current_role(), ['consumidora', 'Consumer', 'Consumidora'])) {
-            $base = rtrim(dirname($_SERVER['PHP_SELF'] ?? '/'), '/\\') . '/';
-            header('Location: ' . $base . 'mobile/index.php');
-            exit;
+        if (preg_match('/Mobile|Android|iPhone|iPad|iPod|Windows Phone/i', $ua)) {
+            // Find the consumidora role however it is named for this user.
+            $roles = get_session_value('roles');
+            $consumidora_role = null;
+            if (is_array($roles)) {
+                foreach (['consumidora', 'Consumidora', 'Consumer'] as $r) {
+                    if (in_array($r, $roles)) { $consumidora_role = $r; break; }
+                }
+            }
+            if ($consumidora_role !== null) {
+                // Force the active role to consumidora while on mobile.
+                if (get_current_role() !== $consumidora_role) {
+                    change_session_role($consumidora_role);
+                }
+                // Send non-app pages to the app home.
+                if (!$is_mobile_page) {
+                    $base = rtrim(dirname($_SERVER['PHP_SELF'] ?? '/'), '/\\') . '/';
+                    header('Location: ' . $base . 'mobile/index.php');
+                    exit;
+                }
+            }
         }
     }
 }
