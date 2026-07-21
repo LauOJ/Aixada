@@ -88,3 +88,17 @@ function aixada_custom_css()
     $v = @filemtime($file) ?: $aixada_vesion_lastDate;
     return '<link rel="stylesheet" type="text/css" media="screen" href="css/custom.css?v=' . $v . '"/>' . "\n";
 }
+
+/**
+ * Compatibility no-op. The mobile-responsive layer on the desktop pages was
+ * removed, but the incremental (diff-against-main) deploy does not re-upload
+ * pages that now match main, so older copies on the server may still call
+ * aixada_mobile_head(). Keeping an empty stub avoids a fatal "undefined
+ * function" there. Safe to delete once every environment is fully re-synced.
+ *
+ * @return string Always an empty string.
+ */
+function aixada_mobile_head()
+{
+    return '';
+}
