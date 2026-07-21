@@ -7,7 +7,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title><?php echo $Text['global_title'] . " - " . $Text['head_ti_account'] ;?></title>
-   
+
    	<link rel="stylesheet" type="text/css"   media="screen" href="css/aixada_main.css" />
 	<link rel="stylesheet" type="text/css"   media="print"  href="css/print.css" />
   	<link rel="stylesheet" type="text/css"   media="screen" href="js/fgmenu/fg.menu.css"   />

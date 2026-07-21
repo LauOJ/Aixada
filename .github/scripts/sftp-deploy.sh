@@ -40,23 +40,32 @@ DELETED=$(git diff --name-only --diff-filter=D  "$BEFORE" "$CURRENT" 2>/dev/null
 echo "Changed: $(echo "$CHANGED" | grep -c . || true) files"
 echo "Deleted: $(echo "$DELETED" | grep -c . || true) files"
 
+# Unique parent directories that need to exist (excluding root ".")
+DIRS=$(while IFS= read -r file; do
+    [ -z "$file" ] && continue
+    is_excluded "$file" && continue
+    dir=$(dirname "$file")
+    [ "$dir" != "." ] && echo "$dir"
+  done <<< "$CHANGED" | sort -u)
+
 {
   echo "set sftp:auto-confirm yes"
   echo "set net:timeout 30"
   echo "set net:max-retries 3"
   echo "open -u ${SFTP_USER},${SFTP_PASSWORD} sftp://${SFTP_HOST}"
 
-  # Create directories (ignore errors if already exist)
+  # Create directories. mkdir returns "Access failed" when the dir already
+  # exists, so tolerate errors here (fail-exit false) and chmod newly created
+  # dirs so the web server can traverse/read them.
   echo "set cmd:fail-exit false"
-  while IFS= read -r file; do
-    [ -z "$file" ] && continue
-    is_excluded "$file" && continue
-    dir=$(dirname "$file")
-    [ "$dir" != "." ] && echo "mkdir ${REMOTE_PATH}/${dir}"
-  done <<< "$CHANGED"
-  echo "set cmd:fail-exit true"
+  while IFS= read -r dir; do
+    [ -z "$dir" ] && continue
+    echo "mkdir -p ${REMOTE_PATH}/${dir}"
+    echo "chmod 755 ${REMOTE_PATH}/${dir}"
+  done <<< "$DIRS"
 
-  # Upload changed files
+  # Upload changed files (real upload failures must fail the job)
+  echo "set cmd:fail-exit true"
   while IFS= read -r file; do
     [ -z "$file" ] && continue
     is_excluded "$file" && { echo "# skipped: $file"; continue; }
@@ -64,13 +73,20 @@ echo "Deleted: $(echo "$DELETED" | grep -c . || true) files"
   done <<< "$CHANGED"
 
   # Delete removed files
+  echo "set cmd:fail-exit false"
   while IFS= read -r file; do
     [ -z "$file" ] && continue
     is_excluded "$file" && continue
-    echo "set cmd:fail-exit false"
     echo "rm ${REMOTE_PATH}/${file}"
-    echo "set cmd:fail-exit true"
   done <<< "$DELETED"
+
+  # Verification: list what actually landed on the server (visible in the log)
+  echo "# === VERIFY DEPLOYED FILES ==="
+  while IFS= read -r file; do
+    [ -z "$file" ] && continue
+    is_excluded "$file" && continue
+    echo "cls -l ${REMOTE_PATH}/${file}"
+  done <<< "$CHANGED"
 
   echo "bye"
 } > /tmp/deploy.lftp

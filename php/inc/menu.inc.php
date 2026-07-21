@@ -8,9 +8,10 @@
             " | " . $Text['uf_long'] . ' ' . get_session_value('uf_id');
 
         // Role selector
+        $role_labels = ['consumidora'=>'Consumidora','responsable'=>'Responsable','tresoreria'=>'Tresoreria','torns'=>'Torns','admin'=>'Admin'];
         echo '<select size="0" name="role_select" id="role_select">';
         foreach (get_session_value('roles') as $role) {
-            $rt = isset($Text[$role]) ? $Text[$role] : "TRANSLATE[$role]";
+            $rt = $role_labels[$role] ?? (isset($Text[$role]) ? $Text[$role] : $role);
             $selected = ($role == get_current_role()) ? ' selected' : '';
             echo '<option' . $selected . ' value="' . $role . '">' . $rt . '</option>';
         }
