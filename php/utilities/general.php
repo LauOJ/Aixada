@@ -250,7 +250,7 @@ function get_session_theme() {
 /**
  * Returns the active role of the logged-in user.
  *
- * @return string Role name (e.g. 'Consumer', 'Hacker Commission').
+ * @return string Role name (e.g. 'consumidora', 'admin').
  */
 function get_current_role()
 {

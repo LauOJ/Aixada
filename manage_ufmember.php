@@ -47,7 +47,7 @@ require_role([ROLE_ADMIN]);
 		var isAdmin = "<?php
             echo get_current_role();
         ?>";
-		isAdmin = (isAdmin == "Hacker Commission")? true:false; 
+		isAdmin = (isAdmin == "admin")? true:false;
 
 			
 		$('#member_listing').tabs();
