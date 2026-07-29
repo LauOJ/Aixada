@@ -1,6 +1,6 @@
 <?php $config = configuration_vars::get_instance(); global $Text; ?>
 <script type="text/javascript">
-    <?php if (is_created_session() && get_current_role() == 'Consumer' && !allowed_negative_balances()) : ?>
+    <?php if (is_created_session() && get_current_role() == ROLE_CONSUMIDORA && !allowed_negative_balances()) : ?>
     document.addEventListener("DOMContentLoaded", function () {
         var endpoint = "php/ctrl/Account.php";
         var data = {

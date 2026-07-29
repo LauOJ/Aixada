@@ -1,5 +1,6 @@
 <?php 
-	include "php/inc/header.inc.php";    
+	include "php/inc/header.inc.php";
+	require_role([ROLE_TRESORERIA, ROLE_ADMIN]);
 	require_once(__ROOT__.'php/lib/account_operations.config.php');
 	require_once(__ROOT__.'php/lib/account_writers.php');
 ?>

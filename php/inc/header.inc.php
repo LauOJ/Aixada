@@ -22,7 +22,7 @@ try {
     $uri      = $_SERVER['REQUEST_URI'];
     $role     = get_current_role();
     $forbidden = false;
-    foreach ($fp[$role] as $page) {
+    foreach ($fp[$role] ?? [] as $page) {
         if (strpos($uri, $page) !== false) {
             $forbidden = true;
             break;
