@@ -15,7 +15,6 @@ $login_name = get_session_value('login');
 $member_name = '';
 $last_order_date = '';
 $current_balance = 0;
-$providers_info = [];
 
 try {
     $db = DBWrap::get_instance();
@@ -39,12 +38,6 @@ try {
     $rs = $db->Execute('SELECT balance FROM aixada_account WHERE account_id = :1q ORDER BY ts DESC LIMIT 1', $account_id);
     if ($row = $rs->fetch_assoc()) {
         $current_balance = $row['balance'];
-    }
-
-    // Info de proveïdores: descripció lliure (camp notes) que editen les responsables
-    $rs = $db->Execute("SELECT name, notes FROM aixada_provider WHERE active = 1 AND notes IS NOT NULL AND TRIM(notes) != '' ORDER BY name");
-    while ($row = $rs->fetch_assoc()) {
-        $providers_info[] = $row;
     }
 
     DBWrap::get_instance()->free_next_results();
@@ -210,25 +203,8 @@ try {
                 <div class="dashboard-section responsables">
                     <h2>Responsables de comanda</h2>
                     <div class="button-group">
-                        <a href="llistat_responsables.php" class="dashboard-button">RESPONSABLES DE COMANDA</a>
+                        <a href="llistat_responsables.php" target="_blank" class="dashboard-button">RESPONSABLES DE COMANDA</a>
                     </div>
-                </div>
-
-                <!-- Info de proveïdores -->
-                <div class="dashboard-section proveidores">
-                    <h2>Info de proveïdores</h2>
-                    <?php if (empty($providers_info)): ?>
-                        <p style="color:#6b7280; font-size:0.9rem;">Encara no hi ha descripcions de proveïdores. Les responsables poden afegir-les al camp de notes de cada proveïdor.</p>
-                    <?php else: ?>
-                    <div style="max-height: 320px; overflow-y: auto;">
-                        <?php foreach ($providers_info as $prov): ?>
-                        <div style="margin-bottom: 12px;">
-                            <p style="margin:0;"><strong><?php echo htmlspecialchars($prov['name']); ?></strong></p>
-                            <p style="margin:2px 0 0; white-space: pre-line; font-size:0.9rem; color:#374151;"><?php echo htmlspecialchars($prov['notes']); ?></p>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
                 </div>
 
                 <!-- Actes de les assemblees -->
@@ -239,7 +215,7 @@ try {
                         <p>
                             <a href="https://lavinagreta.org/acta-marc-2026" class="dashboard-link" target="_blank">MARÇ</a> –
                             <a href="https://lavinagreta.org/acta-maig-2026" class="dashboard-link" target="_blank">MAIG</a> –
-                            <a href="https://lavinagreta.org/acta-juliol-2026" class="dashboard-link" target="_blank">MAIG - JULIOL</a>
+                            <a href="https://lavinagreta.org/acta-juliol-2026" class="dashboard-link" target="_blank">JULIOL</a>
                         </p>
                     </div>
                     <br>
@@ -280,11 +256,11 @@ try {
                     </div>
                 </div>
 
-                <!-- Full de càlcul per quadrar ESTOC -->
-                <div class="dashboard-section estoc">
-                    <h2>Full de càlcul per quadrar ESTOC</h2>
+                <!-- Info de proveïdores -->
+                <div class="dashboard-section proveidores">
+                    <h2>Info de proveïdores</h2>
                     <div class="button-group">
-                        <a href="https://docs.google.com/spreadsheets/d/1wU7kBcaIItXDhBWNGl9CqL2952N4clnJ/edit?gid=1031703495#gid=1031703495" target="_blank" class="dashboard-button">QUADRAR ESTOC</a>
+                        <a href="llistat_proveidors.php" target="_blank" class="dashboard-button">INFO DE PROVEÏDORES</a>
                     </div>
                 </div>
 
