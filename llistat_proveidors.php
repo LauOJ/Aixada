@@ -37,13 +37,15 @@ try {
         }
         .index h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em;
             color: #7a8894; margin-bottom: 10px; }
-        .index-links { display: flex; flex-wrap: wrap; gap: 8px; }
-        .index-links a {
-            display: inline-block; background: #fff; border: 1px solid #cdd5db;
-            border-radius: 16px; padding: 5px 12px; font-size: 0.9rem;
-            text-decoration: none; color: #4a5f6f;
+        .index-hint { font-size: 0.8rem; color: #7a8894; margin-bottom: 10px; }
+        .index-links { column-width: 180px; column-gap: 28px; }
+        .index-links a, .index-links span {
+            display: block; padding: 3px 0; font-size: 0.92rem; line-height: 1.35;
+            break-inside: avoid; text-decoration: none;
         }
-        .index-links a:hover { background: #4a5f6f; color: #fff; }
+        .index-links a { color: #4a5f6f; }
+        .index-links a:hover { text-decoration: underline; }
+        .index-links .no-info { color: #c0392b; }
         .prov {
             border-top: 1px solid #e5e8eb; padding: 18px 0;
             scroll-margin-top: 16px;
@@ -64,22 +66,24 @@ try {
 
     <div class="index">
         <h2>Tria una proveïdora</h2>
+        <p class="index-hint">En vermell, les que encara no tenen descripció.</p>
         <div class="index-links">
             <?php foreach ($proveidors as $p): ?>
+                <?php if (trim((string)($p['notes'] ?? '')) !== ''): ?>
             <a href="#prov-<?= (int)$p['id'] ?>"><?= htmlspecialchars((string)$p['name']) ?></a>
+                <?php else: ?>
+            <span class="no-info"><?= htmlspecialchars((string)$p['name']) ?></span>
+                <?php endif; ?>
             <?php endforeach; ?>
         </div>
     </div>
 
     <?php foreach ($proveidors as $p): ?>
+        <?php $notes = trim((string)($p['notes'] ?? '')); ?>
+        <?php if ($notes === '') continue; ?>
     <div class="prov" id="prov-<?= (int)$p['id'] ?>">
         <h2><?= htmlspecialchars((string)$p['name']) ?></h2>
-        <?php $notes = trim((string)($p['notes'] ?? '')); ?>
-        <?php if ($notes !== ''): ?>
         <div class="notes"><?= htmlspecialchars($notes) ?></div>
-        <?php else: ?>
-        <div class="notes sense">Sense descripció. Les responsables la poden afegir al camp de notes del proveïdor.</div>
-        <?php endif; ?>
         <a href="#top" class="top-link">↑ tornar a dalt</a>
     </div>
     <?php endforeach; ?>
