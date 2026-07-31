@@ -14,6 +14,7 @@ if (!isset($_SESSION)) {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=$language?>" lang="<?=$language?>">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title> <?php print $Text['global_title'] . " - " . $Text['ti_login_news'];?> </title>
 	
 	<link rel="stylesheet" type="text/css"   media="screen" href="css/aixada_main.css" />
@@ -60,6 +61,19 @@ if (!isset($_SESSION)) {
             width: 100% !important;
             box-sizing: border-box !important;
         }
+        /* Login gran i llegible al mòbil, sense zoom ni scroll horitzontal */
+        div#wrap, div#headwrap, div#stagewrap {
+            min-width: 0 !important;
+            width: 100% !important;
+        }
+        p#logonHeader { background-size: contain; }
+        input[type="text"], input[type="password"] {
+            font-size: 16px !important;
+            min-height: 42px;
+        }
+        .formLabel { font-size: 1rem; }
+        h4.ui-widget-header { font-size: 1.1rem; }
+        #btn_logon { font-size: 1.05rem; padding: 10px 20px; }
     }
     #logonMsg {
         line-height: 1.4;
