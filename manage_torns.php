@@ -41,8 +41,10 @@
         .week-cell          { width: 110px; background: #fafafa; }
         .week-dates         { font-weight: bold; font-size: 0.88rem; color: #333; }
         .week-rep-day       { font-size: 0.78rem; color: #2e7d32; margin-top: 3px; }
-        .rep-cell           { border-left: 3px solid #2e7d32; }
-        .net-cell           { border-left: 3px solid #1565c0; }
+        .rep-cell           { border-left: 3px solid #2e7d32; background: #f5faf5; }
+        .net-cell           { border-left: 3px solid #1565c0; background: #eaf1fb; }
+        .rep-cell .group-table th { color: #2e7d32; }
+        .net-cell .group-table th { color: #1565c0; }
         select.uf-select    { min-width: 140px; }
         .group-table        { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         .group-table th     { font-size: 0.75rem; color: #888; text-align: left; padding: 2px 6px 4px;
