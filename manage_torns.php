@@ -45,6 +45,7 @@
         .net-cell           { border-left: 3px solid #1565c0; background: #eaf1fb; }
         .rep-cell .group-table th { color: #2e7d32; }
         .net-cell .group-table th { color: #1565c0; }
+        .autorep-label      { color: #b26a00; font-weight: bold; font-style: italic; padding: 6px 0; }
         select.uf-select    { min-width: 140px; }
         .group-table        { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         .group-table th     { font-size: 0.75rem; color: #888; text-align: left; padding: 2px 6px 4px;
@@ -342,8 +343,13 @@ function renderUpcoming(weeks) {
             }
 
             // Repartiment column
+            var isAuto  = week.repartiment && week.repartiment.length === 1 && week.repartiment[0].uf_id === 0;
+            var repDate = (week.repartiment && week.repartiment.length > 0) ? week.repartiment[0].date : null;
             var repHtml = '';
-            if (week.repartiment && week.repartiment.length > 0) {
+            if (isAuto) {
+                repHtml = '<div class="autorep-label">Autorepartiment</div>'
+                        + '<div style="margin-top:6px"><button class="ui-button ui-corner-all btn-sm" onclick="unsetAutorepartiment(\''+repDate+'\')">Desfer</button></div>';
+            } else if (week.repartiment && week.repartiment.length > 0) {
                 repHtml = '<table class="group-table"><thead><tr><th>UF</th><th>Nom</th><th>Telèfon</th><th></th></tr></thead><tbody>';
                 week.repartiment.forEach(function(entry) {
                     var isResp = !!entry.is_responsible;
@@ -387,8 +393,11 @@ function renderUpcoming(weeks) {
                 netHtml = '<span class="no-torns">—</span>';
             }
 
+            var weekCellBtn = (!isAuto && repDate)
+                  ? '<div style="margin-top:6px"><button class="ui-button ui-corner-all btn-sm" onclick="setAutorepartiment(\''+repDate+'\')">Autorepartiment</button></div>'
+                  : '';
             html += '<tr>'
-                  + '<td class="week-cell"><div class="week-dates">'+weekLabel+'</div>'+repDayLabel+'</td>'
+                  + '<td class="week-cell"><div class="week-dates">'+weekLabel+'</div>'+repDayLabel+weekCellBtn+'</td>'
                   + '<td class="rep-cell">'+repHtml+'</td>'
                   + '<td class="net-cell">'+netHtml+'</td>'
                   + '</tr>';
@@ -446,6 +455,15 @@ function setResponsable(date, uf) {
 
 function deleteTorn(date, uf, task) {
     $.post('php/ctrl/Torns.php', {oper:'deleteTorn', date:date, uf:uf, task:task}, function() { loadUpcoming(); });
+}
+
+function setAutorepartiment(date) {
+    if (!confirm('Marcar aquesta setmana com a autorepartiment? S\'esborraran les UFs assignades al repartiment.')) return;
+    $.post('php/ctrl/Torns.php', {oper:'setAutorepartiment', date:date}, function() { loadUpcoming(); });
+}
+
+function unsetAutorepartiment(date) {
+    $.post('php/ctrl/Torns.php', {oper:'unsetAutorepartiment', date:date}, function() { loadUpcoming(); });
 }
 
 function formatDate(dateStr) {

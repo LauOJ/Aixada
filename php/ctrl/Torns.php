@@ -101,6 +101,21 @@ switch ($_POST['oper'] ?? '') {
         echo 'ok';
         break;
 
+    // La setmana passa a autorepartiment: buidem el grup de repartiment i hi
+    // deixem una fila sentinella (UF 0) que la vista mostra com a "Autorepartiment".
+    case 'setAutorepartiment':
+        $date = $_POST['date'];
+        $db->Execute("DELETE FROM aixada_torns WHERE dataTorn = :1q AND task_type = 'repartiment'", $date);
+        $db->Execute("INSERT IGNORE INTO aixada_torns (dataTorn, ufTorn, task_type, is_responsible) VALUES (:1q, 0, 'repartiment', 0)", $date);
+        echo 'ok';
+        break;
+
+    case 'unsetAutorepartiment':
+        $date = $_POST['date'];
+        $db->Execute("DELETE FROM aixada_torns WHERE dataTorn = :1q AND ufTorn = 0 AND task_type = 'repartiment'", $date);
+        echo 'ok';
+        break;
+
     case 'getUfs':
         $rs   = $db->Execute(
             'SELECT DISTINCT u.id, u.name FROM aixada_uf u
@@ -325,6 +340,14 @@ function generateTorns(string $task, string $start, string $end): void
         }
     }
 
+    // Conservem les setmanes d'autorepartiment (fila sentinella UF 0) en regenerar.
+    $autoDates = [];
+    if ($task === 'repartiment') {
+        $rsA = $db->Execute("SELECT dataTorn FROM aixada_torns WHERE task_type = 'repartiment' AND ufTorn = 0 AND dataTorn >= :1q AND dataTorn <= :2q",
+                            $deleteFrom, $end);
+        while ($rA = $rsA->fetch_assoc()) { $autoDates[] = $rA['dataTorn']; }
+    }
+
     $db->Execute('DELETE FROM aixada_torns WHERE task_type = :1q AND dataTorn >= :2q AND dataTorn <= :3q',
                  $task, $deleteFrom, $end);
 
@@ -336,6 +359,15 @@ function generateTorns(string $task, string $start, string $end): void
 
     while ($current <= $endTs) {
         $date   = date('Y-m-d', $current);
+
+        // Setmana d'autorepartiment: la deixem buida (només la sentinella).
+        if ($task === 'repartiment' && in_array($date, $autoDates)) {
+            $db->Execute("INSERT IGNORE INTO aixada_torns (dataTorn, ufTorn, task_type, is_responsible) VALUES (:1q, 0, 'repartiment', 0)", $date);
+            $lastPicked = [];
+            $current    = strtotime($date . ' +' . $freq_weeks . ' weeks');
+            continue;
+        }
+
         $picked = pickUfs($count, $rotIdx, $eligible, $incompatible, $lastPicked, $recentCount, 2, $nova, 3);
 
         $responsable = null;
@@ -386,7 +418,7 @@ function getUpcomingTorns(int $months): array
                     SEPARATOR \', \')
                  FROM aixada_member m WHERE m.uf_id = u.id AND m.active = 1) AS phone
          FROM aixada_torns t
-         JOIN aixada_uf u ON u.id = t.ufTorn
+         LEFT JOIN aixada_uf u ON u.id = t.ufTorn
          WHERE t.dataTorn >= :1q AND t.dataTorn <= :2q
          ORDER BY t.dataTorn, t.task_type, t.is_responsible DESC, t.ufTorn',
         $today, $end

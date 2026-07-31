@@ -32,6 +32,7 @@
         .rep-cell .group-table th { color: #2e7d32; }
         .net-cell .group-table th { color: #1565c0; }
         .net-cell .group-table tr.responsable td { color: #0d47a1; }
+        .autorep-label      { color: #b26a00; font-weight: bold; font-style: italic; }
         .no-data            { color: #bbb; font-size: 0.85rem; font-style: italic; }
         .no-torns           { color: #999; font-style: italic; font-size: 0.88rem; }
         .group-table        { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -125,8 +126,11 @@ function renderUpcoming(weeks) {
             }
 
             // Repartiment column
+            var isAuto = week.repartiment && week.repartiment.length === 1 && week.repartiment[0].uf_id === 0;
             var repHtml = '';
-            if (week.repartiment && week.repartiment.length > 0) {
+            if (isAuto) {
+                repHtml = '<span class="autorep-label">Autorepartiment</span>';
+            } else if (week.repartiment && week.repartiment.length > 0) {
                 repHtml = '<table class="group-table"><thead><tr><th>UF</th><th>Nom</th><th>Telèfon</th><th></th></tr></thead><tbody>';
                 week.repartiment.forEach(function(entry) {
                     var isMine = (entry.uf_id === currentUfId);
