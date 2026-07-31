@@ -35,53 +35,33 @@ if (!isset($_SESSION)) {
             echo "p#logonHeader {background-image: none;}";
         }
     ?>
-    /* Estils per mòbil */
+    /* Estils mòbil del login: neutralitza el layout d'escriptori i el fa gran i centrat */
     @media (max-width: 768px) {
-        #logonWrap {
-            max-width: 90vw !important;
-            width: 90vw !important;
-            margin: 20px auto !important;
-            position: relative !important;
+        html, body { overflow-x: hidden; }
+        body.login-page div#wrap {
+            width: 100% !important; min-width: 0 !important; margin-top: 130px !important;
         }
-        #logonWrap .ui-widget-content {
-            max-width: 100% !important;
-            width: 100% !important;
+        body.login-page div#stagewrap { width: 100% !important; min-width: 0 !important; }
+        /* amaga qualsevol columna que no sigui el quadre de login */
+        body.login-page div#stagewrap > div:not(#logonWrap) { display: none !important; }
+        body.login-page div#logonWrap {
+            float: none !important; clear: both !important; position: static !important;
+            width: 92% !important; max-width: 400px !important; min-width: 0 !important;
+            margin: 0 auto !important;
         }
-        .tblForms {
-            width: 100% !important;
-            table-layout: fixed !important;
+        body.login-page div#logonWrap .ui-widget-content {
+            width: 100% !important; max-width: 100% !important;
         }
-        .tblForms td:first-child {
-            width: 30% !important;
-        }
-        .tblForms td:last-child {
-            width: 70% !important;
-        }
-        .inputTxtSmall {
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
-        /* Login gran i llegible al mòbil, sense zoom ni scroll horitzontal */
-        div#wrap, div#headwrap, div#stagewrap {
-            min-width: 0 !important;
-            width: 100% !important;
-        }
-        p#logonHeader { background-size: contain; }
+        .tblForms { width: 100% !important; table-layout: fixed !important; }
+        .tblForms td:first-child { width: 32% !important; }
+        .tblForms td:last-child  { width: 68% !important; }
         input[type="text"], input[type="password"] {
-            font-size: 16px !important;
-            min-height: 42px;
+            width: 100% !important; box-sizing: border-box !important;
+            font-size: 16px !important; min-height: 42px !important;
         }
         .formLabel { font-size: 1rem; }
         h4.ui-widget-header { font-size: 1.1rem; }
         #btn_logon { font-size: 1.05rem; padding: 10px 20px; }
-        /* Neutralitza el layout de columnes flotants d'escriptori al mòbil */
-        div#stagewrap .aix-layout-widget-center-col,
-        div#stagewrap .aix-layout-widget-left-col { display: none !important; }
-        div#logonWrap {
-            float: none !important; clear: both !important;
-            max-width: 92vw !important; width: 92vw !important;
-            margin: 20px auto !important; left: auto !important;
-        }
     }
     #logonMsg {
         line-height: 1.4;
