@@ -15,6 +15,7 @@ $login_name = get_session_value('login');
 $member_name = '';
 $last_order_date = '';
 $current_balance = 0;
+$next_torn_label = '';
 
 try {
     $db = DBWrap::get_instance();
@@ -43,6 +44,26 @@ try {
     DBWrap::get_instance()->free_next_results();
 } catch (Exception $e) {
     // En cas d'error, continuar amb valors per defecte
+}
+
+// Proper repartiment (torn) d'aquesta UF — aïllat perquè la taula de torns
+// pot no existir en un entorn on el mòdul encara no s'ha activat.
+try {
+    $db = DBWrap::get_instance();
+    $rs = $db->Execute(
+        "SELECT dataTorn FROM aixada_torns
+         WHERE ufTorn = :1q AND task_type = 'repartiment' AND dataTorn >= CURDATE()
+         ORDER BY dataTorn ASC LIMIT 1",
+        $uf_id
+    );
+    if ($row = $rs->fetch_assoc()) {
+        $dies = ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'];
+        $ts = strtotime($row['dataTorn']);
+        $next_torn_label = $dies[(int)date('w', $ts)] . ' ' . date('d/m/Y', $ts);
+    }
+    DBWrap::get_instance()->free_next_results();
+} catch (Exception $e) {
+    // Mòdul de torns no actiu en aquest entorn; deixem el valor per defecte.
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -113,12 +134,13 @@ try {
                     <p class="info-value"><?php echo $uf_id; ?></p>
                 </div>
                 <div class="info-card">
-                    <h3>Última Comanda</h3>
-                    <p class="info-value"><?php echo $last_order_date ?: 'Cap comanda'; ?></p>
-                </div>
-                <div class="info-card">
                     <h3>Saldo Actual</h3>
                     <p class="info-value"><?php echo number_format($current_balance, 2); ?> €</p>
+                </div>
+                <div class="info-card">
+                    <h3>Proper repartiment</h3>
+                    <p class="info-value"><?php echo $next_torn_label ?: 'Cap assignat'; ?></p>
+                    <a href="torns.php" style="display:inline-block; margin-top:6px; font-size:0.72rem; color:#6b7280; text-decoration:underline;">Canviar torn</a>
                 </div>
             </div>
         </div>
