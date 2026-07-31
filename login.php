@@ -74,6 +74,14 @@ if (!isset($_SESSION)) {
         .formLabel { font-size: 1rem; }
         h4.ui-widget-header { font-size: 1.1rem; }
         #btn_logon { font-size: 1.05rem; padding: 10px 20px; }
+        /* Neutralitza el layout de columnes flotants d'escriptori al mòbil */
+        div#stagewrap .aix-layout-widget-center-col,
+        div#stagewrap .aix-layout-widget-left-col { display: none !important; }
+        div#logonWrap {
+            float: none !important; clear: both !important;
+            max-width: 92vw !important; width: 92vw !important;
+            margin: 20px auto !important; left: auto !important;
+        }
     }
     #logonMsg {
         line-height: 1.4;
