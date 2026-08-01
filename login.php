@@ -35,26 +35,22 @@ if (!isset($_SESSION)) {
             echo "p#logonHeader {background-image: none;}";
         }
     ?>
-    /* Estils mòbil del login: neutralitza el layout d'escriptori i el fa gran i centrat */
+    /* Quadre de login: sempre una targeta centrada (arregla escriptori i mòbil) */
+    body.login-page div#stagewrap { min-width: 0 !important; }
+    body.login-page div#stagewrap > div:not(#logonWrap) { display: none !important; }
+    body.login-page div#logonWrap {
+        float: none !important; clear: both !important; position: static !important;
+        width: 92% !important; max-width: 400px !important; min-width: 0 !important;
+        margin: 20px auto !important;
+    }
+    body.login-page div#logonWrap .ui-widget-content { width: 100% !important; max-width: 100% !important; }
+    .tblForms { width: 100% !important; table-layout: fixed !important; }
+    .tblForms td:first-child { width: 32% !important; }
+    .tblForms td:last-child  { width: 68% !important; }
+
     @media (max-width: 768px) {
         html, body { overflow-x: hidden; }
-        body.login-page div#wrap {
-            width: 100% !important; min-width: 0 !important; margin-top: 130px !important;
-        }
-        body.login-page div#stagewrap { width: 100% !important; min-width: 0 !important; }
-        /* amaga qualsevol columna que no sigui el quadre de login */
-        body.login-page div#stagewrap > div:not(#logonWrap) { display: none !important; }
-        body.login-page div#logonWrap {
-            float: none !important; clear: both !important; position: static !important;
-            width: 92% !important; max-width: 400px !important; min-width: 0 !important;
-            margin: 0 auto !important;
-        }
-        body.login-page div#logonWrap .ui-widget-content {
-            width: 100% !important; max-width: 100% !important;
-        }
-        .tblForms { width: 100% !important; table-layout: fixed !important; }
-        .tblForms td:first-child { width: 32% !important; }
-        .tblForms td:last-child  { width: 68% !important; }
+        body.login-page div#wrap { width: 100% !important; min-width: 0 !important; }
         input[type="text"], input[type="password"] {
             width: 100% !important; box-sizing: border-box !important;
             font-size: 16px !important; min-height: 42px !important;
