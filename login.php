@@ -44,8 +44,10 @@ if (!isset($_SESSION)) {
         body.login-page div#stagewrap > div:not(#logonWrap) { display: none !important; }
         body.login-page div#logonWrap {
             float: none !important; position: static !important;
+            top: auto !important; left: auto !important; right: auto !important;
+            transform: none !important;
             width: 92% !important; max-width: 400px !important; min-width: 0 !important;
-            margin: 20px auto !important; left: auto !important; right: auto !important;
+            margin: 20px auto !important;
         }
         body.login-page div#logonWrap .ui-widget-content { max-width: 100% !important; width: 100% !important; }
         .tblForms { width: 100% !important; table-layout: fixed !important; }
