@@ -35,18 +35,19 @@ if (!isset($_SESSION)) {
             echo "p#logonHeader {background-image: none;}";
         }
     ?>
-    /* Estils NOMÉS per a mòbil (l'escriptori no es toca) */
+    /* Estils NOMÉS per a mòbil (l'escriptori no es toca).
+       Especificitat body.login-page div#... per guanyar a custom.css. */
     @media (max-width: 768px) {
         html, body { overflow-x: hidden; }
-        /* neutralitza el layout de columnes flotants d'escriptori */
-        div#stagewrap { min-width: 0 !important; }
-        div#stagewrap > div:not(#logonWrap) { display: none !important; }
-        #logonWrap {
+        body.login-page div#wrap { width: 100% !important; min-width: 0 !important; }
+        body.login-page div#stagewrap { min-width: 0 !important; width: 100% !important; }
+        body.login-page div#stagewrap > div:not(#logonWrap) { display: none !important; }
+        body.login-page div#logonWrap {
             float: none !important; position: static !important;
             width: 92% !important; max-width: 400px !important; min-width: 0 !important;
-            margin: 20px auto !important;
+            margin: 20px auto !important; left: auto !important; right: auto !important;
         }
-        #logonWrap .ui-widget-content { max-width: 100% !important; width: 100% !important; }
+        body.login-page div#logonWrap .ui-widget-content { max-width: 100% !important; width: 100% !important; }
         .tblForms { width: 100% !important; table-layout: fixed !important; }
         .tblForms td:first-child { width: 32% !important; }
         .tblForms td:last-child { width: 68% !important; }
