@@ -35,28 +35,26 @@ if (!isset($_SESSION)) {
             echo "p#logonHeader {background-image: none;}";
         }
     ?>
-    /* Quadre de login: sempre una targeta centrada (arregla escriptori i mòbil) */
-    body.login-page div#stagewrap { min-width: 0 !important; }
-    body.login-page div#stagewrap > div:not(#logonWrap) { display: none !important; }
-    body.login-page div#logonWrap {
-        float: none !important; clear: both !important; position: static !important;
-        width: 92% !important; max-width: 400px !important; min-width: 0 !important;
-        margin: 20px auto !important;
-    }
-    body.login-page div#logonWrap .ui-widget-content { width: 100% !important; max-width: 100% !important; }
-    .tblForms { width: 100% !important; table-layout: fixed !important; }
-    .tblForms td:first-child { width: 32% !important; }
-    .tblForms td:last-child  { width: 68% !important; }
-
+    /* Estils NOMÉS per a mòbil (l'escriptori no es toca) */
     @media (max-width: 768px) {
         html, body { overflow-x: hidden; }
-        body.login-page div#wrap { width: 100% !important; min-width: 0 !important; }
+        /* neutralitza el layout de columnes flotants d'escriptori */
+        div#stagewrap { min-width: 0 !important; }
+        div#stagewrap > div:not(#logonWrap) { display: none !important; }
+        #logonWrap {
+            float: none !important; position: static !important;
+            width: 92% !important; max-width: 400px !important; min-width: 0 !important;
+            margin: 20px auto !important;
+        }
+        #logonWrap .ui-widget-content { max-width: 100% !important; width: 100% !important; }
+        .tblForms { width: 100% !important; table-layout: fixed !important; }
+        .tblForms td:first-child { width: 32% !important; }
+        .tblForms td:last-child { width: 68% !important; }
+        .inputTxtSmall,
         input[type="text"], input[type="password"] {
             width: 100% !important; box-sizing: border-box !important;
             font-size: 16px !important; min-height: 42px !important;
         }
-        .formLabel { font-size: 1rem; }
-        h4.ui-widget-header { font-size: 1.1rem; }
         #btn_logon { font-size: 1.05rem; padding: 10px 20px; }
     }
     #logonMsg {
