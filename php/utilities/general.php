@@ -250,11 +250,44 @@ function get_session_theme() {
 /**
  * Returns the active role of the logged-in user.
  *
- * @return string Role name (e.g. 'Consumer', 'Hacker Commission').
+ * @return string Role name (e.g. 'consumidora', 'admin').
  */
 function get_current_role()
 {
     return get_session_value('current_role');
+}
+
+// Role constants — single source of truth for role names
+const ROLE_CONSUMIDORA = 'consumidora';
+const ROLE_RESPONSABLE = 'responsable';
+const ROLE_TRESORERIA  = 'tresoreria';
+const ROLE_TORNS       = 'torns';
+const ROLE_ADMIN       = 'admin';
+
+// All valid roles in order from least to most privileged
+const ROLES_ALL = [
+    ROLE_CONSUMIDORA,
+    ROLE_RESPONSABLE,
+    ROLE_TRESORERIA,
+    ROLE_TORNS,
+    ROLE_ADMIN,
+];
+
+function current_role_in(array $roles): bool
+{
+    return in_array(get_current_role(), $roles);
+}
+
+function require_role(array $roles): void
+{
+    if (!current_role_in($roles)) {
+        if (headers_sent()) {
+            echo '<script>window.location="aixada_main.php";</script>';
+        } else {
+            header('Location: aixada_main.php');
+        }
+        exit;
+    }
 }
 
 /**
@@ -1081,11 +1114,14 @@ function get_config_menu($user_role)
 {
     $XML = "<navigation>\n";
     $mconf = configuration_vars::get_instance()->menu_config;
-    if (!isset($mconf[$user_role])) {
-        throw new Exception("Role '" . $user_role . "' not defined in local_config/config.php");
-    }
-    foreach ($mconf[$user_role] as $navItem => $status) {
-        $XML .= '<' . $navItem . '>' . $status . '</' . $navItem . ">\n";
+    // Els rols nous (admin, tresoreria, torns…) encara no surten al menu_config
+    // de config.php. En lloc de fallar amb un 401, retornem una navegació buida:
+    // la visibilitat del menú per a aquests rols ja la gestiona menu.inc.php
+    // (require_role / current_role_in).
+    if (isset($mconf[$user_role])) {
+        foreach ($mconf[$user_role] as $navItem => $status) {
+            $XML .= '<' . $navItem . '>' . $status . '</' . $navItem . ">\n";
+        }
     }
     return $XML . '</navigation>';
 }
@@ -1270,22 +1306,22 @@ function existing_languages_XML()
 function get_roles()
 {
     $XML = '<roles>';
-    foreach (array_keys(configuration_vars::get_instance()->forbidden_pages) as $role) {
+    foreach (ROLES_ALL as $role) {
         $XML .= "<role><description>{$role}</description></role>";
     }
     return $XML . '</roles>';
 }
 
 /**
- * Returns an XML list of commission roles (all roles except Consumer, Checkout, Producer).
+ * Returns an XML list of non-base roles (all roles except consumidora).
  *
  * @return string XML string.
  */
 function get_commissions()
 {
     $XML = '<rows>';
-    foreach (array_keys(configuration_vars::get_instance()->forbidden_pages) as $role) {
-        if (!in_array($role, array('Consumer', 'Checkout', 'Producer'))) {
+    foreach (ROLES_ALL as $role) {
+        if ($role !== ROLE_CONSUMIDORA) {
             $XML .= "<row><description>{$role}</description></row>";
         }
     }
