@@ -37,28 +37,56 @@ if (!isset($_SESSION)) {
     ?>
     /* Estils NOMÉS per a mòbil (l'escriptori no es toca).
        Especificitat body.login-page div#... per guanyar a custom.css. */
+    .login-burger { display: none; }
     @media (max-width: 768px) {
         html, body { overflow-x: hidden; }
-        body.login-page div#wrap { width: 100% !important; min-width: 0 !important; }
+        body.login-page div#wrap { width: 100% !important; min-width: 0 !important; margin-top: 90px !important; }
         body.login-page div#stagewrap { min-width: 0 !important; width: 100% !important; }
         body.login-page div#stagewrap > div:not(#logonWrap) { display: none !important; }
         body.login-page div#logonWrap {
             float: none !important; position: static !important;
             top: auto !important; left: auto !important; right: auto !important;
             transform: none !important;
-            width: 92% !important; max-width: 400px !important; min-width: 0 !important;
-            margin: 20px auto !important;
+            width: 86% !important; max-width: 380px !important; min-width: 0 !important;
+            margin: 34px auto !important;
         }
         body.login-page div#logonWrap .ui-widget-content { max-width: 100% !important; width: 100% !important; }
+        /* Etiquetes a sobre de l'input perquè no es tallin */
+        body.login-page div#logonWrap .tblForms td {
+            display: block !important; width: 100% !important;
+            text-align: left !important; padding: 4px 2px !important;
+        }
+        body.login-page div#logonWrap .formLabel { display: block; float: none !important; margin-bottom: 4px; font-size: 1rem; text-align: left !important; }
         .tblForms { width: 100% !important; table-layout: fixed !important; }
-        .tblForms td:first-child { width: 32% !important; }
-        .tblForms td:last-child { width: 68% !important; }
         .inputTxtSmall,
         input[type="text"], input[type="password"] {
             width: 100% !important; box-sizing: border-box !important;
             font-size: 16px !important; min-height: 42px !important;
         }
         #btn_logon { font-size: 1.05rem; padding: 10px 20px; }
+        /* Capçalera mòbil: logo petit a l'esquerra + menú hamburguesa */
+        body.login-page .login-header {
+            flex-direction: row !important; justify-content: space-between !important;
+            align-items: center !important; padding: 8px 16px !important;
+        }
+        body.login-page .login-header .logo img { height: 32px !important; }
+        .login-burger {
+            display: block; background: none; border: none; padding: 4px 8px;
+            font-size: 1.8rem; line-height: 1; color: #4a5f6f; cursor: pointer;
+        }
+        body.login-page .login-header .nav-links {
+            display: none; position: absolute; top: 100%; left: 0; right: 0;
+            background: #fff; border-bottom: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            padding: 6px 0; margin: 0;
+        }
+        body.login-page .login-header .nav-links.open { display: block; }
+        body.login-page .login-header .nav-links ul {
+            flex-direction: column !important; align-items: stretch !important;
+            gap: 0 !important; padding: 0 !important; margin: 0 !important;
+        }
+        body.login-page .login-header .nav-links li { width: 100%; }
+        body.login-page .login-header .nav-links li a { display: block; padding: 11px 18px; }
+        body.login-page .login-header .nav-links .submenu { display: none !important; }
     }
     #logonMsg {
         line-height: 1.4;
@@ -82,6 +110,13 @@ if (!isset($_SESSION)) {
 			 *	logon stuff
 			 */
 			$('#btn_logon').button();
+
+			// Menú hamburguesa del login (mòbil)
+			$('#login-burger').on('click', function(){
+				var open = $('#login-nav').hasClass('open');
+				$('#login-nav').toggleClass('open', !open);
+				$(this).attr('aria-expanded', String(!open));
+			});
 			function showLoginError(message){
 				$('#logonMsg')
 					.text(message)
@@ -236,8 +271,10 @@ if (!isset($_SESSION)) {
     <div class="logo">
         <img src="<?php echo get_coop_logo(); ?>" alt="<?php echo get_config('coop_name', 'Aixada'); ?>" style="height: 50px; width: auto;">
     </div>
-    
-    <nav class="nav-links">
+
+    <button class="login-burger" id="login-burger" aria-label="Menú" aria-expanded="false">&#9776;</button>
+
+    <nav class="nav-links" id="login-nav">
         <ul>
             <li><a href="https://lavinagreta.org">INICI</a></li>
             <li class="has-submenu">
@@ -288,12 +325,12 @@ if (!isset($_SESSION)) {
 				<input type="hidden" name="oper" value="login">
 				<table class="tblForms" style="width: 100%; table-layout: fixed;">
 					<tr>
-						<td><label class="formLabel" for="login"><?=$Text['logon'];?>:</label></td>
-						<td><input type="text" class="inputTxtSmall ui-widget-content ui-corner-all " name="login" id="login" style="width: 100%; box-sizing: border-box;"/></td>
+						<td><label class="formLabel" for="login">Usuari/a:</label></td>
+						<td><input type="text" class="inputTxtSmall ui-widget-content ui-corner-all " name="login" id="login" autocomplete="username" style="width: 100%; box-sizing: border-box;"/></td>
 					</tr>
 					<tr>
 						<td><label class="formLabel" for="password"><?=$Text['pwd'];?>:</label></td>
-						<td><input type="password" class="inputTxtSmall ui-widget-content ui-corner-all" name="password" id="password" style="width: 100%; box-sizing: border-box;"/></td>
+						<td><input type="password" class="inputTxtSmall ui-widget-content ui-corner-all" name="password" id="password" autocomplete="current-password" style="width: 100%; box-sizing: border-box;"/></td>
 					</tr>
 					<tr>
 						<td colspan="2"><div>&nbsp;</div></td>
