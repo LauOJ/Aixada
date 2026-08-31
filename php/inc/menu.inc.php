@@ -102,11 +102,13 @@
 		<?php if (current_role_in([ROLE_ADMIN])) { ?>
 		<li><a href="manage_ufmember.php"><?php echo $Text['uf_short'];?> & <?php echo $Text['nav_mng_member'];?></a>
 			<ul>
+				<li><a href="manage_ufmember.php"><?php echo $Text['uf_short'];?> & <?php echo $Text['nav_mng_member'];?></a></li>
 				<li><a href="activate_all_roles.php"><?php echo $Text['nav_mng_roles'];?></a></li>
 			</ul>
 		</li>
 		<li><a href="manage_providers.php"><?php echo $Text['nav_mng_products'];?></a>
 			<ul>
+				<li><a href="manage_providers.php"><?php echo $Text['nav_mng_products'];?></a></li>
 				<li><a href="manage_orderable_products.php"><?php echo $Text['nav_mng_deactivate'];?></a></li>
 				<li><a href="manage_data.php?table=aixada_unit_measure"><?php echo $Text['nav_mng_units'];?></a></li>
 				<li><a href="manage_data.php?table=aixada_iva_type"><?php echo $Text['nav_mng_iva']; ?></a></li>
@@ -115,6 +117,7 @@
 		</li>
 		<li><a href="manage_money.php"><?php echo $Text['nav_mng_money'];?></a>
 			<ul>
+				<li><a href="manage_money.php"><?php echo $Text['nav_mng_money'];?></a></li>
 				<li><a href="manage_data.php?table=aixada_account_desc"><?php echo $Text['nav_mng_accdec']; ?></a></li>
 				<li><a href="manage_data.php?table=aixada_payment_method"><?php echo $Text['nav_mng_paymeth']; ?></a></li>
 			</ul>
