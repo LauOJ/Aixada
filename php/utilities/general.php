@@ -1114,11 +1114,14 @@ function get_config_menu($user_role)
 {
     $XML = "<navigation>\n";
     $mconf = configuration_vars::get_instance()->menu_config;
-    if (!isset($mconf[$user_role])) {
-        throw new Exception("Role '" . $user_role . "' not defined in local_config/config.php");
-    }
-    foreach ($mconf[$user_role] as $navItem => $status) {
-        $XML .= '<' . $navItem . '>' . $status . '</' . $navItem . ">\n";
+    // Els rols nous (admin, tresoreria, torns…) encara no surten al menu_config
+    // de config.php. En lloc de fallar amb un 401, retornem una navegació buida:
+    // la visibilitat del menú per a aquests rols ja la gestiona menu.inc.php
+    // (require_role / current_role_in).
+    if (isset($mconf[$user_role])) {
+        foreach ($mconf[$user_role] as $navItem => $status) {
+            $XML .= '<' . $navItem . '>' . $status . '</' . $navItem . ">\n";
+        }
     }
     return $XML . '</navigation>';
 }
