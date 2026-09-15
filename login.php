@@ -286,7 +286,7 @@ if (!isset($_SESSION)) {
                 </ul>
             </li>
             <li><a href="https://lavinagreta.org/contacta">CONTACTA</a></li>
-            <li class="active"><a href="https://lavinagreta.org/aixada">INTRANET</a></li>
+            <li class="active"><a href="https://lavinagreta.org/aixada/">INTRANET</a></li>
         </ul>
     </nav>
 </header>
