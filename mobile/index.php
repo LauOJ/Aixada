@@ -43,6 +43,9 @@ try {
         }
         .app-header .user-name { font-weight: 600; font-size: 1rem; }
         .app-header .user-uf   { font-size: 0.78rem; opacity: 0.75; margin-top: 2px; }
+        .hdr-brand { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .hdr-brand img { height: 28px; display: block; }
+        .hdr-brand span { font-size: 0.85rem; font-weight: 600; opacity: 0.9; }
         .logout-btn {
             background: none;
             border: 1px solid rgba(255,255,255,0.55);
@@ -111,7 +114,8 @@ try {
 <body>
 
 <header class="app-header">
-    <div>
+    <div class="hdr-brand"><img src="../img/logo-vinagreta.png" alt="La Vinagreta"><span>Aixada</span></div>
+    <div style="flex:1; min-width:0; text-align:right;">
         <div class="user-name"><?= htmlspecialchars($member_name ?: get_session_value('login')) ?></div>
         <div class="user-uf">Unitat Familiar <?= (int)$uf_id ?></div>
     </div>

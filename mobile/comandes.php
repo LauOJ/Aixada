@@ -26,6 +26,9 @@ $uf_id = get_session_value('uf_id');
         }
         .app-header .back { font-size: 1.4rem; line-height: 1; cursor: pointer; padding: 2px 6px; }
         .app-header .title { font-weight: 600; font-size: 1.05rem; flex: 1; }
+        .hdr-brand { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .hdr-brand img { height: 26px; display: block; }
+        .hdr-brand span { font-size: 0.82rem; font-weight: 600; opacity: 0.9; }
 
         .app-main { padding: 16px; max-width: 520px; margin: 0 auto; }
 
@@ -61,6 +64,7 @@ $uf_id = get_session_value('uf_id');
 <header class="app-header">
     <span class="back" id="btn-back">&#8249;</span>
     <div class="title">La meva comanda</div>
+    <div class="hdr-brand"><span>Aixada</span><img src="../img/logo-vinagreta.png" alt="La Vinagreta"></div>
 </header>
 
 <main class="app-main">
