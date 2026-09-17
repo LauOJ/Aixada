@@ -8,7 +8,7 @@ if (!is_created_session()) {
 try {
     $db = DBWrap::get_instance();
     $rs = $db->Execute(
-        "SELECT id, name, notes
+        "SELECT id, name, notes, responsible_uf_id
          FROM aixada_provider
          WHERE active = 1
          ORDER BY name"
@@ -51,6 +51,8 @@ try {
             scroll-margin-top: 16px;
         }
         .prov h2 { font-size: 1.15rem; margin-bottom: 6px; color: #2f3e4a; }
+        .prov .resp { font-size: 0.85rem; color: #4a5f6f; margin-bottom: 8px; }
+        .prov .resp a { color: #4a5f6f; }
         .prov .notes { white-space: pre-line; line-height: 1.5; }
         .prov .sense { color: #999; font-style: italic; }
         .prov .top-link { font-size: 0.82rem; margin-top: 8px; display: inline-block; color: #7a8894; text-decoration: none; }
@@ -83,6 +85,14 @@ try {
         <?php if ($notes === '') continue; ?>
     <div class="prov" id="prov-<?= (int)$p['id'] ?>">
         <h2><?= htmlspecialchars((string)$p['name']) ?></h2>
+        <div class="resp">
+            <?php if (!empty($p['responsible_uf_id'])): ?>
+                UF responsable: <strong><?= (int)$p['responsible_uf_id'] ?></strong>
+            <?php else: ?>
+                <span class="sense">Sense UF responsable assignada</span>
+            <?php endif; ?>
+            &middot; <a href="llistat_responsables.php" target="_blank">llistat de responsables</a>
+        </div>
         <div class="notes"><?= htmlspecialchars($notes) ?></div>
         <a href="#top" class="top-link">↑ tornar a dalt</a>
     </div>

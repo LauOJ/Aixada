@@ -192,7 +192,7 @@ function showEdit(btn) {
         return;
     }
 
-    var sel = $('<select class="edit-select" style="font-size:0.82rem;max-width:160px"></select>');
+    var sel = $('<select class="edit-select" style="font-size:0.82rem;max-width:160px;margin:0 8px"></select>');
     allUfs.forEach(function(uf) {
         sel.append($('<option>').val(uf.id).text(uf.id + ' - ' + uf.name));
     });

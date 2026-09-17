@@ -140,7 +140,7 @@ try {
                 <div class="info-card">
                     <h3>Proper repartiment</h3>
                     <p class="info-value"><?php echo $next_torn_label ?: 'Cap assignat'; ?></p>
-                    <a href="torns.php" style="display:inline-block; margin-top:6px; font-size:0.72rem; color:#6b7280; text-decoration:underline;">Canviar torn</a>
+                    <a href="torns.php" style="display:inline-block; margin-top:6px; font-size:0.72rem; color:#6b7280; text-decoration:underline;">Ves al torn</a>
                 </div>
             </div>
         </div>
