@@ -119,7 +119,7 @@ $uf_id = get_session_value('uf_id');
 <header class="app-header">
     <span class="back" id="btn-back">&#8249;</span>
     <div class="title">Fes comanda <div class="step-label" id="step-label"></div></div>
-    <div class="hdr-brand"><img src="../img/logo-vinagreta.png" alt="La Vinagreta"></div>
+    <div class="hdr-brand"><a href="index.php"><img src="../img/logo-vinagreta.png" alt="La Vinagreta"></a></div>
 </header>
 
 <main class="app-main">

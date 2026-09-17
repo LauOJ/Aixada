@@ -114,7 +114,7 @@ try {
 <body>
 
 <header class="app-header">
-    <div class="hdr-brand"><img src="../img/logo-vinagreta.png" alt="La Vinagreta"></div>
+    <div class="hdr-brand"><a href="index.php"><img src="../img/logo-vinagreta.png" alt="La Vinagreta"></a></div>
     <div style="flex:1; min-width:0; text-align:center;">
         <div class="user-name"><?= htmlspecialchars($member_name ?: get_session_value('login')) ?></div>
         <div class="user-uf">Unitat Familiar <?= (int)$uf_id ?></div>
