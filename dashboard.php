@@ -238,14 +238,6 @@ try {
             <!-- Columna central -->
             <div class="dashboard-center">
 
-                <!-- Repartiment i neteja -->
-                <div class="dashboard-section repartiment">
-                    <h2>Repartiment i neteja</h2>
-                    <div class="button-group">
-                        <a href="https://docs.google.com/spreadsheets/d/1Owm0KrG_EdHweBR-yCO3bath_qOasJIpiagEguWO_VI/edit?gid=1698359793#gid=1698359793" target="_blank" class="dashboard-button">REPARTIMENT I NETEJA</a>
-                    </div>
-                </div>
-
                 <!-- Responsables de comanda -->
                 <div class="dashboard-section responsables">
                     <h2>Responsables de comanda</h2>
