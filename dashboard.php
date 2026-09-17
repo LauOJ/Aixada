@@ -246,6 +246,14 @@ try {
                     </div>
                 </div>
 
+                <!-- Info de proveïdores -->
+                <div class="dashboard-section proveidores">
+                    <h2>Info de proveïdores</h2>
+                    <div class="button-group">
+                        <a href="llistat_proveidors.php" target="_blank" class="dashboard-button">INFO DE PROVEÏDORES</a>
+                    </div>
+                </div>
+
                 <!-- Actes de les assemblees -->
                 <div class="dashboard-section actes">
                     <h2>Actes de les assemblees</h2>
@@ -292,14 +300,6 @@ try {
                     <div class="button-group">
                         <a href="llistat_families.php" class="dashboard-button">SIMPLE</a>
                         <a href="llistat_contactes.php" class="dashboard-button">AMB CONTACTES</a>
-                    </div>
-                </div>
-
-                <!-- Info de proveïdores -->
-                <div class="dashboard-section proveidores">
-                    <h2>Info de proveïdores</h2>
-                    <div class="button-group">
-                        <a href="llistat_proveidors.php" target="_blank" class="dashboard-button">INFO DE PROVEÏDORES</a>
                     </div>
                 </div>
 
