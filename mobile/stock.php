@@ -118,19 +118,21 @@ $uf_id = get_session_value('uf_id');
         <div id="products-error"></div>
         <div id="product-list"><div class="spinner">Carregant productes…</div></div>
         <div class="sticky-footer">
-            <button class="action-btn action-primary" id="btn-products-validate">Valida la compra</button>
+            <button class="action-btn action-primary" id="btn-products-review">Revisa la compra</button>
         </div>
     </section>
 
-    <!-- Compra validada: la teva compra per proveïdors -->
+    <!-- Revisa la compra (abans de validar) / Compra validada (després) -->
     <section class="step" id="step-summary">
-        <div class="saved-banner">&#10003; Compra validada</div>
-        <div class="section-title">La teva compra</div>
+        <div class="saved-banner" id="summary-banner" style="display:none">&#10003; Compra validada</div>
+        <div class="section-title" id="summary-title">Revisa la compra</div>
+        <div id="summary-error"></div>
         <div id="summary-list"></div>
         <div class="summary-total"><span>Total</span><span id="summary-total-val">0,00 &euro;</span></div>
         <div class="sticky-footer">
             <button class="action-btn action-secondary" id="btn-add-provider">Afegeix d'una altra proveïdora</button>
-            <button class="action-btn action-primary" id="btn-summary-home">Torna a l'inici</button>
+            <button class="action-btn action-primary" id="btn-validate">Valida la compra</button>
+            <button class="action-btn action-primary" id="btn-summary-home" style="display:none">Torna a l'inici</button>
         </div>
     </section>
 
@@ -329,16 +331,16 @@ $uf_id = get_session_value('uf_id');
     }
 
     function validatePurchase() {
-        $('#products-error').empty();
+        $('#summary-error').empty();
         if (cartCount() === 0) {
-            $('#products-error').html('<div class="msg-error">No has afegit cap producte.</div>');
+            $('#summary-error').html('<div class="msg-error">No has afegit cap producte.</div>');
             return;
         }
-        var $btn = $('#btn-products-validate').prop('disabled', true).text('Validant…');
+        var $btn = $('#btn-validate').prop('disabled', true).text('Validant…');
         var items = buildItemArrays();
 
         function fail(msg) {
-            $('#products-error').html('<div class="msg-error">' + msg + '</div>');
+            $('#summary-error').html('<div class="msg-error">' + msg + '</div>');
             $btn.prop('disabled', false).text('Valida la compra');
         }
 
@@ -359,10 +361,9 @@ $uf_id = get_session_value('uf_id');
                     data: valData
                 })
                 .done(function () {
-                    renderSummary();       // mostra el que s'ha comprat (abans de buidar)
-                    cart = {};
+                    cart = {};             // ja comprat: buidem el carret
                     $btn.prop('disabled', false).text('Valida la compra');
-                    showStep('summary');
+                    enterConfirmation();   // manté el resum ja revisat, passa a mode confirmació
                 })
                 .fail(function (xhr) { fail('No s\'ha pogut validar: ' + (xhr.responseText || 'error')); });
             })
@@ -371,8 +372,24 @@ $uf_id = get_session_value('uf_id');
         .fail(function (xhr) { fail('No s\'ha pogut desar la compra: ' + (xhr.responseText || 'error')); });
     }
 
+    // ── Modes del resum: revisió (abans de validar) / confirmació (després) ──
+    function enterReview() {
+        $('#summary-banner').hide();
+        $('#summary-title').text('Revisa la compra');
+        $('#summary-error').empty();
+        $('#btn-validate').show().prop('disabled', false).text('Valida la compra');
+        $('#btn-summary-home').hide();
+    }
+    function enterConfirmation() {
+        $('#summary-banner').show();
+        $('#summary-title').text('La teva compra');
+        $('#btn-validate').hide();
+        $('#btn-summary-home').show();
+    }
+
     // ── Navegació ──
-    $('#btn-products-validate').on('click', validatePurchase);
+    $('#btn-products-review').on('click', function () { renderSummary(); enterReview(); showStep('summary'); });
+    $('#btn-validate').on('click', validatePurchase);
     $('#btn-add-provider').on('click', function () { showStep('provider'); });
     $('#btn-summary-home').on('click', function () { window.location.href = 'index.php'; });
 
