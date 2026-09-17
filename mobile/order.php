@@ -10,7 +10,7 @@ $uf_id = get_session_value('uf_id');
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fer comanda &middot; La Vinagreta</title>
+    <title>Fes comanda &middot; La Vinagreta</title>
     <script src="../js/jquery/jquery.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -115,7 +115,7 @@ $uf_id = get_session_value('uf_id');
 
 <header class="app-header">
     <span class="back" id="btn-back">&#8249;</span>
-    <div class="title">Fer comanda <div class="step-label" id="step-label"></div></div>
+    <div class="title">Fes comanda <div class="step-label" id="step-label"></div></div>
 </header>
 
 <main class="app-main">

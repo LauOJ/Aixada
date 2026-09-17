@@ -122,7 +122,7 @@ try {
 
     <a href="order.php" class="app-btn">
         <span class="btn-icon">🛒</span>
-        <span class="btn-label">Fer comanda</span>
+        <span class="btn-label">Fes comanda</span>
         <span class="btn-arrow">›</span>
     </a>
 
