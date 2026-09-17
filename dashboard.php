@@ -77,9 +77,10 @@ try {
         $uf_id
     );
     if ($row = $rs->fetch_assoc()) {
-        $dies = ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'];
+        $mesos = ['', 'gener', 'febrer', 'març', 'abril', 'maig', 'juny', 'juliol', 'agost', 'setembre', 'octubre', 'novembre', 'desembre'];
         $ts = strtotime($row['dataTorn']);
-        $next_neteja_label = $dies[(int)date('w', $ts)] . ' ' . date('d/m/Y', $ts);
+        $quinzena = ((int)date('j', $ts) <= 15) ? '1a' : '2a';
+        $next_neteja_label = $quinzena . ' quinzena de ' . $mesos[(int)date('n', $ts)];
     }
     DBWrap::get_instance()->free_next_results();
 } catch (Exception $e) {
@@ -158,12 +159,12 @@ try {
                     <p class="info-value"><?php echo number_format($current_balance, 2); ?> €</p>
                 </div>
                 <div class="info-card">
-                    <h3>Proper repartiment</h3>
+                    <h3>Proper <span style="color:#2e7d32; font-weight:700;">repartiment</span></h3>
                     <p class="info-value"><?php echo $next_torn_label ?: 'Cap assignat'; ?></p>
                     <a href="torns.php" style="display:inline-block; margin-top:6px; font-size:0.72rem; color:#6b7280; text-decoration:underline;">Ves al torn</a>
                 </div>
                 <div class="info-card">
-                    <h3>Proper torn de neteja</h3>
+                    <h3>Proper torn de <span style="color:#1565c0; font-weight:700;">neteja</span></h3>
                     <p class="info-value"><?php echo $next_neteja_label ?: 'Cap assignat'; ?></p>
                     <a href="torns.php" style="display:inline-block; margin-top:6px; font-size:0.72rem; color:#6b7280; text-decoration:underline;">Ves al torn</a>
                 </div>
