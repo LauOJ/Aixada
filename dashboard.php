@@ -168,7 +168,7 @@ try {
                     <a href="torns.php" style="display:inline-block; margin-top:6px; font-size:0.72rem; color:#6b7280; text-decoration:underline;">Ves al torn</a>
                 </div>
                 <div class="info-card">
-                    <h3>Propera <strong>neteja</strong></h3>
+                    <h3>Proper torn de <strong>neteja</strong></h3>
                     <p class="info-value"><?php echo $next_neteja_label ?: 'Cap assignat'; ?></p>
                     <a href="torns.php" style="display:inline-block; margin-top:6px; font-size:0.72rem; color:#6b7280; text-decoration:underline;">Ves al torn</a>
                 </div>
