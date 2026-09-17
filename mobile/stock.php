@@ -37,6 +37,8 @@ $uf_id = get_session_value('uf_id');
         .context-bar { background: #e4e9ed; border-radius: 10px; padding: 10px 14px;
             font-size: 0.9rem; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
         .context-bar strong { color: #2f3e4a; }
+        .saved-banner { background: #e0efd6; color: #3c5e26; border: 1px solid #c4dcae;
+            border-radius: 10px; padding: 11px 14px; margin-bottom: 14px; font-weight: 600; }
 
         .list-btn {
             display: flex; align-items: center; gap: 12px; width: 100%;
@@ -46,7 +48,18 @@ $uf_id = get_session_value('uf_id');
         }
         .list-btn:active { transform: scale(0.98); }
         .list-btn .lb-label { flex: 1; }
-        .list-btn .lb-arrow { color: #bbb; font-size: 1.1rem; }
+        .list-btn .lb-total { color: #4a5f6f; font-weight: 600; font-size: 0.95rem; margin-right: 8px; }
+        .list-btn .lb-arrow { color: #bbb; font-size: 1.1rem; transition: transform 0.15s; }
+
+        /* Acordió resum → proveïdores */
+        .acc-header.open { border-radius: 12px 12px 0 0; margin-bottom: 0; }
+        .acc-header.open .lb-arrow { transform: rotate(90deg); }
+        .acc-body { margin: 0 0 10px; background: #fff; border-radius: 0 0 12px 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow: hidden; }
+        .acc-line { border-top: 1px solid #eef1f3; padding: 12px 16px 12px 26px; }
+        .acc-line .al-top { display: flex; justify-content: space-between; gap: 10px; }
+        .acc-line .al-name { font-weight: 600; font-size: 0.95rem; }
+        .acc-line .al-sub { font-size: 0.8rem; color: #7a8894; margin-top: 2px; }
 
         .product-row {
             background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
@@ -66,11 +79,6 @@ $uf_id = get_session_value('uf_id');
         .qty-input { width: 52px; height: 34px; text-align: center; font-size: 1rem;
             border: 1px solid #cdd5db; border-radius: 8px; }
 
-        .summary-item { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-        .summary-item .si-top { display: flex; justify-content: space-between; gap: 10px; }
-        .summary-item .si-name { font-weight: 600; }
-        .summary-item .si-sub { font-size: 0.8rem; color: #7a8894; margin-top: 2px; }
         .summary-total { display: flex; justify-content: space-between; font-size: 1.15rem;
             font-weight: 700; padding: 14px 4px; }
 
@@ -86,10 +94,6 @@ $uf_id = get_session_value('uf_id');
         .spinner { text-align: center; color: #7a8894; padding: 30px; }
         .msg-error { background: #f8d7da; color: #842029; border-radius: 10px; padding: 12px 14px;
             margin-bottom: 12px; font-size: 0.9rem; }
-        .done-screen { text-align: center; padding: 50px 20px; }
-        .done-screen .check { font-size: 3.5rem; }
-        .done-screen h2 { margin: 16px 0 8px; color: #2f3e4a; }
-        .done-screen p { color: #7a8894; margin-bottom: 24px; }
     </style>
 </head>
 <body>
@@ -105,40 +109,28 @@ $uf_id = get_session_value('uf_id');
     <section class="step active" id="step-provider">
         <div class="section-title">Tria la proveïdora</div>
         <div id="provider-list"><div class="spinner">Carregant…</div></div>
-        <div class="sticky-footer">
-            <button class="action-btn action-primary" id="btn-view-summary">Veure la compra (<span id="cart-count-1">0</span>)</button>
-        </div>
     </section>
 
     <!-- Pas 2: productes -->
     <section class="step" id="step-products">
         <div class="context-bar"><span><strong id="ctx-provider"></strong></span></div>
         <div class="section-title">Afegeix productes de l'estoc</div>
+        <div id="products-error"></div>
         <div id="product-list"><div class="spinner">Carregant productes…</div></div>
         <div class="sticky-footer">
-            <button class="action-btn action-primary" id="btn-products-done">Fet, veure la compra</button>
+            <button class="action-btn action-primary" id="btn-products-validate">Valida la compra</button>
         </div>
     </section>
 
-    <!-- Pas 3: resum -->
+    <!-- Compra validada: la teva compra per proveïdors -->
     <section class="step" id="step-summary">
-        <div class="section-title">Resum de la compra</div>
-        <div id="summary-error"></div>
+        <div class="saved-banner">&#10003; Compra validada</div>
+        <div class="section-title">La teva compra</div>
         <div id="summary-list"></div>
         <div class="summary-total"><span>Total</span><span id="summary-total-val">0,00 &euro;</span></div>
-        <button class="action-btn action-secondary" id="btn-add-provider">+ Afegir d'una altra proveïdora</button>
         <div class="sticky-footer">
-            <button class="action-btn action-primary" id="btn-validate">Validar la compra</button>
-        </div>
-    </section>
-
-    <!-- Confirmació -->
-    <section class="step" id="step-done">
-        <div class="done-screen">
-            <div class="check">&#9989;</div>
-            <h2>Compra registrada!</h2>
-            <p>La teva compra de l'estoc s'ha validat correctament.</p>
-            <button class="action-btn action-primary" id="btn-done-home">Tornar a l'inici</button>
+            <button class="action-btn action-secondary" id="btn-add-provider">Afegeix d'una altra proveïdora</button>
+            <button class="action-btn action-primary" id="btn-summary-home">Torna a l'inici</button>
         </div>
     </section>
 
@@ -166,7 +158,7 @@ $uf_id = get_session_value('uf_id');
         $('.step').removeClass('active');
         $('#step-' + id).addClass('active');
         window.scrollTo(0, 0);
-        var labels = { provider: 'Pas 1 de 3', products: 'Pas 2 de 3', summary: 'Resum', done: '' };
+        var labels = { provider: '', products: 'Productes', summary: '' };
         $('#step-label').text(labels[id] || '');
     }
 
@@ -175,7 +167,6 @@ $uf_id = get_session_value('uf_id');
         for (var k in cart) { if (cart.hasOwnProperty(k) && cart[k].qty > 0) n++; }
         return n;
     }
-    function refreshCartCount() { $('#cart-count-1').text(cartCount()); }
 
     // ── Inici: data d'avui, després proveïdores ──
     function init() {
@@ -209,6 +200,7 @@ $uf_id = get_session_value('uf_id');
     function selectProvider(id, name) {
         selectedProviderName = name;
         $('#ctx-provider').text(name);
+        $('#products-error').empty();
         showStep('products');
         var $list = $('#product-list').html('<div class="spinner">Carregant productes…</div>');
         $.ajax({ type: 'POST', url: CTRL + '?oper=getToShopProducts&provider_id=' + id + '&date=0', dataType: 'xml' })
@@ -273,28 +265,49 @@ $uf_id = get_session_value('uf_id');
         } else if (cart[prod.id]) {
             delete cart[prod.id];
         }
-        refreshCartCount();
     }
 
-    // ── Pas 3: resum ──
+    // ── La teva compra (després de validar): per proveïdora, clicable ──
     function renderSummary() {
-        var $list = $('#summary-list').empty();
-        var total = 0, count = 0;
+        var groups = {}, order = [], total = 0;
         for (var k in cart) {
             if (!cart.hasOwnProperty(k)) continue;
             var it = cart[k];
             if (it.qty <= 0) continue;
-            count++;
-            var line = it.qty * it.price;
-            total += line;
-            $('<div class="summary-item">').append(
-                '<div class="si-top"><span class="si-name">' + it.name + '</span>' +
-                '<span>' + fmt(line) + ' &euro;</span></div>' +
-                '<div class="si-sub">' + fmt(it.qty) + ' &times; ' + fmt(it.price) + ' &euro; / ' + it.unit +
-                ' &middot; ' + (it.provider_name || '') + '</div>'
-            ).appendTo($list);
+            var pn = it.provider_name || '—';
+            if (!groups[pn]) { groups[pn] = []; order.push(pn); }
+            groups[pn].push(it);
+            total += it.qty * it.price;
         }
-        if (count === 0) $list.html('<div class="empty-msg">Encara no has afegit cap producte.</div>');
+
+        var $list = $('#summary-list').empty();
+        if (order.length === 0) {
+            $list.html('<div class="empty-msg">La compra és buida.</div>');
+        } else {
+            $.each(order, function (i, pn) {
+                var items = groups[pn], provTotal = 0;
+                var $body = $('<div class="acc-body" style="display:none"></div>');
+                $.each(items, function (j, it) {
+                    var line = it.qty * it.price;
+                    provTotal += line;
+                    $body.append(
+                        '<div class="acc-line"><div class="al-top">' +
+                        '<span class="al-name">' + it.name + '</span>' +
+                        '<span>' + fmt(line) + ' &euro;</span></div>' +
+                        '<div class="al-sub">' + fmt(it.qty) + ' &times; ' + fmt(it.price) + ' &euro; / ' + it.unit + '</div></div>'
+                    );
+                });
+                var $header = $('<button class="list-btn acc-header">')
+                    .append('<span class="lb-label">' + pn + '</span>')
+                    .append('<span class="lb-total">' + fmt(provTotal) + ' &euro;</span>')
+                    .append('<span class="lb-arrow">&rsaquo;</span>');
+                $header.on('click', function () {
+                    if ($body.is(':visible')) { $body.slideUp(120); $header.removeClass('open'); }
+                    else { $header.addClass('open'); $body.slideDown(120); }
+                });
+                $list.append($header).append($body);
+            });
+        }
         $('#summary-total-val').html(fmt(total) + ' &euro;');
     }
 
@@ -316,17 +329,17 @@ $uf_id = get_session_value('uf_id');
     }
 
     function validatePurchase() {
-        $('#summary-error').empty();
+        $('#products-error').empty();
         if (cartCount() === 0) {
-            $('#summary-error').html('<div class="msg-error">No has afegit cap producte.</div>');
+            $('#products-error').html('<div class="msg-error">No has afegit cap producte.</div>');
             return;
         }
-        var $btn = $('#btn-validate').prop('disabled', true).text('Validant…');
+        var $btn = $('#btn-products-validate').prop('disabled', true).text('Validant…');
         var items = buildItemArrays();
 
         function fail(msg) {
-            $('#summary-error').html('<div class="msg-error">' + msg + '</div>');
-            $btn.prop('disabled', false).text('Validar la compra');
+            $('#products-error').html('<div class="msg-error">' + msg + '</div>');
+            $btn.prop('disabled', false).text('Valida la compra');
         }
 
         // Pas 1: commit del carret de botiga
@@ -346,8 +359,10 @@ $uf_id = get_session_value('uf_id');
                     data: valData
                 })
                 .done(function () {
-                    cart = {}; refreshCartCount();
-                    showStep('done');
+                    renderSummary();       // mostra el que s'ha comprat (abans de buidar)
+                    cart = {};
+                    $btn.prop('disabled', false).text('Valida la compra');
+                    showStep('summary');
                 })
                 .fail(function (xhr) { fail('No s\'ha pogut validar: ' + (xhr.responseText || 'error')); });
             })
@@ -357,11 +372,9 @@ $uf_id = get_session_value('uf_id');
     }
 
     // ── Navegació ──
-    $('#btn-view-summary').on('click', function () { renderSummary(); showStep('summary'); });
-    $('#btn-products-done').on('click', function () { renderSummary(); showStep('summary'); });
+    $('#btn-products-validate').on('click', validatePurchase);
     $('#btn-add-provider').on('click', function () { showStep('provider'); });
-    $('#btn-validate').on('click', validatePurchase);
-    $('#btn-done-home').on('click', function () { window.location.href = 'index.php'; });
+    $('#btn-summary-home').on('click', function () { window.location.href = 'index.php'; });
 
     $('#btn-back').on('click', function () {
         var cur = $('.step.active').attr('id');
