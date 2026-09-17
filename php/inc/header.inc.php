@@ -43,6 +43,11 @@ if (is_created_session()) {
     if (isset($_GET['force_desktop'])) {
         $_SESSION['aixada_desktop_mode'] = true;
     }
+    // Tornar a la versió mòbil: neteja el mode escriptori (la redirecció d'avall
+    // ja tornarà a enviar la consumidora a l'app en un dispositiu mòbil).
+    if (isset($_GET['force_mobile'])) {
+        unset($_SESSION['aixada_desktop_mode']);
+    }
     $is_mobile_page  = strpos($_SERVER['PHP_SELF'] ?? '', '/mobile/') !== false;
     $is_desktop_mode = !empty($_SESSION['aixada_desktop_mode']);
     if (!$is_desktop_mode) {

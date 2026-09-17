@@ -44,6 +44,12 @@
             echo "<a href='" . htmlspecialchars($dashboard_url) . "'>" . $Text['nav_dashboard'] . "</a> | ";
         }
 
+        // Return to the mobile app (only shown on a mobile device that switched to the web view)
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        if (preg_match('/Mobile|Android|iPhone|iPad|iPod|Windows Phone/i', $ua)) {
+            echo "<a href='mobile/index.php?force_mobile=1'>&#128241; Versi&oacute; m&ograve;bil</a> | ";
+        }
+
         // Logout
         echo "<a href='javascript:void(null)' id='logoutRef'>" . $Text['nav_logout'] . "</a>";
 

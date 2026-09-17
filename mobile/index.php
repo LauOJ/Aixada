@@ -126,15 +126,9 @@ try {
         <span class="btn-arrow">›</span>
     </a>
 
-    <a href="stock.php" class="app-btn">
-        <span class="btn-icon">📦</span>
-        <span class="btn-label">Estoc</span>
-        <span class="btn-arrow">›</span>
-    </a>
-
     <a href="../aixada_main.php?force_desktop=1" class="app-btn app-btn-secondary">
         <span class="btn-icon">🖥️</span>
-        <span class="btn-label">Vista web completa</span>
+        <span class="btn-label">Ves a la versió web</span>
         <span class="btn-arrow">›</span>
     </a>
 
