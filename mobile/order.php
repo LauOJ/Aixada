@@ -40,6 +40,8 @@ $uf_id = get_session_value('uf_id');
         .context-bar { background: #e4e9ed; border-radius: 10px; padding: 10px 14px;
             font-size: 0.9rem; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
         .context-bar strong { color: #2f3e4a; }
+        .saved-banner { background: #e0efd6; color: #3c5e26; border: 1px solid #c4dcae;
+            border-radius: 10px; padding: 11px 14px; margin-bottom: 14px; font-weight: 600; }
 
         /* ── Botons de llista (data/proveïdora) ── */
         .list-btn {
@@ -51,12 +53,9 @@ $uf_id = get_session_value('uf_id');
         .list-btn:active { transform: scale(0.98); }
         .list-btn .lb-label { flex: 1; }
         .list-btn .lb-arrow { color: #bbb; font-size: 1.1rem; transition: transform 0.15s; }
-        .list-btn .lb-count { background: #6b8e23; color: #fff; border-radius: 20px;
-            font-size: 0.78rem; padding: 2px 9px; font-weight: 600; }
 
         /* ── Acordió dia → proveïdores ── */
-        .date-header .lb-arrow { transform: rotate(0deg); }
-        .date-header.open { border-radius: 12px 12px 0 0; margin-bottom: 0; box-shadow: 0 -1px 0 rgba(0,0,0,0.04); }
+        .date-header.open { border-radius: 12px 12px 0 0; margin-bottom: 0; }
         .date-header.open .lb-arrow { transform: rotate(90deg); }
         .date-providers { margin: 0 0 10px; background: #fff; border-radius: 0 0 12px 12px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow: hidden; }
@@ -101,7 +100,6 @@ $uf_id = get_session_value('uf_id');
         .day-group { margin-bottom: 18px; }
         .day-group-head { font-size: 0.9rem; font-weight: 700; color: #2f3e4a;
             padding: 4px 2px 8px; display: flex; justify-content: space-between; align-items: baseline; }
-        .day-group-head .dg-total { font-weight: 700; }
         .grand-total { display: flex; justify-content: space-between; font-size: 1.2rem;
             font-weight: 700; padding: 16px 4px; border-top: 2px solid #cdd5db; margin-top: 6px; }
 
@@ -122,10 +120,6 @@ $uf_id = get_session_value('uf_id');
         .spinner { text-align: center; color: #7a8894; padding: 30px; }
         .msg-error { background: #f8d7da; color: #842029; border-radius: 10px; padding: 12px 14px;
             margin-bottom: 12px; font-size: 0.9rem; }
-        .done-screen { text-align: center; padding: 50px 20px; }
-        .done-screen .check { font-size: 3.5rem; }
-        .done-screen h2 { margin: 16px 0 8px; color: #2f3e4a; }
-        .done-screen p { color: #7a8894; margin-bottom: 24px; }
     </style>
 </head>
 <body>
@@ -141,6 +135,7 @@ $uf_id = get_session_value('uf_id');
     <section class="step active" id="step-browse">
         <div class="section-title">Tria el dia i la proveïdora</div>
         <div id="browse-list"><div class="spinner">Carregant dies…</div></div>
+        <button class="action-link" id="btn-all-dates-browse">Veure les meves comandes</button>
     </section>
 
     <!-- Pas 2: productes -->
@@ -150,23 +145,24 @@ $uf_id = get_session_value('uf_id');
             <span><strong id="ctx-provider"></strong></span>
         </div>
         <div class="section-title">Afegeix productes</div>
+        <div id="products-error"></div>
         <div id="product-list"><div class="spinner">Carregant productes…</div></div>
         <div class="sticky-footer">
-            <button class="action-btn action-primary" id="btn-products-done">Fet, veure la comanda</button>
+            <button class="action-btn action-primary" id="btn-products-save">Desar la comanda</button>
         </div>
     </section>
 
-    <!-- Resum del dia -->
+    <!-- Comanda desada: resum del dia -->
     <section class="step" id="step-summary">
+        <div class="saved-banner">&#10003; Comanda desada</div>
         <div class="context-bar"><span>Dia: <strong id="ctx-date-3"></strong></span></div>
-        <div class="section-title">Resum de la comanda</div>
-        <div id="summary-error"></div>
+        <div class="section-title">La teva comanda</div>
         <div id="summary-list"></div>
         <div class="summary-total"><span>Total</span><span id="summary-total-val">0,00 &euro;</span></div>
         <button class="action-btn action-secondary" id="btn-add-provider">+ Demanar d'una altra proveïdora</button>
         <button class="action-link" id="btn-all-dates">Veure les comandes de tots els dies</button>
         <div class="sticky-footer">
-            <button class="action-btn action-primary" id="btn-save">Desar la comanda</button>
+            <button class="action-btn action-primary" id="btn-summary-home">Tornar a l'inici</button>
         </div>
     </section>
 
@@ -177,17 +173,6 @@ $uf_id = get_session_value('uf_id');
         <div class="grand-total"><span>Total general</span><span id="alldates-total-val">0,00 &euro;</span></div>
         <div class="sticky-footer">
             <button class="action-btn action-secondary" id="btn-alldates-back">Tornar</button>
-        </div>
-    </section>
-
-    <!-- Confirmació -->
-    <section class="step" id="step-done">
-        <div class="done-screen">
-            <div class="check">&#9989;</div>
-            <h2>Comanda desada!</h2>
-            <p>La teva comanda per al <strong id="done-date"></strong> s'ha guardat correctament.</p>
-            <button class="action-btn action-primary" id="btn-done-home">Tornar a l'inici</button>
-            <button class="action-btn action-secondary" id="btn-done-edit">Seguir editant</button>
         </div>
     </section>
 
@@ -204,6 +189,7 @@ $uf_id = get_session_value('uf_id');
     var selectedDate = null;
     var selectedProviderName = '';
     var orderableDates = [];   // dates carregades (sense la comanda oberta)
+    var alldatesFrom = 'browse';
     // cart: { product_id: {id,name,unit,price,iva,revtax,qty,notes,provider_name,locked} }
     var cart = {};
 
@@ -216,7 +202,7 @@ $uf_id = get_session_value('uf_id');
         $('.step').removeClass('active');
         $('#step-' + id).addClass('active');
         window.scrollTo(0, 0);
-        var labels = { browse: 'Dia i proveïdora', products: 'Productes', summary: 'Resum', alldates: 'Totes les comandes', done: '' };
+        var labels = { browse: '', products: 'Productes', summary: '', alldates: 'Totes les comandes' };
         $('#step-label').text(labels[id] || '');
     }
 
@@ -261,7 +247,6 @@ $uf_id = get_session_value('uf_id');
             $header.removeClass('open');
             return;
         }
-        // tanca les altres dates obertes
         $('.date-header.open').not($header).removeClass('open');
         $('.date-providers:visible').not($providers).slideUp(120);
 
@@ -310,8 +295,7 @@ $uf_id = get_session_value('uf_id');
             type: 'POST', url: CTRL + '?oper=getOrderCart&date=' + encodeURIComponent(d), dataType: 'xml'
         }).done(function (xml) {
             $(xml).find('row').each(function () {
-                var preorder = rowVal(this, 'preorder');
-                if (preorder === 'true') return;   // ítems de comanda oberta: no gestionat aquí
+                if (rowVal(this, 'preorder') === 'true') return;   // ítems de comanda oberta
                 var pid = rowVal(this, 'id');
                 var qty = parseNum(rowVal(this, 'quantity'));
                 if (qty <= 0) return;
@@ -339,6 +323,7 @@ $uf_id = get_session_value('uf_id');
     function selectProvider(id, name) {
         selectedProviderName = name;
         $('#ctx-provider').text(name);
+        $('#products-error').empty();
         showStep('products');
         var $list = $('#product-list').html('<div class="spinner">Carregant productes…</div>');
         $.ajax({
@@ -412,7 +397,7 @@ $uf_id = get_session_value('uf_id');
         }
     }
 
-    // ── Resum del dia ──
+    // ── Resum del dia (després de desar) ──
     function renderSummary() {
         var $list = $('#summary-list').empty();
         var total = 0, count = 0;
@@ -429,16 +414,17 @@ $uf_id = get_session_value('uf_id');
                 '<div class="si-top"><span class="si-name">' + it.name + '</span>' +
                 '<span>' + fmt(line) + ' &euro;</span></div>' +
                 '<div class="si-sub">' + fmt(it.qty) + ' &times; ' + fmt(it.price) + ' &euro; / ' + it.unit +
-                ' &middot; ' + (it.provider_name || '') + (it.locked ? ' &middot; <em>tancada</em>' : '') + '</div>'
+                ' &middot; ' + (it.provider_name || '') + '</div>'
             );
             $list.append($item);
         }
-        if (count === 0) $list.html('<div class="empty-msg">Encara no has afegit cap producte.</div>');
+        if (count === 0) $list.html('<div class="empty-msg">La comanda és buida.</div>');
         $('#summary-total-val').html(fmt(total) + ' &euro;');
     }
 
     // ── Totes les comandes (només lectura) ──
-    function showAllDates() {
+    function showAllDates(from) {
+        alldatesFrom = from || 'browse';
         showStep('alldates');
         var $list = $('#alldates-list').html('<div class="spinner">Carregant totes les comandes…</div>');
         $('#alldates-total-val').html('0,00 &euro;');
@@ -498,7 +484,7 @@ $uf_id = get_session_value('uf_id');
             grand += dayTotal;
             $group.append(
                 '<div class="day-group-head"><span>' + formatDateLabel(d) + '</span>' +
-                '<span class="dg-total">' + fmt(dayTotal) + ' &euro;</span></div>'
+                '<span>' + fmt(dayTotal) + ' &euro;</span></div>'
             ).append($body);
             $list.append($group);
         });
@@ -506,9 +492,9 @@ $uf_id = get_session_value('uf_id');
         $('#alldates-total-val').html(fmt(grand) + ' &euro;');
     }
 
-    // ── Desar (commit de tot el cart del dia) ──
+    // ── Desar (commit del carret del dia) ──
     function saveOrder() {
-        $('#summary-error').empty();
+        $('#products-error').empty();
         var data = {
             what: 'Order', oper: 'commit', date: selectedDate,
             cart_id: 0, ts_last_saved: 0,
@@ -528,34 +514,32 @@ $uf_id = get_session_value('uf_id');
             data.preorder.push('false');
         }
 
-        var $btn = $('#btn-save').prop('disabled', true).text('Desant…');
+        var $btn = $('#btn-products-save').prop('disabled', true).text('Desant…');
         $.ajax({ type: 'POST', url: CTRL, data: data, traditional: false })
             .done(function () {
-                showStep('done');
-                $('#done-date').text(formatDateLabel(selectedDate));
+                renderSummary();
+                showStep('summary');
             })
             .fail(function (xhr) {
-                $('#summary-error').html('<div class="msg-error">No s\'ha pogut desar: ' +
+                $('#products-error').html('<div class="msg-error">No s\'ha pogut desar: ' +
                     (xhr.responseText || 'error desconegut') + '</div>');
             })
             .always(function () { $btn.prop('disabled', false).text('Desar la comanda'); });
     }
 
     // ── Navegació ──
-    $('#btn-products-done').on('click', function () { renderSummary(); showStep('summary'); });
+    $('#btn-products-save').on('click', saveOrder);
     $('#btn-add-provider').on('click', function () { showStep('browse'); });
-    $('#btn-all-dates').on('click', showAllDates);
-    $('#btn-alldates-back').on('click', function () { showStep('summary'); });
-    $('#btn-save').on('click', saveOrder);
-    $('#btn-done-home').on('click', function () { window.location.href = 'index.php'; });
-    $('#btn-done-edit').on('click', function () { renderSummary(); showStep('summary'); });
+    $('#btn-all-dates').on('click', function () { showAllDates('summary'); });
+    $('#btn-all-dates-browse').on('click', function () { showAllDates('browse'); });
+    $('#btn-alldates-back').on('click', function () { showStep(alldatesFrom); });
+    $('#btn-summary-home').on('click', function () { window.location.href = 'index.php'; });
 
     $('#btn-back').on('click', function () {
         var cur = $('.step.active').attr('id');
-        if (cur === 'step-browse') { window.location.href = 'index.php'; }
-        else if (cur === 'step-products') { showStep('browse'); }
+        if (cur === 'step-products') { showStep('browse'); }
         else if (cur === 'step-summary') { showStep('browse'); }
-        else if (cur === 'step-alldates') { showStep('summary'); }
+        else if (cur === 'step-alldates') { showStep(alldatesFrom); }
         else { window.location.href = 'index.php'; }
     });
 
