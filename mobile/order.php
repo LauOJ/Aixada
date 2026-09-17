@@ -50,9 +50,25 @@ $uf_id = get_session_value('uf_id');
         }
         .list-btn:active { transform: scale(0.98); }
         .list-btn .lb-label { flex: 1; }
-        .list-btn .lb-arrow { color: #bbb; font-size: 1.1rem; }
+        .list-btn .lb-arrow { color: #bbb; font-size: 1.1rem; transition: transform 0.15s; }
         .list-btn .lb-count { background: #6b8e23; color: #fff; border-radius: 20px;
             font-size: 0.78rem; padding: 2px 9px; font-weight: 600; }
+
+        /* ── Acordió dia → proveïdores ── */
+        .date-header .lb-arrow { transform: rotate(0deg); }
+        .date-header.open { border-radius: 12px 12px 0 0; margin-bottom: 0; box-shadow: 0 -1px 0 rgba(0,0,0,0.04); }
+        .date-header.open .lb-arrow { transform: rotate(90deg); }
+        .date-providers { margin: 0 0 10px; background: #fff; border-radius: 0 0 12px 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow: hidden; }
+        .provider-sub {
+            display: flex; align-items: center; gap: 12px; width: 100%;
+            background: #fff; border: none; border-top: 1px solid #eef1f3; padding: 15px 16px 15px 26px;
+            font-size: 1rem; font-weight: 500; color: #2f3e4a; text-align: left; cursor: pointer;
+        }
+        .provider-sub:active { background: #f4f6f7; }
+        .provider-sub .lb-label { flex: 1; }
+        .provider-sub .lb-arrow { color: #bbb; }
+        .date-providers .sub-msg { padding: 14px 16px 14px 26px; color: #7a8894; font-size: 0.9rem; }
 
         /* ── Productes ── */
         .product-row {
@@ -81,12 +97,22 @@ $uf_id = get_session_value('uf_id');
         .summary-total { display: flex; justify-content: space-between; font-size: 1.15rem;
             font-weight: 700; padding: 14px 4px; }
 
+        /* ── Vista de totes les dates (només lectura) ── */
+        .day-group { margin-bottom: 18px; }
+        .day-group-head { font-size: 0.9rem; font-weight: 700; color: #2f3e4a;
+            padding: 4px 2px 8px; display: flex; justify-content: space-between; align-items: baseline; }
+        .day-group-head .dg-total { font-weight: 700; }
+        .grand-total { display: flex; justify-content: space-between; font-size: 1.2rem;
+            font-weight: 700; padding: 16px 4px; border-top: 2px solid #cdd5db; margin-top: 6px; }
+
         /* ── Accions ── */
         .action-btn { display: block; width: 100%; border: none; border-radius: 12px;
             padding: 16px; font-size: 1.05rem; font-weight: 600; cursor: pointer; margin-top: 8px; }
         .action-primary { background: #6b8e23; color: #fff; }
         .action-primary:active { background: #5c7a1e; }
         .action-secondary { background: #fff; color: #4a5f6f; border: 1px solid #cdd5db; }
+        .action-link { background: none; border: none; color: #4a5f6f; text-decoration: underline;
+            font-size: 0.92rem; padding: 12px; width: 100%; cursor: pointer; margin-top: 4px; }
         .action-primary:disabled { background: #b6c68f; cursor: default; }
 
         .sticky-footer { position: sticky; bottom: 0; background: #f0f2f4;
@@ -111,23 +137,13 @@ $uf_id = get_session_value('uf_id');
 
 <main class="app-main">
 
-    <!-- Pas 1: data -->
-    <section class="step active" id="step-date">
-        <div class="section-title">Tria el dia de comanda</div>
-        <div id="date-list"><div class="spinner">Carregant dates…</div></div>
+    <!-- Pas 1: dia + proveïdora (acordió) -->
+    <section class="step active" id="step-browse">
+        <div class="section-title">Tria el dia i la proveïdora</div>
+        <div id="browse-list"><div class="spinner">Carregant dies…</div></div>
     </section>
 
-    <!-- Pas 2: proveïdora -->
-    <section class="step" id="step-provider">
-        <div class="context-bar"><span>Dia: <strong id="ctx-date-1"></strong></span></div>
-        <div class="section-title">Tria la proveïdora</div>
-        <div id="provider-list"><div class="spinner">Carregant proveïdores…</div></div>
-        <div class="sticky-footer">
-            <button class="action-btn action-primary" id="btn-view-summary">Veure la comanda (<span id="cart-count-1">0</span>)</button>
-        </div>
-    </section>
-
-    <!-- Pas 3: productes -->
+    <!-- Pas 2: productes -->
     <section class="step" id="step-products">
         <div class="context-bar">
             <span>Dia: <strong id="ctx-date-2"></strong></span>
@@ -140,7 +156,7 @@ $uf_id = get_session_value('uf_id');
         </div>
     </section>
 
-    <!-- Pas 4: resum -->
+    <!-- Resum del dia -->
     <section class="step" id="step-summary">
         <div class="context-bar"><span>Dia: <strong id="ctx-date-3"></strong></span></div>
         <div class="section-title">Resum de la comanda</div>
@@ -148,8 +164,19 @@ $uf_id = get_session_value('uf_id');
         <div id="summary-list"></div>
         <div class="summary-total"><span>Total</span><span id="summary-total-val">0,00 &euro;</span></div>
         <button class="action-btn action-secondary" id="btn-add-provider">+ Demanar d'una altra proveïdora</button>
+        <button class="action-link" id="btn-all-dates">Veure les comandes de tots els dies</button>
         <div class="sticky-footer">
             <button class="action-btn action-primary" id="btn-save">Desar la comanda</button>
+        </div>
+    </section>
+
+    <!-- Totes les comandes (només lectura) -->
+    <section class="step" id="step-alldates">
+        <div class="section-title">Les teves comandes de tots els dies</div>
+        <div id="alldates-list"><div class="spinner">Carregant…</div></div>
+        <div class="grand-total"><span>Total general</span><span id="alldates-total-val">0,00 &euro;</span></div>
+        <div class="sticky-footer">
+            <button class="action-btn action-secondary" id="btn-alldates-back">Tornar</button>
         </div>
     </section>
 
@@ -176,6 +203,7 @@ $uf_id = get_session_value('uf_id');
     // Estat
     var selectedDate = null;
     var selectedProviderName = '';
+    var orderableDates = [];   // dates carregades (sense la comanda oberta)
     // cart: { product_id: {id,name,unit,price,iva,revtax,qty,notes,provider_name,locked} }
     var cart = {};
 
@@ -188,38 +216,8 @@ $uf_id = get_session_value('uf_id');
         $('.step').removeClass('active');
         $('#step-' + id).addClass('active');
         window.scrollTo(0, 0);
-        var labels = { date: 'Pas 1 de 4', provider: 'Pas 2 de 4', products: 'Pas 3 de 4', summary: 'Resum', done: '' };
+        var labels = { browse: 'Dia i proveïdora', products: 'Productes', summary: 'Resum', alldates: 'Totes les comandes', done: '' };
         $('#step-label').text(labels[id] || '');
-    }
-
-    function cartCount() {
-        var n = 0;
-        for (var k in cart) { if (cart.hasOwnProperty(k) && cart[k].qty > 0) n++; }
-        return n;
-    }
-    function refreshCartCount() { $('#cart-count-1').text(cartCount()); }
-
-    // ── Pas 1: dates ──
-    function loadDates() {
-        $.ajax({
-            type: 'POST', url: DATES + '?oper=getOrderableDates&responseFormat=array', dataType: 'json'
-        }).done(function (dates) {
-            var $list = $('#date-list').empty();
-            var shown = 0;
-            $.each(dates, function (i, d) {
-                if (d === '1234-01-23') return;   // comanda oberta / preorder: no gestionat a mòbil v1
-                shown++;
-                var label = formatDateLabel(d);
-                $('<button class="list-btn">')
-                    .append('<span class="lb-label">' + label + '</span>')
-                    .append('<span class="lb-arrow">&rsaquo;</span>')
-                    .on('click', function () { selectDate(d); })
-                    .appendTo($list);
-            });
-            if (shown === 0) $list.html('<div class="empty-msg">No hi ha cap dia obert per fer comanda ara mateix.</div>');
-        }).fail(function (xhr) {
-            $('#date-list').html('<div class="msg-error">No s\'han pogut carregar les dates.<br>' + (xhr.responseText || '') + '</div>');
-        });
     }
 
     var MESOS = ['gen', 'feb', 'mar', 'abr', 'mai', 'juny', 'jul', 'ag', 'set', 'oct', 'nov', 'des'];
@@ -231,15 +229,79 @@ $uf_id = get_session_value('uf_id');
         return DIES[dt.getDay()] + ' ' + (+p[2]) + ' ' + MESOS[+p[1] - 1] + ' ' + p[0];
     }
 
-    function selectDate(d) {
-        selectedDate = d;
-        var label = formatDateLabel(d);
-        $('#ctx-date-1, #ctx-date-2, #ctx-date-3').text(label);
-        cart = {};
-        loadExistingCart(d, function () {
-            loadProviders(d);
-            showStep('provider');
+    // ── Pas 1: acordió dia → proveïdores ──
+    function loadBrowse() {
+        $.ajax({
+            type: 'POST', url: DATES + '?oper=getOrderableDates&responseFormat=array', dataType: 'json'
+        }).done(function (dates) {
+            var $list = $('#browse-list').empty();
+            orderableDates = [];
+            $.each(dates, function (i, d) {
+                if (d === '1234-01-23') return;   // comanda oberta / preorder: no gestionat a mòbil v1
+                orderableDates.push(d);
+                var $header = $('<button class="list-btn date-header">')
+                    .attr('data-date', d)
+                    .append('<span class="lb-label">' + formatDateLabel(d) + '</span>')
+                    .append('<span class="lb-arrow">&rsaquo;</span>');
+                var $providers = $('<div class="date-providers" data-date="' + d + '" style="display:none"></div>');
+                $header.on('click', function () { toggleDate(d, $header, $providers); });
+                $list.append($header).append($providers);
+            });
+            if (orderableDates.length === 0) {
+                $list.html('<div class="empty-msg">No hi ha cap dia obert per fer comanda ara mateix.</div>');
+            }
+        }).fail(function (xhr) {
+            $('#browse-list').html('<div class="msg-error">No s\'han pogut carregar les dates.<br>' + (xhr.responseText || '') + '</div>');
         });
+    }
+
+    function toggleDate(d, $header, $providers) {
+        if ($providers.is(':visible')) {
+            $providers.slideUp(120);
+            $header.removeClass('open');
+            return;
+        }
+        // tanca les altres dates obertes
+        $('.date-header.open').not($header).removeClass('open');
+        $('.date-providers:visible').not($providers).slideUp(120);
+
+        $header.addClass('open');
+        if ($providers.data('loaded')) {
+            $providers.slideDown(120);
+            return;
+        }
+        $providers.html('<div class="sub-msg">Carregant proveïdores…</div>').slideDown(120);
+        $.ajax({
+            type: 'POST', url: CTRL + '?oper=getOrderProviders&date=' + encodeURIComponent(d), dataType: 'xml'
+        }).done(function (xml) {
+            $providers.empty().data('loaded', true);
+            var rows = $(xml).find('row'), any = false;
+            rows.each(function () {
+                var id = rowVal(this, 'id'), name = rowVal(this, 'name');
+                if (!id || id < 0) return;
+                any = true;
+                $('<button class="provider-sub">')
+                    .append('<span class="lb-label">' + name + '</span>')
+                    .append('<span class="lb-arrow">&rsaquo;</span>')
+                    .on('click', function () { openProducts(d, id, name); })
+                    .appendTo($providers);
+            });
+            if (!any) $providers.html('<div class="sub-msg">No hi ha proveïdores obertes per aquest dia.</div>');
+        }).fail(function () {
+            $providers.html('<div class="sub-msg">No s\'han pogut carregar les proveïdores.</div>');
+        });
+    }
+
+    // En triar una proveïdora d'un dia: fixem el dia (carregant-ne el carret) i mostrem els productes
+    function openProducts(d, id, name) {
+        if (selectedDate !== d) {
+            selectedDate = d;
+            $('#ctx-date-2, #ctx-date-3').text(formatDateLabel(d));
+            cart = {};
+            loadExistingCart(d, function () { selectProvider(id, name); });
+        } else {
+            selectProvider(id, name);
+        }
     }
 
     // ── Carrega la comanda existent d'aquell dia (per no perdre res en desar) ──
@@ -269,35 +331,11 @@ $uf_id = get_session_value('uf_id');
                     locked: locked
                 };
             });
-            refreshCartCount();
             if (cb) cb();
         }).fail(function () { if (cb) cb(); });
     }
 
-    // ── Pas 2: proveïdores ──
-    function loadProviders(d) {
-        var $list = $('#provider-list').html('<div class="spinner">Carregant proveïdores…</div>');
-        $.ajax({
-            type: 'POST', url: CTRL + '?oper=getOrderProviders&date=' + encodeURIComponent(d), dataType: 'xml'
-        }).done(function (xml) {
-            $list.empty();
-            var rows = $(xml).find('row');
-            if (rows.length === 0) { $list.html('<div class="empty-msg">No hi ha proveïdores obertes per aquest dia.</div>'); return; }
-            rows.each(function () {
-                var id = rowVal(this, 'id'), name = rowVal(this, 'name');
-                if (!id || id < 0) return;
-                $('<button class="list-btn">')
-                    .append('<span class="lb-label">' + name + '</span>')
-                    .append('<span class="lb-arrow">&rsaquo;</span>')
-                    .on('click', function () { selectProvider(id, name); })
-                    .appendTo($list);
-            });
-        }).fail(function (xhr) {
-            $list.html('<div class="msg-error">No s\'han pogut carregar les proveïdores.</div>');
-        });
-    }
-
-    // ── Pas 3: productes ──
+    // ── Pas 2: productes ──
     function selectProvider(id, name) {
         selectedProviderName = name;
         $('#ctx-provider').text(name);
@@ -372,10 +410,9 @@ $uf_id = get_session_value('uf_id');
         } else if (cart[prod.id]) {
             delete cart[prod.id];
         }
-        refreshCartCount();
     }
 
-    // ── Pas 4: resum ──
+    // ── Resum del dia ──
     function renderSummary() {
         var $list = $('#summary-list').empty();
         var total = 0, count = 0;
@@ -400,7 +437,76 @@ $uf_id = get_session_value('uf_id');
         $('#summary-total-val').html(fmt(total) + ' &euro;');
     }
 
-    // ── Desar (commit de tot el cart) ──
+    // ── Totes les comandes (només lectura) ──
+    function showAllDates() {
+        showStep('alldates');
+        var $list = $('#alldates-list').html('<div class="spinner">Carregant totes les comandes…</div>');
+        $('#alldates-total-val').html('0,00 &euro;');
+        if (orderableDates.length === 0) {
+            $list.html('<div class="empty-msg">No hi ha dies oberts.</div>');
+            return;
+        }
+        var results = {}, pending = orderableDates.length;
+        $.each(orderableDates, function (i, d) {
+            $.ajax({
+                type: 'POST', url: CTRL + '?oper=getOrderCart&date=' + encodeURIComponent(d), dataType: 'xml'
+            }).done(function (xml) {
+                var items = [];
+                $(xml).find('row').each(function () {
+                    if (rowVal(this, 'preorder') === 'true') return;
+                    var qty = parseNum(rowVal(this, 'quantity'));
+                    if (qty <= 0) return;
+                    items.push({
+                        name: rowVal(this, 'name'),
+                        qty: qty,
+                        price: parseNum(rowVal(this, 'unit_price')),
+                        unit: rowVal(this, 'unit'),
+                        provider_name: rowVal(this, 'provider_name')
+                    });
+                });
+                results[d] = items;
+            }).fail(function () {
+                results[d] = [];
+            }).always(function () {
+                pending--;
+                if (pending === 0) renderAllDates(results);
+            });
+        });
+    }
+
+    function renderAllDates(results) {
+        var $list = $('#alldates-list').empty();
+        var grand = 0, anyDay = false;
+        $.each(orderableDates, function (i, d) {
+            var items = results[d] || [];
+            if (items.length === 0) return;
+            anyDay = true;
+            var dayTotal = 0;
+            var $group = $('<div class="day-group">');
+            var $body = $('<div>');
+            $.each(items, function (j, it) {
+                var line = it.qty * it.price;
+                dayTotal += line;
+                $body.append(
+                    '<div class="summary-item"><div class="si-top">' +
+                    '<span class="si-name">' + it.name + '</span>' +
+                    '<span>' + fmt(line) + ' &euro;</span></div>' +
+                    '<div class="si-sub">' + fmt(it.qty) + ' &times; ' + fmt(it.price) + ' &euro; / ' + it.unit +
+                    ' &middot; ' + (it.provider_name || '') + '</div></div>'
+                );
+            });
+            grand += dayTotal;
+            $group.append(
+                '<div class="day-group-head"><span>' + formatDateLabel(d) + '</span>' +
+                '<span class="dg-total">' + fmt(dayTotal) + ' &euro;</span></div>'
+            ).append($body);
+            $list.append($group);
+        });
+        if (!anyDay) $list.html('<div class="empty-msg">Encara no tens cap comanda en cap dia.</div>');
+        $('#alldates-total-val').html(fmt(grand) + ' &euro;');
+    }
+
+    // ── Desar (commit de tot el cart del dia) ──
     function saveOrder() {
         $('#summary-error').empty();
         var data = {
@@ -436,25 +542,26 @@ $uf_id = get_session_value('uf_id');
     }
 
     // ── Navegació ──
-    $('#btn-view-summary').on('click', function () { renderSummary(); showStep('summary'); });
     $('#btn-products-done').on('click', function () { renderSummary(); showStep('summary'); });
-    $('#btn-add-provider').on('click', function () { showStep('provider'); });
+    $('#btn-add-provider').on('click', function () { showStep('browse'); });
+    $('#btn-all-dates').on('click', showAllDates);
+    $('#btn-alldates-back').on('click', function () { showStep('summary'); });
     $('#btn-save').on('click', saveOrder);
     $('#btn-done-home').on('click', function () { window.location.href = 'index.php'; });
     $('#btn-done-edit').on('click', function () { renderSummary(); showStep('summary'); });
 
     $('#btn-back').on('click', function () {
         var cur = $('.step.active').attr('id');
-        if (cur === 'step-date') { window.location.href = 'index.php'; }
-        else if (cur === 'step-provider') { showStep('date'); }
-        else if (cur === 'step-products') { showStep('provider'); }
-        else if (cur === 'step-summary') { showStep('provider'); }
+        if (cur === 'step-browse') { window.location.href = 'index.php'; }
+        else if (cur === 'step-products') { showStep('browse'); }
+        else if (cur === 'step-summary') { showStep('browse'); }
+        else if (cur === 'step-alldates') { showStep('summary'); }
         else { window.location.href = 'index.php'; }
     });
 
     // Inici
-    showStep('date');
-    loadDates();
+    showStep('browse');
+    loadBrowse();
 }());
 </script>
 </body>
