@@ -387,8 +387,8 @@ begin
   	insert into 
   		aixada_user_role (user_id, role) 
   	values 
-     ( the_user_id, 'Consumer' ),
-     ( the_user_id, 'Checkout');
+     ( the_user_id, 'consumidora' ),
+     ( the_user_id, 'responsable');
   
 	commit;
 end|
@@ -499,9 +499,9 @@ begin
   insert into aixada_user_role (
       user_id, role
   ) values 
-     (the_user_id, 'Consumer'),
-     (the_user_id, 'Checkout'),
-     (the_user_id, 'Hacker Commission');
+     (the_user_id, 'consumidora'),
+     (the_user_id, 'responsable'),
+     (the_user_id, 'admin');
   commit;
 end|
 

@@ -34,7 +34,7 @@
   	insert into 
   		aixada_user_role (user_id, role) 
   	values 
-    (1, 'Hacker Commission');
+    (1, 'admin');
     
     
     -- create accounts --

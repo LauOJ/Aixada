@@ -1,4 +1,6 @@
-<?php include "php/inc/header.inc.php" ?>
+<?php include "php/inc/header.inc.php";
+require_role([ROLE_ADMIN]);
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?=$language;?>" lang="<?=$language;?>">
 <head>
@@ -45,7 +47,7 @@
 		var isAdmin = "<?php
             echo get_current_role();
         ?>";
-		isAdmin = (isAdmin == "Hacker Commission")? true:false; 
+		isAdmin = (isAdmin == "admin")? true:false;
 
 			
 		$('#member_listing').tabs();

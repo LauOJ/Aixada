@@ -1,5 +1,8 @@
 $(function(){
 
+	// Dispositius sense hover (mòbils/tàctils): submenús per clic (drilldown) en lloc de hover.
+	var noHover = window.matchMedia && window.matchMedia('(hover: none)').matches;
+
 	$("#navAjuda").button();
 	$("#navHome").button();
 	$("#navWizard").button({
@@ -10,7 +13,7 @@ $(function(){
 		content: $('#navWizardItems').html(),
 		showSpeed: 50,
 		width: 220,
-		flyOut: true
+		flyOut: !noHover
 	});
 	$("#navShop").button();
 	$("#navOrder").button();
@@ -23,7 +26,7 @@ $(function(){
 		content: $('#navManageItems').html(),
 		showSpeed: 50,
 		width:200,
-		flyOut: true
+		flyOut: !noHover
 	});
 
 	$("#navReport").button({
@@ -33,7 +36,7 @@ $(function(){
 	}).menu({
 		content: $('#navReportItems').html(),
 		showSpeed: 50,
-		flyOut: true
+		flyOut: !noHover
 	});
 
 	$("#navIncidents").button({
@@ -43,7 +46,7 @@ $(function(){
 	}).menu({
 		content: $('#navIncidentsItems').html(),
 		showSpeed: 50,
-		flyOut: true
+		flyOut: !noHover
 	});
 
 	$("#navMyAccount").button({
@@ -53,7 +56,7 @@ $(function(){
 	}).menu({
 		content: $('#navMyAcountItems').html(),
 		showSpeed: 50,
-		flyOut: true
+		flyOut: !noHover
 	});
 
 

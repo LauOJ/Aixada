@@ -206,8 +206,8 @@ function CheckExistAndLogin() {
             <br><a target=\"_blank\" href=\"login.php?\">login</a>");
         }
         $roles = get_session_value('roles');
-        if (!in_array('Hacker Commission', $roles)) {
-            throw new Exception("Only a user with role \"Hacker Commission\" can do an database update!
+        if (!in_array('admin', $roles)) {
+            throw new Exception("Only a user with role \"admin\" can do an database update!
             <br><a target=\"_blank\" href=\"login.php?\">login</a>");
         }
         // Is updatable?

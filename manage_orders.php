@@ -1881,9 +1881,9 @@
                         <td><label for="printOpt_format"><?=$Text['order_printOpt_format']?></label>&nbsp;</td>
                         <td class="freeInput">
                             <select id="printOpt_format">
-                                <option value="default" selected ><?=$Text['order_printOpt_default']?></option>
+                                <option value="default"><?=$Text['order_printOpt_default']?></option>
                                 <option value="Prod"><?=$Text['prvOrdF_prod']?></option>
-                                <option value="Matrix"><?=$Text['prvOrdF_matrix']?></option>
+                                <option value="Matrix" selected><?=$Text['prvOrdF_matrix']?></option>
                                 <option value="Prod_Matrix"><?=$Text['prvOrdF_prod_matrix'];?></option>
                                 <option value="ProdUf"><?=$Text['prvOrdF_prodUf'];?></option>
                                 <option value="Prod_ProdUf"><?=$Text['prvOrdF_prod_prodUf']?></option>
@@ -1897,12 +1897,12 @@
                         <td><label for="printOpt_prices"><?=$Text['order_printOpt_prices']?></label>&nbsp;</td>
                         <td class="freeInput">
                             <select id="printOpt_prices">
-                                <option value="default" selected ><?=$Text['order_printOpt_default']?></option>
+                                <option value="default"><?=$Text['order_printOpt_default']?></option>
                                 <option value="cost_amount"><?=$Text['prvOrdP_cost_amount']?></option>
                                 <option value="cost"><?=$Text['prvOrdP_cost_price']?></option>
                                 <option value="final_amount"><?=$Text['prvOrdP_final_amount']?></option>
                                 <option value="final"><?=$Text['prvOrdP_final_price']?></option>
-                                <option value="none"><?=$Text['prvOrdP_no_amount']?></option>
+                                <option value="none" selected><?=$Text['prvOrdP_no_amount']?></option>
                             </select>
                         </td>
                     </tr>
