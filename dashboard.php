@@ -123,8 +123,8 @@ try {
     </script>
 
     <style>
-        /* Botó "Torna a l'app" (mòbil) */
-        .back-to-app-bar { padding: 0 var(--spacing-md, 16px) 12px; }
+        /* Botó "Torna a la versió mòbil": separat de la capçalera fixa perquè no quedi tapat */
+        .back-to-app-bar { padding: 20px 16px 6px; }
         .back-to-app-btn {
             display: inline-flex; align-items: center; gap: 6px;
             background: #4a5f6f; color: #fff; text-decoration: none;
@@ -134,12 +134,14 @@ try {
         }
         .back-to-app-btn:active { opacity: 0.8; }
 
-        /* En mòbil, les 4 caixes de la capçalera en una sola línia (encara que es facin petites) */
+        /* Les 4 caixes de la capçalera SEMPRE en una sola línia (es fan més petites si cal) */
+        .user-info-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 10px !important;
+        }
+        /* En pantalles petites, encongim text i marges perquè les 4 hi càpiguen */
         @media (max-width: 768px) {
-            .user-info-grid {
-                grid-template-columns: repeat(4, 1fr) !important;
-                gap: 6px !important;
-            }
+            .user-info-grid { gap: 6px !important; }
             .info-card { padding: 8px 4px !important; }
             .info-card h3 { font-size: 0.6rem !important; letter-spacing: 0 !important; }
             .info-card .info-value { font-size: 0.95rem !important; }
@@ -188,7 +190,7 @@ try {
         ?>
         <!-- Tornar a l'app (només en dispositius mòbils) -->
         <div class="back-to-app-bar">
-            <a href="mobile/index.php?force_mobile=1" class="back-to-app-btn">&#8249; Torna a l'app</a>
+            <a href="mobile/index.php?force_mobile=1" class="back-to-app-btn">&#8249; Torna a la versi&oacute; m&ograve;bil</a>
         </div>
         <?php endif; ?>
 
