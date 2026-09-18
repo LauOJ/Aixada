@@ -292,6 +292,25 @@ function generate(task) {
     var end   = $('#end_'+task).val();
     if (!start || !end) { alert('Tria la data d\'inici i la data de fi.'); return; }
     if (end <= start)   { alert('La data de fi ha de ser posterior a l\'inici.'); return; }
+
+    // Abans de generar, comprovem si el període ja té dades. Només avisem si cal.
+    $.post('php/ctrl/Torns.php', {oper:'countTornsInRange', task:task, start:start, end:end}, function(data) {
+        var count = parseInt(JSON.parse(data), 10) || 0;
+        if (count > 0) {
+            var taskLabel = (task === 'repartiment') ? 'repartiment' : 'neteja';
+            var msg = '⚠️ ATENCIÓ\n\n'
+                    + 'En aquest període ja hi ha ' + count + ' assignacions de ' + taskLabel + '.\n\n'
+                    + 'Si continues, S\'ESBORRARAN i es tornaran a generar automàticament '
+                    + '(inclosos els torns carregats manualment).\n\n'
+                    + 'Els torns d\'altres tipus i els de fora d\'aquest període no es toquen.\n\n'
+                    + 'Vols continuar?';
+            if (!confirm(msg)) return;
+        }
+        doGenerate(task, start, end);
+    });
+}
+
+function doGenerate(task, start, end) {
     $.post('php/ctrl/Torns.php', {oper:'generateTorns', task:task, start:start, end:end},
         function(data) { renderUpcoming(JSON.parse(data)); }
     );
