@@ -61,6 +61,21 @@ switch ($_POST['oper'] ?? '') {
         echo json_encode(getUpcomingTorns(12));
         break;
 
+    // Només lectura: compta les assignacions (UF > 0) que un "generar" esborraria
+    // en aquest període i tipus. Serveix perquè la pantalla només avisi si cal.
+    case 'countTornsInRange':
+        $task  = $_POST['task'];
+        $start = $_POST['start'];
+        $end   = $_POST['end'];
+        $rs = $db->Execute(
+            'SELECT COUNT(*) AS n FROM aixada_torns
+             WHERE task_type = :1q AND ufTorn > 0 AND dataTorn >= :2q AND dataTorn <= :3q',
+            $task, $start, $end
+        );
+        $row = $rs->fetch_assoc();
+        echo json_encode((int)$row['n']);
+        break;
+
     case 'addTorn':
         $date = $_POST['date'];
         $uf   = (int)$_POST['uf'];
