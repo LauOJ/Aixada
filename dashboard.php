@@ -121,6 +121,38 @@ try {
             }
         }
     </script>
+
+    <style>
+        /* Botó "Torna a l'app" (mòbil) */
+        .back-to-app-bar { padding: 0 var(--spacing-md, 16px) 12px; }
+        .back-to-app-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #4a5f6f; color: #fff; text-decoration: none;
+            padding: 9px 16px; border-radius: 8px;
+            font-size: 0.95rem; font-weight: 600;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .back-to-app-btn:active { opacity: 0.8; }
+
+        /* En mòbil, les 4 caixes de la capçalera en una sola línia (encara que es facin petites) */
+        @media (max-width: 768px) {
+            .user-info-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 6px !important;
+            }
+            .info-card { padding: 8px 4px !important; }
+            .info-card h3 { font-size: 0.6rem !important; letter-spacing: 0 !important; }
+            .info-card .info-value { font-size: 0.95rem !important; }
+            .info-card a { font-size: 0.58rem !important; }
+        }
+        @media (max-width: 480px) {
+            .user-info-grid { gap: 4px !important; }
+            .info-card { padding: 6px 2px !important; }
+            .info-card h3 { font-size: 0.5rem !important; }
+            .info-card .info-value { font-size: 0.78rem !important; }
+            .info-card a { font-size: 0.5rem !important; }
+        }
+    </style>
 </head>
 
 <body>
@@ -149,6 +181,16 @@ try {
     </header>
 
     <div id="wrap" style="margin-top: 70px;">
+
+        <?php
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        if (preg_match('/Mobile|Android|iPhone|iPad|iPod|Windows Phone/i', $ua)):
+        ?>
+        <!-- Tornar a l'app (només en dispositius mòbils) -->
+        <div class="back-to-app-bar">
+            <a href="mobile/index.php?force_mobile=1" class="back-to-app-btn">&#8249; Torna a l'app</a>
+        </div>
+        <?php endif; ?>
 
         <!-- Missatge personalitzat -->
         <div class="dashboard-welcome">
