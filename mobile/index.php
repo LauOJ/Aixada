@@ -136,6 +136,12 @@ try {
         <span class="btn-arrow">›</span>
     </a>
 
+    <a href="../dashboard.php?force_desktop=1" class="app-btn">
+        <span class="btn-icon">📊</span>
+        <span class="btn-label">Tauler</span>
+        <span class="btn-arrow">›</span>
+    </a>
+
     <a href="../aixada_main.php?force_desktop=1" class="app-btn app-btn-secondary">
         <span class="btn-icon">🖥️</span>
         <span class="btn-label">Ves a la versió web</span>
