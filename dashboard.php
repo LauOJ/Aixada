@@ -124,7 +124,7 @@ try {
 
     <style>
         /* Botó "Torna a la versió mòbil": separat de la capçalera fixa perquè no quedi tapat */
-        .back-to-app-bar { padding: 26px 16px 2px; }
+        .back-to-app-bar { padding: 44px 16px 2px; }
         .back-to-app-btn {
             display: inline-flex; align-items: center; gap: 6px;
             background: #4a5f6f; color: #fff; text-decoration: none;
