@@ -4,6 +4,8 @@ if (!defined('__ROOT__')) define('__ROOT__', dirname(__DIR__) . DS);
 include __ROOT__ . 'php/inc/header.inc.php';
 
 $uf_id = get_session_value('uf_id');
+// Igual que a la web: si està activat, no es poden demanar productes d'estoc (tipus 1) sense estoc.
+$prevent_out_of_stock = configuration_vars::get_instance()->prevent_out_of_stock_purchase ? 'true' : 'false';
 ?>
 <!DOCTYPE html>
 <html lang="ca">
@@ -165,6 +167,7 @@ $uf_id = get_session_value('uf_id');
 
     var CTRL   = '../php/ctrl/ShopAndOrder.php';
     var DATES  = '../php/ctrl/Dates.php';
+    var PREVENT_OUT_OF_STOCK = <?php echo $prevent_out_of_stock; ?>;
 
     // Estat
     var selectedDate = null;
@@ -316,6 +319,7 @@ $uf_id = get_session_value('uf_id');
                 if (typeId === '3') return;   // productes-nota: no gestionats a mòbil v1
                 var pid = rowVal(this, 'id');
                 var timeLeft = parseNum(rowVal(this, 'time_left'));
+                var stockActual = parseNum(rowVal(this, 'stock_actual'));
                 var prod = {
                     id: pid,
                     name: rowVal(this, 'name'),
@@ -325,24 +329,27 @@ $uf_id = get_session_value('uf_id');
                     revtax: parseNum(rowVal(this, 'rev_tax_percent')),
                     provider_name: name
                 };
-                renderProductRow($list, prod, timeLeft < 0);
+                // Igual que la web: producte d'estoc (tipus 1) sense estoc no es pot demanar.
+                var outOfStock = PREVENT_OUT_OF_STOCK && typeId === '1' && stockActual <= 0;
+                renderProductRow($list, prod, timeLeft < 0, outOfStock);
             });
         }).fail(function () {
             $list.html('<div class="msg-error">No s\'han pogut carregar els productes.</div>');
         });
     }
 
-    function renderProductRow($list, prod, closed) {
+    function renderProductRow($list, prod, closed, outOfStock) {
         var current = cart[prod.id] ? cart[prod.id].qty : 0;
+        var blocked = closed || outOfStock;
         var $row = $('<div class="product-row">');
-        if (closed) $row.addClass('locked');
+        if (blocked) $row.addClass('locked');
         var $info = $('<div class="prod-info">')
             .append('<div class="prod-name">' + prod.name + '</div>')
             .append('<div class="prod-meta">' + fmt(prod.price) + ' &euro; / ' + prod.unit + '</div>');
         $row.append($info);
 
-        if (closed) {
-            $info.append('<div class="prod-locked-tag">Comanda tancada</div>');
+        if (blocked) {
+            $info.append('<div class="prod-locked-tag">' + (closed ? 'Comanda tancada' : 'Sense estoc') + '</div>');
             $list.append($row);
             return;
         }
