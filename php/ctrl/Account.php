@@ -29,13 +29,20 @@ try{
 	        exit;   
 	        
   		case 'accountExtract':
+  			// Només admin/tresoreria poden consultar un compte arbitrari; la resta
+  			// de sòcies queden restringides al SEU propi compte (s'ignora account_id).
+  			if (current_role_in([ROLE_ADMIN, ROLE_TRESORERIA])) {
+  				$account_id = get_param('account_id', get_session_uf_id());
+  			} else {
+  				$account_id = get_session_uf_id();
+  			}
   			printXML($ao->get_account_extract_XML(
-				get_param('account_id', get_session_uf_id() ), 
+				$account_id,
 				get_param('filter','today'),
 				get_param('fromDate',0),
 				get_param('toDate',0)
 			));
-  			exit; 
+  			exit;
   		
   	 	case 'latestMovements':
             printXML($ao->latest_movements_XML(
