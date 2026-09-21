@@ -271,20 +271,27 @@ function getLastResponsable(string $before): ?int
     return null;
 }
 
-function pickUfs(int $count, int &$rotIdx, array $eligible, array $incompatible, array $lastPeriod, array $recentCount = [], int $maxRecent = 2, array $nova = [], int $maxNova = 3): array
+function pickUfs(int $count, array $eligible, array $incompatible, array $lastPeriod, array $recentCount = [], int $maxRecent = 2, array $nova = [], int $maxNova = 3): array
 {
-    $n                 = count($eligible);
     $picked            = [];
     $deferred_consec   = [];
     $deferred_freq     = [];
     $deferred_both     = [];
     $deferred_nova_cap = []; // nova UFs deferred because the group already has maxNova nova UFs
-    $tried             = 0;
 
-    while (count($picked) < $count && $tried < $n * 3) {
-        $candidate = $eligible[$rotIdx % $n];
-        $rotIdx    = ($rotIdx + 1) % $n;
-        $tried++;
+    // Ordena les famílies per qui ha repartit MENYS últimament (asc), amb desempat
+    // ALEATORI. Així les famílies noves (0 repartiments) entren des del principi
+    // barrejades amb les velles, i ningú passa del límit (maxRecent) mentre en quedin
+    // amb menys torns. La clau aleatòria evita dependre de l'estabilitat de sort (PHP 7.4).
+    $order = [];
+    foreach ($eligible as $uf) {
+        $order[] = [$recentCount[$uf] ?? 0, random_int(0, PHP_INT_MAX), $uf];
+    }
+    usort($order, fn($a, $b) => [$a[0], $a[1]] <=> [$b[0], $b[1]]);
+    $order = array_map(fn($x) => $x[2], $order);
+
+    foreach ($order as $candidate) {
+        if (count($picked) >= $count) break;
 
         $conflict = false;
         foreach ($picked as $already) {
@@ -366,7 +373,6 @@ function generateTorns(string $task, string $start, string $end): void
     $db->Execute('DELETE FROM aixada_torns WHERE task_type = :1q AND dataTorn >= :2q AND dataTorn <= :3q',
                  $task, $deleteFrom, $end);
 
-    $rotIdx          = getRotationStart($task, $eligible, $start);
     $lastPicked      = getLastPeriodUfs($task, $start);
     $lastResponsable = ($task === 'repartiment') ? getLastResponsable($start) : null;
     $current         = strtotime($start);
@@ -383,7 +389,7 @@ function generateTorns(string $task, string $start, string $end): void
             continue;
         }
 
-        $picked = pickUfs($count, $rotIdx, $eligible, $incompatible, $lastPicked, $recentCount, 2, $nova, 3);
+        $picked = pickUfs($count, $eligible, $incompatible, $lastPicked, $recentCount, 2, $nova, 3);
 
         $responsable = null;
         if ($task === 'repartiment') {
@@ -408,6 +414,9 @@ function generateTorns(string $task, string $start, string $end): void
             $is_resp = ($uf === $responsable) ? 1 : 0;
             $db->Execute('INSERT INTO aixada_torns (dataTorn, ufTorn, task_type, is_responsible) VALUES (:1q, :2q, :3q, :4q)',
                          $date, $uf, $task, $is_resp);
+            // Comptador dinàmic: cada assignació compta perquè el límit (maxRecent)
+            // s'apliqui de veritat i el repartiment quedi equilibrat dins la generació.
+            $recentCount[$uf] = ($recentCount[$uf] ?? 0) + 1;
         }
 
         $lastPicked = $picked;
