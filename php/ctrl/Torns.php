@@ -271,61 +271,90 @@ function getLastResponsable(string $before): ?int
     return null;
 }
 
-function pickUfs(int $count, array $eligible, array $incompatible, array $lastPeriod, array $recentCount = [], int $maxRecent = 2, array $nova = [], int $maxNova = 3): array
+// Quantes vegades ha estat responsable cada UF des de $since (per rotar el càrrec).
+function getResponsableCount(string $since): array
 {
-    $picked            = [];
-    $deferred_consec   = [];
-    $deferred_freq     = [];
-    $deferred_both     = [];
-    $deferred_nova_cap = []; // nova UFs deferred because the group already has maxNova nova UFs
-
-    // Ordena les famílies per qui ha repartit MENYS últimament (asc), amb desempat
-    // ALEATORI. Així les famílies noves (0 repartiments) entren des del principi
-    // barrejades amb les velles, i ningú passa del límit (maxRecent) mentre en quedin
-    // amb menys torns. La clau aleatòria evita dependre de l'estabilitat de sort (PHP 7.4).
-    $order = [];
-    foreach ($eligible as $uf) {
-        $order[] = [$recentCount[$uf] ?? 0, random_int(0, PHP_INT_MAX), $uf];
+    $db = DBWrap::get_instance();
+    $rs = $db->Execute(
+        "SELECT ufTorn, COUNT(*) AS cnt FROM aixada_torns
+         WHERE task_type = 'repartiment' AND is_responsible = 1 AND dataTorn >= :1q
+         GROUP BY ufTorn",
+        $since
+    );
+    $counts = [];
+    while ($row = $rs->fetch_assoc()) {
+        $counts[(int)$row['ufTorn']] = (int)$row['cnt'];
     }
-    usort($order, fn($a, $b) => [$a[0], $a[1]] <=> [$b[0], $b[1]]);
-    $order = array_map(fn($x) => $x[2], $order);
+    return $counts;
+}
 
-    foreach ($order as $candidate) {
-        if (count($picked) >= $count) break;
+function pickUfs(int $count, array $eligible, array $incompatible, array $lastPeriod, array $recentCount = [], int $maxRecent = 2, array $nova = [], int $maxNova = 3, int $minNova = 0): array
+{
+    $isNovaFn = fn($uf) => in_array($uf, $nova);
 
-        $conflict = false;
-        foreach ($picked as $already) {
-            $a = min($candidate, $already);
-            $b = max($candidate, $already);
+    // Comprova si $cand xoca amb alguna parella incompatible dins de $group.
+    $incompatWith = function ($cand, array $group) use ($incompatible) {
+        foreach ($group as $already) {
+            $a = min($cand, $already);
+            $b = max($cand, $already);
             foreach ($incompatible as $pair) {
-                if ($pair[0] === $a && $pair[1] === $b) { $conflict = true; break 2; }
+                if ($pair[0] === $a && $pair[1] === $b) return true;
             }
         }
-        if ($conflict) continue;
+        return false;
+    };
 
-        $isConsec  = in_array($candidate, $lastPeriod);
-        $isCapped  = ($recentCount[$candidate] ?? 0) >= $maxRecent;
-        $isNova    = in_array($candidate, $nova);
-        $novaSoFar = count(array_filter($picked, fn($u) => in_array($u, $nova)));
-        $novaFull  = $isNova && $novaSoFar >= $maxNova;
+    // Ordre de prioritat: qui ha repartit MENYS últimament (asc); a igualtat, VETERANES
+    // abans que noves (prioritzar veteranes pendents); i desempat ALEATORI. La clau
+    // aleatòria evita dependre de l'estabilitat de sort (PHP 7.4).
+    $order = [];
+    foreach ($eligible as $uf) {
+        $order[] = [$recentCount[$uf] ?? 0, $isNovaFn($uf) ? 1 : 0, random_int(0, PHP_INT_MAX), $uf];
+    }
+    usort($order, fn($a, $b) => [$a[0], $a[1], $a[2]] <=> [$b[0], $b[1], $b[2]]);
+    $order = array_map(fn($x) => $x[3], $order);
 
-        if (!$isConsec && !$isCapped && !$novaFull) {
-            $picked[] = $candidate;
-        } elseif ($novaFull) {
-            $deferred_nova_cap[] = $candidate;
-        } elseif ($isConsec && !$isCapped) {
-            $deferred_consec[] = $candidate;
-        } elseif (!$isConsec && $isCapped) {
-            $deferred_freq[] = $candidate;
-        } else {
-            $deferred_both[] = $candidate;
+    $picked   = [];
+    $deferred = []; // consec/capped: només com a última opció, en ordre de prioritat
+    $novaNow  = 0;
+
+    foreach ($order as $cand) {
+        if (count($picked) >= $count) break;
+        if ($incompatWith($cand, $picked)) continue;
+        $isNova = $isNovaFn($cand);
+        if ($isNova && $novaNow >= $maxNova) continue; // límit de noves: es queda per una altra setmana
+        if (in_array($cand, $lastPeriod) || ($recentCount[$cand] ?? 0) >= $maxRecent) {
+            $deferred[] = $cand;
+            continue;
         }
+        $picked[] = $cand;
+        if ($isNova) $novaNow++;
     }
 
-    foreach ([$deferred_consec, $deferred_freq, $deferred_both, $deferred_nova_cap] as $deferred) {
-        foreach ($deferred as $uf) {
-            if (count($picked) >= $count) break 2;
-            $picked[] = $uf;
+    // Si falten places, omplim amb els diferits (respectant incompat i límit de noves).
+    foreach ($deferred as $cand) {
+        if (count($picked) >= $count) break;
+        if ($incompatWith($cand, $picked)) continue;
+        $isNova = $isNovaFn($cand);
+        if ($isNova && $novaNow >= $maxNova) continue;
+        $picked[] = $cand;
+        if ($isNova) $novaNow++;
+    }
+
+    // Garantir un mínim de famílies noves: si en falten, canviem veteranes (les que han
+    // repartit MÉS) per noves disponibles encara no escollides.
+    if ($minNova > 0 && $novaNow < $minNova) {
+        $availNovas = array_values(array_filter($order, fn($u) => $isNovaFn($u) && !in_array($u, $picked)));
+        $vets = array_values(array_filter($picked, fn($u) => !$isNovaFn($u)));
+        usort($vets, fn($a, $b) => ($recentCount[$b] ?? 0) <=> ($recentCount[$a] ?? 0));
+        foreach ($availNovas as $novaUf) {
+            if ($novaNow >= $minNova || $novaNow >= $maxNova || empty($vets)) break;
+            $vet   = array_shift($vets);
+            $group = array_values(array_filter($picked, fn($u) => $u !== $vet));
+            if ($incompatWith($novaUf, $group)) continue;
+            $picked = $group;
+            $picked[] = $novaUf;
+            $novaNow++;
         }
     }
 
@@ -344,11 +373,21 @@ function generateTorns(string $task, string $start, string $end): void
     $nova         = $cfg['nova']           ?? [];
     $incompatible = array_map(fn($p) => [(int)$p[0], (int)$p[1]], $cfg['incompatible'] ?? []);
 
+    // Límit i mínim de famílies noves per torn (per defecte: repartiment 2/1, neteja 1/0).
+    $novaMax = (int)($cfg[$task . '_nova_max'] ?? ($task === 'repartiment' ? 2 : 1));
+    $novaMin = (int)($cfg[$task . '_nova_min'] ?? ($task === 'repartiment' ? 1 : 0));
+    // Neteja: excloure l'agost i limitar el nombre de torns per mes.
+    $excludeAugust = ($task === 'neteja') && ((int)($cfg['neteja_exclude_august'] ?? 1) === 1);
+    $maxPerMonth   = ($task === 'neteja') ? (int)($cfg['neteja_max_per_month'] ?? 2) : 0;
+
     $eligible = getEligibleUfs($excluded);
     if (empty($eligible)) return;
 
     $since       = date('Y-m-d', strtotime('-2 months'));
     $recentCount = getRecentAssignmentCount($task, $since);
+    // Rotació del càrrec de responsable: comptador de vegades que cadascú ho ha sigut.
+    $respCount   = ($task === 'repartiment') ? getResponsableCount($since) : [];
+    $monthCount  = []; // torns de neteja assignats per mes (Y-m => n)
 
     // Snap repartiment start to the configured day of week.
     // DELETE from the original start so old off-day data is also removed.
@@ -374,7 +413,6 @@ function generateTorns(string $task, string $start, string $end): void
                  $task, $deleteFrom, $end);
 
     $lastPicked      = getLastPeriodUfs($task, $start);
-    $lastResponsable = ($task === 'repartiment') ? getLastResponsable($start) : null;
     $current         = strtotime($start);
     $endTs           = strtotime($end);
 
@@ -389,25 +427,29 @@ function generateTorns(string $task, string $start, string $end): void
             continue;
         }
 
-        $picked = pickUfs($count, $eligible, $incompatible, $lastPicked, $recentCount, 2, $nova, 3);
+        // Neteja: saltar l'agost i no superar el màxim de torns per mes.
+        if ($task === 'neteja') {
+            $ym = date('Y-m', $current);
+            if (($excludeAugust && (int)date('n', $current) === 8)
+                || ($monthCount[$ym] ?? 0) >= $maxPerMonth) {
+                $current = strtotime($date . ' +' . $freq_weeks . ' weeks');
+                continue;
+            }
+        }
+
+        $picked = pickUfs($count, $eligible, $incompatible, $lastPicked, $recentCount, 2, $nova, $novaMax, $novaMin);
 
         $responsable = null;
         if ($task === 'repartiment') {
-            foreach ($picked as $uf) {
-                if (!in_array($uf, $no_resp) && $uf !== $lastResponsable) {
-                    $responsable = $uf;
-                    break;
-                }
+            // Rotació: entre les del grup que poden ser responsables, tria qui ho ha
+            // estat MENYS vegades (desempat aleatori). Així totes ho són abans de repetir.
+            $respCandidates = array_values(array_filter($picked, fn($uf) => !in_array($uf, $no_resp)));
+            if (!empty($respCandidates)) {
+                $ranked = array_map(fn($uf) => [$respCount[$uf] ?? 0, random_int(0, PHP_INT_MAX), $uf], $respCandidates);
+                usort($ranked, fn($a, $b) => [$a[0], $a[1]] <=> [$b[0], $b[1]]);
+                $responsable = $ranked[0][2];
+                $respCount[$responsable] = ($respCount[$responsable] ?? 0) + 1;
             }
-            if ($responsable === null) {
-                foreach ($picked as $uf) {
-                    if (!in_array($uf, $no_resp)) {
-                        $responsable = $uf;
-                        break;
-                    }
-                }
-            }
-            $lastResponsable = $responsable;
         }
 
         foreach ($picked as $uf) {
@@ -417,6 +459,11 @@ function generateTorns(string $task, string $start, string $end): void
             // Comptador dinàmic: cada assignació compta perquè el límit (maxRecent)
             // s'apliqui de veritat i el repartiment quedi equilibrat dins la generació.
             $recentCount[$uf] = ($recentCount[$uf] ?? 0) + 1;
+        }
+
+        if ($task === 'neteja') {
+            $ym = date('Y-m', $current);
+            $monthCount[$ym] = ($monthCount[$ym] ?? 0) + 1;
         }
 
         $lastPicked = $picked;
