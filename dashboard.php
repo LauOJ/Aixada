@@ -80,10 +80,11 @@ try {
         $mesos = ['', 'gener', 'febrer', 'març', 'abril', 'maig', 'juny', 'juliol', 'agost', 'setembre', 'octubre', 'novembre', 'desembre'];
         $ts = strtotime($row['dataTorn']);
         $mes_nom = $mesos[(int)date('n', $ts)];
+        $any     = date('Y', $ts);
         if ((int)date('j', $ts) <= 15) {
-            $next_neteja_label = '1 - 15 ' . $mes_nom;
+            $next_neteja_label = '1 - 15 ' . $mes_nom . ' ' . $any;
         } else {
-            $next_neteja_label = '16 - ' . (int)date('t', $ts) . ' ' . $mes_nom;
+            $next_neteja_label = '16 - ' . (int)date('t', $ts) . ' ' . $mes_nom . ' ' . $any;
         }
     }
     DBWrap::get_instance()->free_next_results();
