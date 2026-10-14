@@ -1,4 +1,6 @@
 <?php include "php/inc/header.inc.php";
+require_once(__ROOT__ . "php/utilities/sell_in_shop.php");
+ensure_sell_in_shop();
 require_role([ROLE_RESPONSABLE, ROLE_ADMIN]);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -610,6 +612,7 @@ require_role([ROLE_RESPONSABLE, ROLE_ADMIN]);
 			loadOnInit:false,
 			rowComplete : function (rowIndex, row){
 				setCheckBoxes('#frm_product_edit');
+				syncSellInShopBox('#frm_product_edit');
 				populateSelect(gProductSelects,'#tbl_product_edit');
 
 			}, complete : function(){
@@ -1045,10 +1048,12 @@ require_role([ROLE_RESPONSABLE, ROLE_ADMIN]);
 			//clear unit_price paragraph
 			$('.unit_price_brutto').text('');
 			
-			//assume that a new product is active
+			//assume that a new product is active, but not listed in the stock shop
 			$('input:checkbox', frm).each(function(){
 				$(this).attr('checked','checked');
 			});
+			$('input[name=sell_in_shop]', frm).val('0');
+			$('.sellInShopBox', frm).each(function(){ this.checked = false; });
 
 			//reset provider id. 
 			$('.setProductId', frm).html('&nbsp;');
@@ -1247,6 +1252,41 @@ require_role([ROLE_RESPONSABLE, ROLE_ADMIN]);
 			});
 		}
 
+		function syncSellInShopBox(selStr){
+			var on = $(selStr + ' input[name=sell_in_shop]').val() == '1';
+			$(selStr + ' .sellInShopBox').each(function(){ this.checked = on; });
+		}
+
+		$('.sellInShopBox').live('click', function(){
+			$(this).closest('tr').find('input[name=sell_in_shop]').val($(this).is(':checked') ? '1' : '0');
+		});
+
+		function clearSellInShop(frm){
+			$('input[name=sell_in_shop]', frm).val('0');
+			$('.sellInShopBox', frm).each(function(){ this.checked = false; });
+		}
+
+		// Self-service stock is only for stock and cumulative products.
+		function applyOrderableTypeLayout(typeId, frm){
+			typeId = parseInt(typeId, 10);
+			if (typeId === 1) {
+				$('.priceElements', frm).show();
+				$('.stockElements', frm).show();
+				$('.sellInShopElements', frm).show();
+			} else if (typeId === 4) {
+				$('.sellInShopElements', frm).show();
+			} else if (typeId === 2) {
+				$('.priceElements', frm).show();
+				$('.stockElements', frm).hide();
+				clearSellInShop(frm);
+				$('.sellInShopElements', frm).hide();
+			} else if (typeId === 3) {
+				$('.priceElements', frm).hide();
+				$('.stockElements', frm).hide();
+				clearSellInShop(frm);
+				$('.sellInShopElements', frm).hide();
+			}
+		}
 
 		//loads the options for select boxes. The whole story is  that the selects
 		//delivered from the getFieldsOptions of the TableManger don't have the name attribute set
@@ -1287,15 +1327,8 @@ require_role([ROLE_RESPONSABLE, ROLE_ADMIN]);
                          manageEditStockBtn();
                     }
 
-                    if (destination.indexOf('sOrderableTypeId') > 0 && selValue == 1){
-                        $('.priceElements').show();
-                        $('.stockElements').show();
-                    } else if (destination.indexOf('sOrderableTypeId') > 0 && selValue == 2) {
-                        $('.priceElements').show();
-                        $('.stockElements').hide();
-                    } else if (destination.indexOf('sOrderableTypeId') > 0 && selValue == 3) {
-                        $('.stockElements').hide();
-                        $('.priceElements').hide();
+                    if (destination.indexOf('sOrderableTypeId') > 0) {
+                        applyOrderableTypeLayout(selValue, $(destination).closest('form'));
                     }
                     
                 }
@@ -1495,16 +1528,8 @@ require_role([ROLE_RESPONSABLE, ROLE_ADMIN]);
 					calcBruttoPrice(frm);
 				}	
 
-				//show hide stock btn depending on orderable_type
-				if (which == 'orderable_type_id' && selOption == 1){
-					$('.priceElements').fadeIn(500);
-					$('.stockElements').fadeIn(500);
-				} else if (which == 'orderable_type_id' && selOption == 2){
-					$('.priceElements').fadeIn(500);
-					$('.stockElements').fadeOut(500);
-				} else if (which == 'orderable_type_id' && selOption == 3){
-					$('.priceElements').fadeOut(500);
-					$('.stockElements').fadeOut(500);
+				if (which == 'orderable_type_id'){
+					applyOrderableTypeLayout(selOption, $(this).closest('form'));
 				}
 			})
 			
@@ -1790,6 +1815,14 @@ require_role([ROLE_RESPONSABLE, ROLE_ADMIN]);
 							    	<input type="hidden" name="orderable_type_id" value="{orderable_type_id}"/>
 							    	<span class="textAlignLeft sOrderableTypeId"></span>
 							    </td colspan="3">
+							  </tr>
+							  <tr class="sellInShopElements">
+							    <td><label for="sell_in_shop"><?php echo $Text['sell_in_shop']; ?></label></td>
+							    <td colspan="3">
+							    	<input type="hidden" name="sell_in_shop" value="{sell_in_shop}"/>
+							    	<input type="checkbox" class="sellInShopBox" />
+							    	<?php echo $Text['sell_in_shop_help']; ?>
+							    </td>
 							  </tr>
 							  <tr>
 							    <td><label for="category_id"><?php echo $Text['category']; ?></label></td>

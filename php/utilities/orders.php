@@ -6,6 +6,7 @@ $price_stamp_decimals = 6;
 require_once(__ROOT__ . 'php/inc/database.php');
 require_once(__ROOT__ . 'local_config/config.php');
 require_once(__ROOT__ . 'php/utilities/general.php');
+require_once(__ROOT__ . 'php/utilities/sell_in_shop.php');
 require_once(__ROOT__ . 'local_config/lang/' . get_session_language() . '.php');
 require_once(__ROOT__ . 'php/lib/account_operations.php');
 require_once(__ROOT__ . 'php/lib/report_orders.php');
@@ -922,7 +923,6 @@ function get_all_products_to_order($order_id)
         throw new Exception("Order not exists!");
     }
     $provider_id = $rowOrder['provider_id'];
-    $ge_orderable_type_id = get_config('orders_allow_stock', false) ? 1 : 2;
     $db = DBWrap::get_instance();
     $sql = "
         select p.id,
@@ -936,7 +936,7 @@ function get_all_products_to_order($order_id)
             )) product_name
         from aixada_product p
         where p.active = 1 
-        and p.orderable_type_id >= {$ge_orderable_type_id}
+        and " . sql_can_be_ordered('p') . "
         and p.orderable_type_id <> 3
         and p.provider_id = {$provider_id}
         group by p.id, p.name

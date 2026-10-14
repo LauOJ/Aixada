@@ -201,6 +201,7 @@ create table aixada_iva_type (
   barcode 	 			varchar(50)		default null,
   custom_product_ref	varchar(100)	default null,		
   active     	      	tinyint			default 1,
+  sell_in_shop          tinyint         not null default 0, /* 1 = listed on the stock shop screen */
   responsible_uf_id     int             default null,
   orderable_type_id		tinyint			default 2,
     /* 1-> Stoc

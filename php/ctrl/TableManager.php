@@ -9,6 +9,7 @@ require_once(__ROOT__ . "php/utilities/general.php");
 
 require_once(__ROOT__ . 'local_config/lang/' . get_session_language() . '.php');
 require_once(__ROOT__ . "php/utilities/tables.php");
+require_once(__ROOT__ . "php/utilities/sell_in_shop.php");
 
 function get_columns_as_JSON()
 {
@@ -158,12 +159,20 @@ try{
     exit;
 
   case 'edit':
+    if ($_REQUEST['table'] === 'aixada_product') {
+      ensure_sell_in_shop();
+      normalize_product_sell_in_shop($_REQUEST);
+    }
     DBWrap::get_instance()->Update($_REQUEST);
     post_edit_hook($_REQUEST);
     echo '1';
     exit;
     
   case 'add':
+    if ($_REQUEST['table'] === 'aixada_product') {
+      ensure_sell_in_shop();
+      normalize_product_sell_in_shop($_REQUEST);
+    }
     $db = DBWrap::get_instance();
     $db->Insert($_REQUEST);
     $index = $db->last_insert_id();

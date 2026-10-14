@@ -4,6 +4,7 @@
 require_once(__ROOT__ . 'php/inc/database.php');
 require_once(__ROOT__ . 'local_config/config.php');
 require_once(__ROOT__ . 'php/utilities/general.php');
+require_once(__ROOT__ . 'php/utilities/sell_in_shop.php');
 
 
 
@@ -29,13 +30,20 @@ function get_upcoming_orders ($nr_weeks){
 function activate_all_for_date($provider_id, $date, $activate)
 {
 	$product_ids = array();
-	$rs = do_stored_query('get_products_of_provider', $provider_id, 1);
-	
-	//for each product 
-	while ($row = $rs->fetch_assoc()) {
-	 	array_push($product_ids, $row['id']);	 
+	$provider_id = (int) $provider_id;
+	$rs = DBWrap::get_instance()->Execute(
+		"select p.id
+		 from aixada_product p
+		 where p.provider_id = {$provider_id}
+		   and p.active = 1
+		   and " . sql_not_self_service_stock('p')
+	);
+	if ($rs) {
+		while ($row = $rs->fetch_assoc()) {
+			array_push($product_ids, $row['id']);
+		}
+		$rs->free();
 	}
-	DBWrap::get_instance()->free_next_results();
 	
 	
 	foreach($product_ids as $id){

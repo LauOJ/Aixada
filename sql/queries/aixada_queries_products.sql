@@ -475,7 +475,10 @@ begin
 		pv.id = the_provider_id
 		and p.provider_id = pv.id
 		and pv.active = 1
-		and p.orderable_type_id >= ge_orderable_type_id
+		and (
+			p.orderable_type_id >= ge_orderable_type_id
+			or (p.orderable_type_id = 1 and p.sell_in_shop = 0)
+		)
 	order by is_active desc, name asc;
 end|
 
@@ -567,7 +570,7 @@ create procedure get_products_detail(in the_provider_id int,
 begin
 	
     declare today date default date(sysdate());
-    declare wherec varchar(255) default "";
+    declare wherec varchar(1024) default "";
     declare fromc varchar(255) default "";
     declare fieldc varchar(255) default "";
      
@@ -581,14 +584,14 @@ begin
     /** no date provided we assume that we are shopping, i.e. all active products are shown stock + orderable **/
     if the_date = 0 then
     	set wherec = concat(wherec, " and p.unit_measure_shop_id = u.id ");
-        /** hack: the_product_id=-1 works to exclude products as notes **/
+        /** hack: the_product_id=-1 is the stock-shop catalog: no notes, and only products marked sell_in_shop **/
         if the_product_id = -1 then
-            set wherec = concat(wherec, " and p.orderable_type_id <> 3 "); /* Exclude product as order notes */
+            set wherec = concat(wherec, " and p.orderable_type_id in (1, 4) and p.sell_in_shop = 1 ");
         end if;
     
     /** hack: date=-1 works to filter stock only products **/ 	
     elseif the_date = '1234-01-01' then 
-    	set wherec = concat(wherec, " and (p.orderable_type_id = 1 or p.orderable_type_id = 4) and p.unit_measure_shop_id = u.id ");
+    	set wherec = concat(wherec, " and p.sell_in_shop = 1 and (p.orderable_type_id = 1 or p.orderable_type_id = 4) and p.unit_measure_shop_id = u.id ");
     
     /** otherwise search for products with orderable dates **/
     else 
