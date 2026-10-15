@@ -1821,7 +1821,7 @@ require_role([ROLE_RESPONSABLE, ROLE_ADMIN]);
 							    <td colspan="3">
 							    	<input type="hidden" name="sell_in_shop" value="{sell_in_shop}"/>
 							    	<input type="checkbox" class="sellInShopBox" />
-							    	<?php echo $Text['sell_in_shop_help']; ?>
+							    	<span style="font-size:10px;"><?php echo $Text['sell_in_shop_help']; ?></span>
 							    </td>
 							  </tr>
 							  <tr>

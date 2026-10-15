@@ -568,7 +568,7 @@ $Text['description'] = 'Descripció';
 $Text['barcode'] = 'Codi de barres';
 $Text['orderable_type'] = 'Tipus de producte';
 $Text['sell_in_shop'] = 'Es pot agafar a Estoc';
-$Text['sell_in_shop_help'] = "Marcat: la gent el pot agafar i validar a Estoc. Apagat: es demana com a comanda i es porta l'estoc del local.";
+$Text['sell_in_shop_help'] = "Marcat: es pot agafar de l'estoc. Desmarcat: s'ha de demanar per comanda";
 $Text['category'] = 'Categoria';
 $Text['rev_tax_type'] = "Tipus d'impost revolucionari";
 $Text['unit_price'] = 'Preu per unitat';
@@ -849,8 +849,8 @@ $Text['view_opt'] = "Mostra opcions";
 $Text['days_display'] = "Nombre de dies a mostrar";
 $Text['plus_seven'] = "Mostra +7 dies";
 $Text['minus_seven'] = "Mostra -7 dies";
-$Text['btn_earlier'] = "Abans de"; //cómo más temprano
-$Text['btn_later'] = "després de"; //más tarde... futuro
+$Text['btn_earlier'] = "Abans"; //cómo más temprano
+$Text['btn_later'] = "després"; //más tarde... futuro
 
 //la frase entera es: "activate the selected day and products for the next  1|2|3.... month(s) every week | second week | third week | fourth week.
 $Text['pattern_intro'] = "Activa els productes i dia per als propers ";

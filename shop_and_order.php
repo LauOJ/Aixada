@@ -11,10 +11,25 @@
   	<link rel="stylesheet" type="text/css"   media="screen" href="js/fgmenu/fg.menu.css"   />
     <link rel="stylesheet" type="text/css"   media="screen" href="css/ui-themes/<?=$default_theme;?>/jqueryui.css"/>
     <style>
-    .ol_selectable .ui-selecting { background: #FECA40;  }
-    .ol_selectable .ui-selected  {
-        background: #F39814; border-color: #555;
-        color: white;
+    /* Same contrast as the other buttons and tabs: light when idle, dark when chosen. */
+    #dateList li {
+        background: #dfeffc;
+        background-image: none;
+        color: #2e6e9e;
+        border: 1px solid #c5dbec;
+    }
+    #dateList li:hover {
+        background: #d0e5f5;
+        border-color: #79b7e7;
+    }
+    #dateList li.ui-selecting,
+    #dateList li.ui-selected,
+    #dateList li.ui-selected:hover {
+        background: var(--vinagreta-primary, #4a5f6f);
+        background-image: none;
+        color: #fff;
+        border-color: var(--vinagreta-primary-dark, #3a4f5f);
+        font-weight: 600;
     }
     .ol_selectable {
         list-style-type: none;
@@ -304,7 +319,7 @@
             
             $.each(dates, function () {
                 if (this == '1234-01-23') {
-                    $('#dateList').append('<li class="ui-widget-header" val="1234-01-23">' +
+                    $('#dateList').append('<li val="1234-01-23">' +
                     $.aixadacart.title.preorder + 
                     '</li>');
                 } else {
@@ -313,7 +328,7 @@
                     _selectablesCount++;
                     if (_selectablesCount <= _MAX_SELECTABLES) {
                         $('#dateList').append(
-                            '<li class="ui-widget-header" val="' + this + '">' +
+                            '<li val="' + this + '">' +
                             $.datepicker.formatDate('DD d M', orderDate) + 
                             '</li>'
                         );

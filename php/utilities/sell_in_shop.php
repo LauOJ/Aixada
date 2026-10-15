@@ -39,6 +39,64 @@ function ensure_sell_in_shop()
              WHERE orderable_type_id IN (1, 4)"
         );
     }
+    apply_stocked_order_setup($db);
+}
+
+/**
+ * One-time data fix, applied on the first page load after deploy.
+ * Stock of the numbered order providers is not self-service, and the old
+ * individual copies of those providers are deactivated. Soap and paper stay.
+ */
+function apply_stocked_order_setup($db)
+{
+    $db->Execute(
+        "CREATE TABLE IF NOT EXISTS aixada_setup_flag (
+            flag varchar(64) NOT NULL PRIMARY KEY
+        ) ENGINE=InnoDB"
+    );
+    $done = get_row_query(
+        "SELECT flag FROM aixada_setup_flag
+         WHERE flag = 'stocked_orders_202610'"
+    );
+    if ($done) {
+        return;
+    }
+
+    $db->Execute(
+        "UPDATE aixada_product p
+         JOIN aixada_provider pv ON pv.id = p.provider_id
+         SET p.sell_in_shop = 0
+         WHERE p.orderable_type_id IN (1, 4)
+           AND pv.name REGEXP '^[1-5][.]'"
+    );
+
+    $names = array(
+        'Aigua i Vichy',
+        'Cal Valls',
+        'Chocolates Solé',
+        'Coop-era',
+        "Manel Massana - Fruita de l'Ordal",
+        'Riet Vell',
+        'Senglaris/Estupenda',
+        'Tes Riera Gersén',
+        'Tobiers',
+        'Xocolata Gluki',
+    );
+    $quoted = array();
+    foreach ($names as $name) {
+        $quoted[] = "'" . str_replace("'", "''", $name) . "'";
+    }
+    $db->Execute(
+        "UPDATE aixada_provider
+         SET active = 0
+         WHERE name IN (" . implode(', ', $quoted) . ")
+            OR name LIKE 'Cafè Rebeldía - ASSOCIACIO SOLIDARIA CAFE REBELDIA%'"
+    );
+
+    $db->Execute(
+        "INSERT INTO aixada_setup_flag (flag)
+         VALUES ('stocked_orders_202610')"
+    );
 }
 
 /**
