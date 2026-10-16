@@ -56,7 +56,10 @@ begin
   where  
     pv.active = 1
     and pv.id = p.provider_id
-    and p.orderable_type_id >= ge_orderable_type_id
+    and (
+        p.orderable_type_id >= ge_orderable_type_id
+        or (p.orderable_type_id = 1 and p.sell_in_shop = 0)
+    )
   order by pv.name;
 end|
 
@@ -110,8 +113,8 @@ end|
 
 
 /**
- * returns list of providers with stock only products, 
- * or cumulative order
+ * Providers that have at least one active product marked for the stock shop.
+ * Order products appear only when sell_in_shop is set on the product itself.
  */
 drop procedure if exists get_stock_providers|
 create procedure get_stock_providers()
@@ -126,7 +129,8 @@ begin
     pv.active = 1
     and pv.id = p.provider_id
     and p.active = 1
-    and (p.orderable_type_id = 1 or p.orderable_type_id = 4) 
+    and p.sell_in_shop = 1
+    and p.orderable_type_id in (1, 4)
   order by pv.name;
 end|
 

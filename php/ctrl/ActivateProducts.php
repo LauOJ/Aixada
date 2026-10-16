@@ -15,10 +15,7 @@ try{
   switch($_REQUEST['oper']) {
   	
 	  case 'listAllOrderableProviders':
-	  	printXML(stored_query_XML('get_orderable_providers',
-	  	    'providers', 'name',
-	  	    (get_config('orders_allow_stock', false) ? 1 : 2) 
-	  	));
+	  	printXML(query_XML_fields(getSql_orderable_provider_list()));
 	    exit;
 
 	  //retrieves the products for a given provider that have an entry in aixada_product_orderable_for_date
@@ -48,10 +45,7 @@ try{
 	  	exit;
 	  	
 	  case 'getTypeOrderableProducts':
-	  	printXML(stored_query_XML_fields('get_type_orderable_products',
-	  	    get_param('provider_id'),
-	  	    (get_config('orders_allow_stock', false) ? 1 : 2) 
-	  	));
+	  	printXML(query_XML_fields(getSql_type_orderable_products(get_param('provider_id'))));
 	  	exit;
 
 	  //changes product status to "active" in general (independent of specific dates)

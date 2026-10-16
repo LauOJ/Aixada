@@ -7,9 +7,11 @@ require_once(__ROOT__ . "local_config/config.php");
 require_once(__ROOT__ . "php/inc/database.php");
 require_once(__ROOT__ . "php/utilities/general.php");
 require_once(__ROOT__ . "php/utilities/shop_and_order.php");
+require_once(__ROOT__ . "php/utilities/sell_in_shop.php");
 
 try{
 	validate_session(); // The user must be logged in.
+	ensure_sell_in_shop();
 	
     // first we process those requests that don't need to construct a cart manager
     switch (get_param('oper')) {
@@ -18,7 +20,7 @@ try{
 	     *  retrieves provider and category selects for Shop or Order
 	     */
 	    case 'getOrderProviders':
-	    	printXML(stored_query_XML_fields('get_orderable_providers_for_date', get_param('date')));
+	    	printXML(query_XML_fields(getSql_order_providers_for_date(get_param('date'))));
 	    	exit;
 	    
 	   	case 'getShopProviders':
@@ -26,7 +28,7 @@ try{
 	    	exit;
 	    	
 	    case 'getOrderCategories':
-	    	printXML(stored_query_XML_fields('get_orderable_categories_for_date', get_param('date')));
+	    	printXML(query_XML_fields(getSql_order_categories_for_date(get_param('date'))));
 	    	exit;
 
 	    //retrieves all categories of all products active; optional the date parameter
@@ -36,7 +38,7 @@ try{
 	    	exit;
 	    	
 	    case 'getStockProviders':
-	    	printXML(stored_query_XML_fields('get_stock_providers'));
+	    	printXML(query_XML_fields(getSql_stock_providers()));
 	    	exit;
     	
 
@@ -51,7 +53,7 @@ try{
 	     */
 	    case 'getOrderProducts':
 	    case 'getToOrderProducts':
-	    	printXML(stored_query_XML_fields('get_products_detail',get_param('provider_id',0), get_param('category_id',0), get_param('like',''), get_param('date'), get_param('all',0), get_param('product_id',0)));
+	    	printXML(order_products_xml());
 	    	exit;
 	
 	    case 'getShopProducts':
@@ -59,13 +61,7 @@ try{
 	    	exit;
 	
   		case 'getToShopProducts':
-            $use_shop = get_config('use_shop', 'order_and_stock');
-            printXML(stored_query_XML_fields('get_products_detail',
-                ($use_shop ? get_param('provider_id',0) : -1), // no products for shop
-                get_param('category_id',0), get_param('like',''),
-                ($use_shop === 'only_stock' ? '1234-01-01' : '0'), // '1234-01-01' is used to filter only stock products for shop
-                get_param('all',0), -1)
-            );
+            printXML(shop_products_xml());
 	    	exit;
 	    	
   		case 'getPreorderableProducts':
