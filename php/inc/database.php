@@ -7,7 +7,6 @@
  * @package Aixada
  */
 
-require_once(__DIR__ . '/maintenance.php');
 require_once(__ROOT__ . 'local_config'.DS.'config.php');
 require_once(__ROOT__ . 'php'.DS.'utilities'.DS.'general.php');
 require_once(__ROOT__ . 'php'.DS.'lib'.DS.'exceptions.php');
