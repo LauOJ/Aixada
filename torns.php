@@ -1,10 +1,13 @@
 <?php include "php/inc/header.inc.php" ?>
-<?php $currentUfId = (int)get_session_value('uf_id'); ?>
+<?php
+$currentUfId = (int)get_session_value('uf_id');
+$pastView = (($_GET['vista'] ?? '') === 'passats');
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?= $language ?>" lang="<?= $language ?>">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title><?= $Text['global_title'] ?> - Torns</title>
+    <title><?= $Text['global_title'] ?> - <?= $pastView ? 'Repartiments passats' : 'Torns' ?></title>
     <link rel="stylesheet" type="text/css" media="screen" href="css/aixada_main.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui-themes/<?= $default_theme ?>/jqueryui.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="js/fgmenu/fg.menu.css" />
@@ -49,14 +52,32 @@
             border: 1px solid #ccc; background: #f5f5f5; border-radius: 2px; color: #666;
         }
         button.btn-canvia-sm:hover { background: #e8e8e8; border-color: #999; color: #333; }
+        a.btn-passats {
+            display: inline-block; margin: 0 0 4px 6px; padding: 3px 10px;
+            font-size: 0.8rem; color: #333; background: #f5f5f5;
+            border: 1px solid #ccc; border-radius: 3px; text-decoration: none;
+        }
+        a.btn-passats:hover { background: #e8e8e8; border-color: #999; color: #333; }
     </style>
 </head>
 <body>
 <div id="wrap">
     <?php include "php/inc/menu.inc.php" ?>
     <div id="stagewrap" class="ui-widget <?= negative_balances_stagewrap_class() ?>">
-        <div id="titlewrap"><h1>Torns</h1></div>
-        <p class="intro-text">Si no pots fer el teu torn, coordina't amb algú i feu servir "canvia" per actualitzar l'assignació. El teu torn surt destacat en groc.</p>
+        <div id="titlewrap">
+            <?php if ($pastView): ?>
+                <a class="btn-passats" href="torns.php">torns</a>
+                <h1>Repartiments passats</h1>
+            <?php else: ?>
+                <a class="btn-passats" href="torns.php?vista=passats">repartiments passats</a>
+                <h1>Torns</h1>
+            <?php endif; ?>
+        </div>
+        <?php if ($pastView): ?>
+            <p class="intro-text">Últims 6 mesos, del més recent al més antic. La UF amb estrella era la responsable del repartiment.</p>
+        <?php else: ?>
+            <p class="intro-text">Si no pots fer el teu torn, coordina't amb algú i feu servir "canvia" per actualitzar l'assignació. El teu torn surt destacat en groc.</p>
+        <?php endif; ?>
         <div id="torns_list"><p class="no-torns">Carregant...</p></div>
     </div>
 </div>
@@ -64,12 +85,17 @@
 <script>
 var allUfs = [];
 var currentUfId = <?= $currentUfId ?>;
+var pastView = <?= $pastView ? 'true' : 'false' ?>;
 var monthNamesCat = ['Gener','Febrer','Març','Abril','Maig','Juny','Juliol','Agost','Setembre','Octubre','Novembre','Desembre'];
 var dayNamesCat   = ['Dg','Dl','Dm','Dc','Dj','Dv','Ds'];
 var shortMonths   = ['gen','feb','mar','abr','mai','jun','jul','ago','set','oct','nov','des'];
 
 $(document).ready(function() {
-    loadUfs(function() { loadUpcoming(); });
+    if (pastView) {
+        loadPast();
+    } else {
+        loadUfs(function() { loadUpcoming(); });
+    }
 });
 
 function loadUfs(callback) {
@@ -81,13 +107,22 @@ function loadUfs(callback) {
 
 function loadUpcoming() {
     $.post('php/ctrl/Torns.php', {oper:'getUpcoming'}, function(data) {
-        renderUpcoming(JSON.parse(data));
+        renderUpcoming(JSON.parse(data), true);
     });
 }
 
-function renderUpcoming(weeks) {
+function loadPast() {
+    $.post('php/ctrl/Torns.php', {oper:'getPast'}, function(data) {
+        renderUpcoming(JSON.parse(data), false);
+    });
+}
+
+function renderUpcoming(weeks, editable) {
     if (!weeks || weeks.length === 0) {
-        $('#torns_list').html('<p class="no-torns">No hi ha torns programats.</p>');
+        var emptyMsg = editable
+            ? 'No hi ha torns programats.'
+            : 'No hi ha repartiments en els últims 6 mesos.';
+        $('#torns_list').html('<p class="no-torns">'+emptyMsg+'</p>');
         return;
     }
 
@@ -131,17 +166,21 @@ function renderUpcoming(weeks) {
             if (isAuto) {
                 repHtml = '<span class="autorep-label">Autorepartiment</span>';
             } else if (week.repartiment && week.repartiment.length > 0) {
-                repHtml = '<table class="group-table"><thead><tr><th>UF</th><th>Nom</th><th>Telèfon</th><th></th></tr></thead><tbody>';
+                repHtml = '<table class="group-table"><thead><tr><th>UF</th><th>Nom</th><th>Telèfon</th>'
+                        + (editable ? '<th></th>' : '') + '</tr></thead><tbody>';
                 week.repartiment.forEach(function(entry) {
                     var isMine = (entry.uf_id === currentUfId);
                     var isResp = !!entry.is_responsible;
                     var cls    = (isResp ? 'responsable' : '') + (isMine ? ' my-torn' : '');
                     var ufNum  = entry.uf_id + (isResp ? ' ★' : '');
+                    var editCell = editable
+                        ? '<td><button class="btn-canvia-sm" onclick="showEdit(this)">canvia</button></td>'
+                        : '';
                     repHtml += '<tr class="'+cls+'" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="repartiment">'
                              + '<td class="col-uf">'+ufNum+'</td>'
                              + '<td>'+entry.name+'</td>'
                              + '<td class="col-phone">'+(entry.phone || '')+'</td>'
-                             + '<td><button class="btn-canvia-sm" onclick="showEdit(this)">canvia</button></td>'
+                             + editCell
                              + '</tr>';
                 });
                 repHtml += '</tbody></table>';
@@ -152,15 +191,19 @@ function renderUpcoming(weeks) {
             // Neteja column
             var netHtml = '';
             if (week.neteja && week.neteja.length > 0) {
-                netHtml = '<table class="group-table"><thead><tr><th>UF</th><th>Nom</th><th>Telèfon</th><th></th></tr></thead><tbody>';
+                netHtml = '<table class="group-table"><thead><tr><th>UF</th><th>Nom</th><th>Telèfon</th>'
+                        + (editable ? '<th></th>' : '') + '</tr></thead><tbody>';
                 week.neteja.forEach(function(entry) {
                     var isMine = (entry.uf_id === currentUfId);
                     var cls    = isMine ? 'my-torn' : '';
+                    var editCell = editable
+                        ? '<td><button class="btn-canvia-sm" onclick="showEdit(this)">canvia</button></td>'
+                        : '';
                     netHtml += '<tr class="'+cls+'" data-date="'+entry.date+'" data-uf="'+entry.uf_id+'" data-task="neteja">'
                              + '<td class="col-uf">'+entry.uf_id+'</td>'
                              + '<td>'+entry.name+'</td>'
                              + '<td class="col-phone">'+(entry.phone || '')+'</td>'
-                             + '<td><button class="btn-canvia-sm" onclick="showEdit(this)">canvia</button></td>'
+                             + editCell
                              + '</tr>';
                 });
                 netHtml += '</tbody></table>';
@@ -201,6 +244,13 @@ function showEdit(btn) {
     var btnOk = $('<button class="btn-confirm-edit btn-canvia-sm">OK</button>').click(function() {
         var new_uf = parseInt(sel.val());
         if (new_uf === old_uf) { sel.remove(); $(this).remove(); return; }
+        // The star stays on this row, so the new UF becomes the responsible one.
+        if (task === 'repartiment' && row.hasClass('responsable')) {
+            var msg = 'La UF responsable ha de ser una UF amb certa antiguitat; no pot ser una UF nova.\n\n'
+                    + 'Assegura\'t d\'això abans de canviar el repartiment.\n\n'
+                    + 'Vols continuar?';
+            if (!confirm(msg)) return;
+        }
         $.post('php/ctrl/Torns.php', {oper:'updateTorn', date:date, old_uf:old_uf, new_uf:new_uf, task:task},
             function() { loadUpcoming(); });
     });
