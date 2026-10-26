@@ -61,6 +61,12 @@ switch ($_POST['oper'] ?? '') {
         echo json_encode(getUpcomingTorns(12));
         break;
 
+    // Read-only: repartiments (and neteja) from the previous 6 months, newest first.
+    // Today stays on the upcoming list.
+    case 'getPast':
+        echo json_encode(getPastTorns(6));
+        break;
+
     // Només lectura: compta les assignacions (UF > 0) que un "generar" esborraria
     // en aquest període i tipus. Serveix perquè la pantalla només avisi si cal.
     case 'countTornsInRange':
@@ -473,9 +479,22 @@ function generateTorns(string $task, string $start, string $end): void
 
 function getUpcomingTorns(int $months): array
 {
-    $db    = DBWrap::get_instance();
     $today = date('Y-m-d');
     $end   = date('Y-m-d', strtotime('+' . $months . ' months'));
+    return fetchTornsBetween($today, $end, true);
+}
+
+function getPastTorns(int $months): array
+{
+    $today = date('Y-m-d');
+    $from  = date('Y-m-d', strtotime('-' . $months . ' months'));
+    return array_reverse(fetchTornsBetween($from, $today, false));
+}
+
+function fetchTornsBetween(string $from, string $to, bool $includeTo): array
+{
+    $db = DBWrap::get_instance();
+    $endOp = $includeTo ? '<=' : '<';
 
     $rs = $db->Execute(
         'SELECT t.dataTorn, t.ufTorn, t.task_type, t.is_responsible, u.name,
@@ -490,9 +509,9 @@ function getUpcomingTorns(int $months): array
                  FROM aixada_member m WHERE m.uf_id = u.id AND m.active = 1) AS phone
          FROM aixada_torns t
          LEFT JOIN aixada_uf u ON u.id = t.ufTorn
-         WHERE t.dataTorn >= :1q AND t.dataTorn <= :2q
+         WHERE t.dataTorn >= :1q AND t.dataTorn ' . $endOp . ' :2q
          ORDER BY t.dataTorn, t.task_type, t.is_responsible DESC, t.ufTorn',
-        $today, $end
+        $from, $to
     );
 
     $weeks = [];
